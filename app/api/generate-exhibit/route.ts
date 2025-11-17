@@ -1,39 +1,102 @@
 import { NextRequest, NextResponse } from "next/server";
+import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
 
-    const files: { name: string; size: number; type: string }[] = [];
-    let totalSize = 0;
-
+    const inputFiles: File[] = [];
     for (const entry of formData.entries()) {
       const [key, value] = entry;
-
       if (key === "files" && value instanceof File) {
-        files.push({
-          name: value.name,
-          size: value.size,
-          type: value.type,
-        });
-        totalSize += value.size;
+        inputFiles.push(value);
       }
     }
 
-    if (files.length === 0) {
+    if (inputFiles.length === 0) {
       return NextResponse.json(
         { ok: false, message: "No files received." },
         { status: 400 }
       );
     }
 
-    return NextResponse.json({
-      ok: true,
-      message: "Files received successfully.",
-      fileCount: files.length,
-      totalSizeBytes: totalSize,
-      totalSizeMB: (totalSize / (1024 * 1024)).toFixed(2),
-      files,
+    // Create a new PDF
+    const pdfDoc = await PDFDocument.create();
+    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+
+    for (const f of inputFiles) {
+      const bytes = new Uint8Array(await f.arrayBuffer());
+      const mime = f.type || "";
+
+      if (mime === "application/pdf") {
+        // Merge PDF pages
+        const srcDoc = await PDFDocument.load(bytes);
+        const copiedPages = await pdfDoc.copyPages(
+          srcDoc,
+          srcDoc.getPageIndices()
+        );
+        copiedPages.forEach((p) => pdfDoc.addPage(p));
+      } else if (mime.startsWith("image/")) {
+        // Add image as a full page
+        let embedded;
+        if (mime === "image/jpeg" || mime === "image/jpg") {
+          embedded = await pdfDoc.embedJpg(bytes);
+        } else {
+          // treat as PNG or other image
+          embedded = await pdfDoc.embedPng(bytes);
+        }
+
+        const imgWidth = embedded.width;
+        const imgHeight = embedded.height;
+
+        const page = pdfDoc.addPage();
+        const pageWidth = page.getWidth();
+        const pageHeight = page.getHeight();
+
+        const scale = Math.min(
+          pageWidth / imgWidth,
+          pageHeight / imgHeight
+        );
+        const scaledWidth = imgWidth * scale;
+        const scaledHeight = imgHeight * scale;
+
+        const x = (pageWidth - scaledWidth) / 2;
+        const y = (pageHeight - scaledHeight) / 2;
+
+        page.drawImage(embedded, {
+          x,
+          y,
+          width: scaledWidth,
+          height: scaledHeight,
+        });
+      } else {
+        // Unsupported type for now – you can expand this later
+        console.log(`Skipping unsupported file type: ${f.name} (${mime})`);
+      }
+    }
+
+    // Add simple page numbers (bottom-right)
+    const pages = pdfDoc.getPages();
+    pages.forEach((page, index) => {
+      const { width } = page.getSize();
+      page.drawText(`${index + 1}`, {
+        x: width - 40,
+        y: 20,
+        size: 10,
+        font,
+        color: rgb(0.5, 0.5, 0.5),
+      });
+    });
+
+    const pdfBytes = await pdfDoc.save();
+
+    return new NextResponse(pdfBytes, {
+      status: 200,
+      headers: {
+        "Content-Type": "application/pdf",
+        "Content-Disposition":
+          'attachment; filename="caseready-exhibit.pdf"',
+      },
     });
   } catch (err) {
     console.error("Error in /api/generate-exhibit:", err);
@@ -43,3 +106,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+

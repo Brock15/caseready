@@ -31,7 +31,7 @@ export default function Home() {
       })),
     ]);
 
-    // allow selecting the same file again later
+    // allow selecting the same file again
     e.target.value = "";
   };
 
@@ -55,16 +55,33 @@ export default function Home() {
         body: formData,
       });
 
-      const data = await res.json();
+      const contentType = res.headers.get("content-type") || "";
 
-      if (!res.ok || !data.ok) {
-        setServerMessage(data.message || "Something went wrong.");
+      if (!res.ok) {
+        if (contentType.includes("application/json")) {
+          const data = await res.json();
+          setServerMessage(data.message || "Something went wrong.");
+        } else {
+          setServerMessage("Something went wrong generating the PDF.");
+        }
+        return;
+      }
+
+      if (contentType.includes("application/pdf")) {
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "caseready-exhibit.pdf";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+
+        setServerMessage("Exhibit PDF generated and downloaded.");
       } else {
-        setServerMessage(
-          `Server received ${data.fileCount} file${
-            data.fileCount > 1 ? "s" : ""
-          } (${data.totalSizeMB} MB). PDF generation coming next.`
-        );
+        setServerMessage("Unexpected response from server.");
       }
     } catch (err) {
       console.error(err);
@@ -80,7 +97,7 @@ export default function Home() {
       <header className="w-full border-b border-black/5 bg-white/60 backdrop-blur-sm">
         <div className="mx-auto max-w-5xl flex items-center justify-between py-4 px-4 sm:px-6">
           <div className="flex items-center gap-3">
-            {/* Logo icon placeholder */}
+            {/* Logo placeholder */}
             <div className="relative h-9 w-9 rounded-xl bg-gradient-to-br from-[#3FA9FF] to-[#0056D6] shadow-md flex items-center justify-center">
               <span className="text-white font-bold text-xl">CR</span>
             </div>
@@ -104,7 +121,7 @@ export default function Home() {
       <div className="flex-1 flex items-center">
         <div className="mx-auto max-w-5xl w-full px-4 sm:px-6 py-10 sm:py-16">
           <div className="grid gap-10 md:grid-cols-[1.2fr,1fr] items-start md:items-center">
-            {/* Left: Hero copy + upload card */}
+            {/* Left side */}
             <section>
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-gray-900 mb-4">
                 Turn messy evidence into
@@ -127,7 +144,7 @@ export default function Home() {
                     Screenshots, PDFs, emails, photos — up to 100 pages.
                   </p>
 
-                  {/* Hidden file input */}
+                  {/* Hidden input */}
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -140,11 +157,12 @@ export default function Home() {
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     <button
                       type="button"
-                      className="inline-flex justify-center items-center rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:brightness-110 transition"
                       onClick={handleSelectFiles}
+                      className="inline-flex justify-center items-center rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:brightness-110 transition"
                     >
                       Select files
                     </button>
+
                     <button
                       type="button"
                       onClick={handleGenerate}
@@ -155,9 +173,7 @@ export default function Home() {
                           : "border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed"
                       }`}
                     >
-                      {isSubmitting
-                        ? "Processing..."
-                        : "Generate exhibit PDF (preview)"}
+                      {isSubmitting ? "Processing..." : "Generate Exhibit PDF"}
                     </button>
                   </div>
 
@@ -203,22 +219,10 @@ export default function Home() {
                     securely and never used for training.
                   </p>
                 </div>
-
-                <div className="mt-4 flex flex-wrap gap-2 text-[11px] text-gray-500">
-                  <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1">
-                    • Auto Bates numbering
-                  </span>
-                  <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1">
-                    • Exhibit labels
-                  </span>
-                  <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1">
-                    • Chronological timelines
-                  </span>
-                </div>
               </div>
             </section>
 
-            {/* Right: Trust panel */}
+            {/* Right side */}
             <aside className="space-y-4">
               <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm text-sm text-gray-700">
                 <h2 className="font-semibold text-gray-900 mb-2">
@@ -257,5 +261,6 @@ export default function Home() {
     </main>
   );
 }
+
 
 
