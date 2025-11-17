@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
+import "@/lib/supabaseConfig";
 
 export async function POST(req: NextRequest) {
   try {
