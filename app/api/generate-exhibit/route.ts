@@ -2,11 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import "@/lib/supabaseConfig";
+import { SUPABASE_ANON_KEY, SUPABASE_URL } from "@/lib/supabaseConfig";
 
 export async function POST(req: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createRouteHandlerClient(
+      { cookies },
+      {
+        supabaseUrl: SUPABASE_URL,
+        supabaseKey: SUPABASE_ANON_KEY,
+      }
+    );
     const {
       data: { session },
       error: sessionError,
@@ -151,9 +157,10 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error("Failed to generate exhibit PDF", error);
-    return NextResponse.json(
-      { ok: false, message: "Failed to generate exhibit PDF." },
-      { status: 500 }
-    );
+    const message =
+      error instanceof Error
+        ? `Failed to generate exhibit PDF: ${error.message}`
+        : "Failed to generate exhibit PDF.";
+    return NextResponse.json({ ok: false, message }, { status: 500 });
   }
 }
