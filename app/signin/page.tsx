@@ -1,5 +1,6 @@
 "use client";
 
+import NextImage from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, Suspense, useMemo, useState } from "react";
@@ -49,8 +50,15 @@ function SigninPageContent() {
       <header className="w-full border-b border-black/5 bg-white/60 backdrop-blur-sm">
         <div className="mx-auto max-w-xl flex items-center justify-between py-4 px-4 sm:px-6">
           <Link href="/" className="flex items-center gap-3">
-            <div className="relative h-9 w-9 rounded-xl bg-gradient-to-br from-[#3FA9FF] to-[#0056D6] shadow-md flex items-center justify-center">
-              <span className="text-white font-bold text-xl">CR</span>
+            <div className="h-12 w-12 rounded-2xl bg-white shadow-md flex items-center justify-center border border-gray-100">
+              <NextImage
+                src="/logo.svg"
+                alt="CaseReady logo"
+                width={48}
+                height={48}
+                className="h-10 w-10"
+                priority
+              />
             </div>
             <span className="font-semibold tracking-tight text-lg text-gray-900">
               CaseReady

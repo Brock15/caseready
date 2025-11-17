@@ -1,5 +1,6 @@
 "use client";
 
+import NextImage from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -189,9 +190,15 @@ export default function Home() {
       <header className="w-full border-b border-black/5 bg-white/60 backdrop-blur-sm">
         <div className="mx-auto max-w-5xl flex items-center justify-between py-4 px-4 sm:px-6">
           <div className="flex items-center gap-3">
-            {/* Logo placeholder */}
-            <div className="relative h-9 w-9 rounded-xl bg-gradient-to-br from-[#3FA9FF] to-[#0056D6] shadow-md flex items-center justify-center">
-              <span className="text-white font-bold text-xl">CR</span>
+            <div className="h-12 w-12 rounded-2xl bg-white shadow-md flex items-center justify-center border border-gray-100">
+              <NextImage
+                src="/logo.svg"
+                alt="CaseReady logo"
+                width={48}
+                height={48}
+                className="h-10 w-10"
+                priority
+              />
             </div>
             <div className="flex flex-col leading-tight">
               <span className="font-semibold tracking-tight text-lg">
@@ -201,43 +208,64 @@ export default function Home() {
                 Evidence made effortless.
               </span>
             </div>
-        </div>
+          </div>
 
-        {isAuthenticated ? (
-          <div className="flex items-center gap-3">
-            <div className="hidden sm:flex flex-col text-right">
-              <span className="text-xs text-gray-500">
-                {userEmail || "Account"}
-              </span>
-              <span className="text-[10px] text-gray-400">ID: {userId}</span>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              document
+                .getElementById("how-it-works")
+                ?.scrollIntoView({ behavior: "smooth" });
+            }}
+            className="inline-flex items-center rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
+          >
+            How it works
+          </button>
+
+          <Link
+            href="/pricing"
+            className="inline-flex items-center rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
+          >
+            Pricing
+          </Link>
+
+          {isAuthenticated ? (
+            <div className="flex items-center gap-3">
+              <div className="hidden sm:flex flex-col text-right">
+                <span className="text-xs text-gray-500">
+                  {userEmail || "Account"}
+                </span>
+                <span className="text-[10px] text-gray-400">ID: {userId}</span>
+              </div>
+              <button
+                type="button"
+                onClick={handleSignOut}
+                disabled={isSigningOut}
+                className={`inline-flex items-center rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 ${
+                  isSigningOut ? "opacity-60 cursor-not-allowed" : ""
+                }`}
+              >
+                {isSigningOut ? "Signing out..." : "Sign out"}
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={handleSignOut}
-              disabled={isSigningOut}
-              className={`inline-flex items-center rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 ${
-                isSigningOut ? "opacity-60 cursor-not-allowed" : ""
-              }`}
-            >
-              {isSigningOut ? "Signing out..." : "Sign out"}
-            </button>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2">
-            <Link
-              href="/signin"
-              className="inline-flex items-center rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
-            >
-              {isCheckingSession ? "Checking..." : "Sign in"}
-            </Link>
-            <Link
-              href="/signup"
-              className="hidden sm:inline-flex items-center rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
-            >
-              Early access
-            </Link>
-          </div>
-        )}
+          ) : (
+            <>
+              <Link
+                href="/signin"
+                className="inline-flex items-center rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
+              >
+                {isCheckingSession ? "Checking..." : "Sign in"}
+              </Link>
+              <Link
+                href="/signup"
+                className="hidden sm:inline-flex items-center rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
+              >
+                Early access
+              </Link>
+            </>
+          )}
+        </div>
       </div>
     </header>
 
@@ -396,19 +424,99 @@ export default function Home() {
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-gray-200 bg-[#0056D6] text-white p-5 text-sm shadow-sm">
-                <p className="font-semibold mb-1">Launch offer</p>
-                <p className="text-xs mb-2">
-                  First 10 firms get unlimited matters for $19/mo for life.
-                </p>
-                <p className="text-[11px] text-blue-100">
-                  2 free exports to try it. No credit card required.
-                </p>
-              </div>
             </aside>
           </div>
         </div>
       </div>
+
+      <section
+        id="how-it-works"
+        className="bg-white border-t border-black/5 scroll-mt-24"
+      >
+        <div className="mx-auto max-w-5xl w-full px-4 sm:px-6 py-12 sm:py-16 space-y-10">
+          <div className="text-center max-w-2xl mx-auto">
+            <p className="text-xs uppercase tracking-[0.2em] text-[#0056D6] font-semibold">
+              How it works
+            </p>
+            <h2 className="text-2xl sm:text-3xl font-semibold text-gray-900 mt-2">
+              Three quick steps from inbox chaos to court-ready exhibits.
+            </h2>
+            <p className="text-sm sm:text-base text-gray-600 mt-3">
+              Designed for solos and small teams—no complicated onboarding, just
+              a fast path from raw files to polished PDFs.
+            </p>
+          </div>
+
+          <div className="grid gap-6 sm:gap-8 md:grid-cols-3">
+            {[
+              {
+                title: "Upload evidence",
+                body: "Drag up to 100 screenshots, PDFs, or photos at once. Everything stays encrypted in transit.",
+              },
+              {
+                title: "Let CaseReady format",
+                body: "We merge PDFs, resize images, add page numbers, and keep your files in order automatically.",
+              },
+              {
+                title: "Download & file",
+                body: "Get a single exhibit-ready PDF that drops straight into your judge’s preferred format.",
+              },
+            ].map((step, index) => (
+              <div
+                key={step.title}
+                className="rounded-2xl border border-gray-200 bg-gray-50/70 p-6 flex flex-col gap-3 shadow-sm"
+              >
+                <span className="h-10 w-10 rounded-2xl bg-gradient-to-br from-[#3FA9FF] to-[#0056D6] text-white font-semibold text-lg flex items-center justify-center">
+                  {index + 1}
+                </span>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {step.title}
+                </h3>
+                <p className="text-sm text-gray-600">{step.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-[#0056D6] text-white">
+        <div className="mx-auto max-w-5xl w-full px-4 sm:px-6 py-10 sm:py-12 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-[0.35em] text-blue-100 font-semibold">
+              Pricing
+            </p>
+            <h3 className="text-2xl font-semibold mt-2">
+              First 10 firms lock $29/mo forever.
+            </h3>
+            <p className="text-sm text-blue-100 mt-2 max-w-xl">
+              Start free with two exports, then upgrade when your caseload calls
+              for unlimited matters and priority access.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3 text-sm font-medium">
+            <div className="rounded-2xl bg-white/10 px-4 py-3">
+              <p className="text-xs uppercase tracking-wide text-blue-100">
+                Free
+              </p>
+              <p className="text-xl font-semibold">$0</p>
+              <p className="text-xs text-blue-100">2 exports included</p>
+            </div>
+            <div className="rounded-2xl bg-white text-[#0056D6] px-4 py-3">
+              <p className="text-xs uppercase tracking-wide text-[#0056D6]/70">
+                Launch offer
+              </p>
+              <p className="text-xl font-semibold">$19</p>
+              <p className="text-xs text-[#0056D6]/70">Unlimited matters</p>
+            </div>
+            <Link
+              href="/pricing"
+              className="inline-flex items-center justify-center rounded-full bg-white text-[#0056D6] px-5 py-2.5 font-semibold hover:bg-blue-50 transition"
+            >
+              View plans
+            </Link>
+          </div>
+        </div>
+      </section>
 
       <footer className="border-t border-black/5 bg-white/60">
         <div className="mx-auto max-w-5xl flex items-center justify-between py-3 px-4 sm:px-6 text-[11px] text-gray-500">

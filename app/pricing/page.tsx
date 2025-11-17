@@ -1,0 +1,298 @@
+"use client";
+
+import NextImage from "next/image";
+import Link from "next/link";
+
+const mainPlans = [
+  {
+    name: "Free",
+    price: "$0",
+    duration: "forever",
+    badge: "Get started",
+    audience: "Solo lawyers & small firms kicking the tires.",
+    description:
+      "Perfect for trying CaseReady on a couple of matters before you roll it out across the team.",
+    perks: [
+      "2 exhibit PDFs per month",
+      "Up to 10 files per packet",
+      "All common formats (PDF, images, screenshots)",
+      "No credit card required",
+    ],
+    cta: { label: "Start for free", href: "/" },
+    highlighted: false,
+    note: "Best for testing on your next case.",
+  },
+  {
+    name: "Solo",
+    price: "$29",
+    duration: "per month",
+    originalPrice: "$39",
+    badge: "Founding Attorney – first 50",
+    audience: "Solo practitioners who live in their inbox & scanner.",
+    description:
+      "Unlimited, judge-ready exhibit packets with Bates numbers and labels. Built to replace late-night PDF surgery.",
+    perks: [
+      "Unlimited exhibit PDFs",
+      "Unlimited files per packet",
+      "Exhibit labels (Ex. A, Ex. B…) and page stamping",
+      "Bates numbering (e.g. CR-0001, 0002…)",
+      "Higher-priority processing",
+    ],
+    cta: {
+      label: "Lock in founding rate",
+      href: "mailto:founders@caseready.io?subject=Founding%20Attorney%20Solo%20Plan",
+    },
+    highlighted: true,
+    note: "Founder pricing is locked in for life for the first 50 attorneys.",
+  },
+  {
+    name: "Firm",
+    price: "$79",
+    duration: "per month",
+    badge: "Up to 5 users",
+    audience: "Boutique litigation, family, immigration, and PI teams.",
+    description:
+      "Give your whole team the same clean, consistent exhibit packets—without burning paralegal time.",
+    perks: [
+      "Everything in Solo",
+      "Up to 5 attorney or staff accounts",
+      "Unlimited client upload links",
+      "Shared matter templates & presets",
+      "Priority email support",
+    ],
+    cta: {
+      label: "Talk to us about your firm",
+      href: "mailto:hello@caseready.io?subject=Firm%20plan%20inquiry",
+    },
+    highlighted: false,
+    note: "Ideal for 2–10 person teams running active dockets.",
+  },
+];
+
+const enterprisePlan = {
+  name: "Enterprise",
+  blurb: "For litigation groups, PI shops, and high-volume teams.",
+  points: [
+    "10+ users with role-based access",
+    "SSO & advanced security controls",
+    "Audit logs & retention policies",
+    "Custom Bates/exhibit schemas by jurisdiction",
+    "White-labeling and firm branding",
+  ],
+  cta: {
+    label: "Schedule a demo",
+    href: "mailto:hello@caseready.io?subject=Enterprise%20demo%20request",
+  },
+};
+
+export default function PricingPage() {
+  return (
+    <main className="min-h-screen bg-[#FAF8F5] text-[#111827] flex flex-col">
+      {/* Top nav */}
+      <header className="w-full border-b border-black/5 bg-white/70 backdrop-blur-sm">
+        <div className="mx-auto max-w-5xl flex items-center justify-between py-4 px-4 sm:px-6">
+          <Link href="/" className="flex items-center gap-3">
+            <div className="h-12 w-12 rounded-2xl bg-white shadow-md flex items-center justify-center border border-gray-100">
+              <NextImage
+                src="/logo.svg"
+                alt="CaseReady logo"
+                width={48}
+                height={48}
+                className="h-10 w-10"
+                priority
+              />
+            </div>
+            <div className="flex flex-col leading-tight">
+              <span className="font-semibold tracking-tight text-lg">
+                CaseReady
+              </span>
+              <span className="text-xs text-gray-500 hidden sm:block">
+                Evidence made effortless.
+              </span>
+            </div>
+          </Link>
+
+          <nav className="hidden sm:flex items-center gap-6 text-xs font-medium text-gray-600">
+            <Link href="/" className="hover:text-gray-900">
+              How it works
+            </Link>
+            <Link href="/" className="hover:text-gray-900">
+              Features
+            </Link>
+            <Link href="/pricing" className="text-gray-900">
+              Pricing
+            </Link>
+            <Link href="/" className="hover:text-gray-900">
+              Security
+            </Link>
+          </nav>
+
+          <Link
+            href="/signup"
+            className="inline-flex items-center rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
+          >
+            Sign in / Sign up
+          </Link>
+        </div>
+      </header>
+
+      {/* Pricing content */}
+      <section className="flex-1">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 py-12 sm:py-20 space-y-12">
+          {/* Hero copy */}
+          <div className="text-center max-w-3xl mx-auto space-y-4">
+            <p className="text-xs uppercase tracking-[0.2em] text-[#0056D6] font-semibold">
+              Pricing
+            </p>
+            <h1 className="text-3xl sm:text-4xl font-semibold text-gray-900">
+              Simple, honest pricing for solos and litigation teams.
+            </h1>
+            <p className="text-sm sm:text-base text-gray-600">
+              Start free on your next matter. When CaseReady becomes part of
+              your workflow, step into a Solo or Firm plan and stop doing
+              late-night PDF surgery by hand.
+            </p>
+            <p className="text-[11px] sm:text-xs text-gray-500">
+              All plans include bank-level encryption, US-based hosting, and
+              files processed in memory only — never used for AI training.
+            </p>
+          </div>
+
+          {/* Founding offer banner */}
+          <div className="rounded-3xl border border-dashed border-[#3FA9FF]/60 bg-[#F1F7FF] px-4 py-4 sm:px-6 sm:py-5 text-xs sm:text-sm text-gray-800 text-center">
+            <span className="inline-flex items-center justify-center rounded-full bg-[#0056D6] text-white text-[10px] font-semibold px-2 py-0.5 mr-2">
+              Founding offer
+            </span>
+            First 50 attorneys to subscribe to the Solo plan lock in{" "}
+            <span className="font-semibold">$29/mo</span> for life (normally{" "}
+            <span className="line-through decoration-red-500/70">$39/mo</span>).
+            No hidden fees, no contracts.
+          </div>
+
+          {/* Main plans */}
+          <div className="grid gap-6 md:grid-cols-3">
+            {mainPlans.map((plan) => (
+              <div
+                key={plan.name}
+                className={`rounded-3xl border p-6 sm:p-7 shadow-sm bg-white flex flex-col gap-5 ${
+                  plan.highlighted
+                    ? "border-[#0056D6] ring-2 ring-[#3FA9FF]/30"
+                    : "border-gray-200"
+                }`}
+              >
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <div>
+                      <p className="text-xs uppercase tracking-wide text-gray-500">
+                        {plan.name}
+                      </p>
+                      <p className="text-[11px] text-gray-400">
+                        {plan.audience}
+                      </p>
+                    </div>
+                    {plan.badge && (
+                      <span className="inline-flex items-center rounded-full bg-[#0056D6] text-white text-[10px] font-semibold px-2 py-0.5 text-right">
+                        {plan.badge}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-baseline gap-2">
+                    <p className="text-3xl sm:text-4xl font-semibold text-gray-900">
+                      {plan.price}
+                    </p>
+                    <span className="text-xs sm:text-sm font-normal text-gray-500">
+                      {plan.duration}
+                    </span>
+                    {"originalPrice" in plan && plan.originalPrice && (
+                      <span className="text-[11px] text-gray-400 line-through ml-auto">
+                        {plan.originalPrice}
+                      </span>
+                    )}
+                  </div>
+
+                  <p className="text-xs sm:text-sm text-gray-600">
+                    {plan.description}
+                  </p>
+                </div>
+
+                <ul className="space-y-2 text-xs sm:text-sm text-gray-700">
+                  {plan.perks.map((perk) => (
+                    <li
+                      key={perk}
+                      className="flex items-start gap-2 text-gray-600"
+                    >
+                      <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[#0056D6]" />
+                      <span>{perk}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="mt-auto space-y-2">
+                  <Link
+                    href={plan.cta.href}
+                    className={`inline-flex justify-center items-center w-full rounded-full px-4 py-2.5 text-sm font-semibold transition ${
+                      plan.highlighted
+                        ? "bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] text-white hover:brightness-110"
+                        : "border border-gray-200 text-gray-700 hover:bg-gray-50"
+                    }`}
+                  >
+                    {plan.cta.label}
+                  </Link>
+                  {plan.note && (
+                    <p className="text-[11px] text-gray-500 text-center">
+                      {plan.note}
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Enterprise section */}
+          <div className="rounded-3xl border border-gray-200 bg-white px-6 py-6 sm:px-8 sm:py-7 flex flex-col md:flex-row gap-6 items-start md:items-center">
+            <div className="flex-1 space-y-2">
+              <p className="text-xs uppercase tracking-[0.2em] text-gray-500">
+                Enterprise
+              </p>
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
+                Need CaseReady across a larger litigation group?
+              </h2>
+              <p className="text-xs sm:text-sm text-gray-600">
+                For teams with 10+ users or specific security/compliance
+                requirements, we&apos;ll tailor CaseReady to your stack.
+              </p>
+              <ul className="mt-3 space-y-1.5 text-xs sm:text-sm text-gray-700">
+                {enterprisePlan.points.map((point) => (
+                  <li key={point} className="flex gap-2 items-start">
+                    <span className="mt-1 h-1.5 w-1.5 rounded-full bg-gray-400" />
+                    <span>{point}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="w-full md:w-auto">
+              <Link
+                href={enterprisePlan.cta.href}
+                className="inline-flex justify-center items-center w-full md:w-auto rounded-full px-5 py-2.5 text-sm font-semibold text-white bg-gray-900 hover:bg-black transition"
+              >
+                {enterprisePlan.cta.label}
+              </Link>
+              <p className="mt-2 text-[11px] text-gray-500 text-center md:text-left">
+                Volume pricing available for high-throughput teams.
+              </p>
+            </div>
+          </div>
+
+          {/* Security reassurance footer */}
+          <div className="text-center text-[11px] sm:text-xs text-gray-500">
+            CaseReady is built for confidentiality. Documents are transmitted
+            over HTTPS, processed in memory, and never stored or used to train
+            AI models. Formal security whitepaper available on request.
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}
