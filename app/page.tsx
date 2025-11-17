@@ -10,6 +10,8 @@ type SelectedFile = {
 export default function Home() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [files, setFiles] = useState<SelectedFile[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [serverMessage, setServerMessage] = useState<string | null>(null);
 
   const handleSelectFiles = () => {
     fileInputRef.current?.click();
@@ -22,7 +24,9 @@ export default function Home() {
     setFiles((prev) => [
       ...prev,
       ...newFiles.map((f) => ({
-        id: `${f.name}-${f.lastModified}-${Math.random().toString(36).slice(2)}`,
+        id: `${f.name}-${f.lastModified}-${Math.random()
+          .toString(36)
+          .slice(2)}`,
         file: f,
       })),
     ]);
@@ -33,6 +37,42 @@ export default function Home() {
 
   const totalSizeBytes = files.reduce((sum, f) => sum + f.file.size, 0);
   const totalSizeMB = totalSizeBytes / (1024 * 1024);
+
+  const handleGenerate = async () => {
+    if (!files.length || isSubmitting) return;
+
+    setIsSubmitting(true);
+    setServerMessage(null);
+
+    try {
+      const formData = new FormData();
+      files.forEach(({ file }) => {
+        formData.append("files", file);
+      });
+
+      const res = await fetch("/api/generate-exhibit", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.ok) {
+        setServerMessage(data.message || "Something went wrong.");
+      } else {
+        setServerMessage(
+          `Server received ${data.fileCount} file${
+            data.fileCount > 1 ? "s" : ""
+          } (${data.totalSizeMB} MB). PDF generation coming next.`
+        );
+      }
+    } catch (err) {
+      console.error(err);
+      setServerMessage("Network error. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <main className="min-h-screen bg-[#FAF8F5] text-[#111827] flex flex-col">
@@ -107,14 +147,17 @@ export default function Home() {
                     </button>
                     <button
                       type="button"
-                      disabled={!files.length}
+                      onClick={handleGenerate}
+                      disabled={!files.length || isSubmitting}
                       className={`inline-flex justify-center items-center rounded-full border px-5 py-2.5 text-sm font-medium transition ${
-                        files.length
+                        files.length && !isSubmitting
                           ? "border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
                           : "border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed"
                       }`}
                     >
-                      Generate exhibit PDF (coming soon)
+                      {isSubmitting
+                        ? "Processing..."
+                        : "Generate exhibit PDF (preview)"}
                     </button>
                   </div>
 
@@ -147,6 +190,13 @@ export default function Home() {
                       </>
                     )}
                   </div>
+
+                  {/* Server response */}
+                  {serverMessage && (
+                    <p className="mt-3 text-[11px] text-gray-500">
+                      {serverMessage}
+                    </p>
+                  )}
 
                   <p className="mt-3 text-[11px] text-gray-400">
                     End-to-end encrypted in transit. Files are processed
