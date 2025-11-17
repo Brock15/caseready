@@ -17,7 +17,7 @@ export default function Home() {
             </div>
             <div className="flex flex-col leading-tight">
               <span className="font-semibold tracking-tight text-lg">
-                Caseready
+                CaseReady
               </span>
               <span className="text-xs text-gray-500 hidden sm:block">
                 Evidence made effortless.
@@ -100,7 +100,7 @@ export default function Home() {
                   Built for busy attorneys.
                 </h2>
                 <p className="mb-2">
-                  Caseready was designed for solos and small firms drowning in
+                  CaseReady was designed for solos and small firms drowning in
                   screenshots and PDFs. Save paralegal hours on every matter.
                 </p>
                 <p className="text-xs text-gray-500">
