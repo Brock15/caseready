@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRef, useState, ChangeEvent } from "react";
 
 type SelectedFile = {
@@ -111,9 +112,12 @@ export default function Home() {
             </div>
           </div>
 
-          <button className="hidden sm:inline-flex items-center rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50">
-            Sign in
-          </button>
+          <Link
+            href="/signup"
+            className="hidden sm:inline-flex items-center rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
+          >
+            Sign up
+          </Link>
         </div>
       </header>
 
@@ -261,6 +265,5 @@ export default function Home() {
     </main>
   );
 }
-
 
 
