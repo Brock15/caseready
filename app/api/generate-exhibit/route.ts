@@ -6,8 +6,13 @@ import { SUPABASE_ANON_KEY, SUPABASE_URL } from "@/lib/supabaseConfig";
 
 export async function POST(req: NextRequest) {
   try {
+    const cookieStore = await cookies();
     const supabase = createRouteHandlerClient(
-      { cookies },
+      {
+        cookies: (() => cookieStore) as unknown as () => ReturnType<
+          typeof cookies
+        >,
+      },
       {
         supabaseUrl: SUPABASE_URL,
         supabaseKey: SUPABASE_ANON_KEY,
