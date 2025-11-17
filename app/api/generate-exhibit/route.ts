@@ -89,21 +89,20 @@ export async function POST(req: NextRequest) {
     });
 
     const pdfBytes = await pdfDoc.save();
+    const pdfBuffer = Buffer.from(pdfBytes);
 
-    return new NextResponse(pdfBytes, {
+    return new Response(pdfBuffer, {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition":
-          'attachment; filename="caseready-exhibit.pdf"',
+        "Content-Disposition": 'attachment; filename="exhibit.pdf"',
       },
     });
-  } catch (err) {
-    console.error("Error in /api/generate-exhibit:", err);
+  } catch (error) {
+    console.error("Failed to generate exhibit PDF", error);
     return NextResponse.json(
-      { ok: false, message: "Server error. Please try again." },
+      { ok: false, message: "Failed to generate exhibit PDF." },
       { status: 500 }
     );
   }
 }
-
