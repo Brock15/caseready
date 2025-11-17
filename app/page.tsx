@@ -17,7 +17,7 @@ export default function Home() {
             </div>
             <div className="flex flex-col leading-tight">
               <span className="font-semibold tracking-tight text-lg">
-                Casework
+                Caseready
               </span>
               <span className="text-xs text-gray-500 hidden sm:block">
                 Evidence made effortless.
@@ -44,7 +44,7 @@ export default function Home() {
                 </span>
               </h1>
               <p className="text-sm sm:text-base text-gray-600 max-w-xl mb-6">
-                Drag, drop, and let Casework handle the formatting. Bates
+                Drag, drop, and let Caseready handle the formatting. Bates
                 numbers, exhibits, timelines—done in minutes instead of hours.
               </p>
 
@@ -100,7 +100,7 @@ export default function Home() {
                   Built for busy attorneys.
                 </h2>
                 <p className="mb-2">
-                  Casework was designed for solos and small firms drowning in
+                  Caseready was designed for solos and small firms drowning in
                   screenshots and PDFs. Save paralegal hours on every matter.
                 </p>
                 <p className="text-xs text-gray-500">
@@ -125,7 +125,7 @@ export default function Home() {
 
       <footer className="border-t border-black/5 bg-white/60">
         <div className="mx-auto max-w-5xl flex items-center justify-between py-3 px-4 sm:px-6 text-[11px] text-gray-500">
-          <span>© {new Date().getFullYear()} Casework.io</span>
+          <span>© {new Date().getFullYear()} Caseready.io</span>
           <span>Privacy • Terms</span>
         </div>
       </footer>
