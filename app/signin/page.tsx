@@ -2,10 +2,18 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, Suspense, useMemo, useState } from "react";
 import { createBrowserSupabaseClient } from "@/lib/createBrowserSupabaseClient";
 
 export default function SigninPage() {
+  return (
+    <Suspense fallback={<div className="p-10 text-center">Loading...</div>}>
+      <SigninPageContent />
+    </Suspense>
+  );
+}
+
+function SigninPageContent() {
   const supabase = useMemo(() => createBrowserSupabaseClient(), []);
   const router = useRouter();
   const searchParams = useSearchParams();
