@@ -1,14 +1,16 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useMemo, useState } from "react";
 import { createBrowserSupabaseClient } from "@/lib/createBrowserSupabaseClient";
 
-export default function SignupPage() {
+export default function SigninPage() {
   const supabase = useMemo(() => createBrowserSupabaseClient(), []);
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -18,27 +20,17 @@ export default function SignupPage() {
 
     setIsSubmitting(true);
     setErrorMessage(null);
-    setStatusMessage(null);
 
-    const { error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/`,
-        data: {
-          exportsUsed: 0,
-        },
-      },
     });
 
     if (error) {
       setErrorMessage(error.message);
     } else {
-      setStatusMessage(
-        "Thanks! Check your inbox to confirm your email before signing in."
-      );
-      setEmail("");
-      setPassword("");
+      const redirectTo = searchParams.get("redirectedFrom") || "/";
+      router.replace(redirectTo);
     }
 
     setIsSubmitting(false);
@@ -58,10 +50,10 @@ export default function SignupPage() {
           </Link>
 
           <Link
-            href="/"
+            href="/signup"
             className="inline-flex items-center rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
           >
-            Back home
+            Need an invite?
           </Link>
         </div>
       </header>
@@ -70,14 +62,13 @@ export default function SignupPage() {
         <div className="w-full max-w-md rounded-3xl border border-gray-200 bg-white p-8 shadow-sm">
           <div className="mb-6 text-center">
             <p className="text-xs uppercase tracking-wide text-[#0056D6] font-semibold">
-              Early access
+              Welcome back
             </p>
             <h1 className="text-2xl font-semibold text-gray-900 mt-2">
-              Claim your CaseReady seat.
+              Sign in to CaseReady.
             </h1>
             <p className="text-sm text-gray-500 mt-1">
-              Create an account to start generating exhibits. We&apos;ll email
-              you to confirm before you sign in.
+              Use the email you confirmed to access your free exports.
             </p>
           </div>
 
@@ -103,7 +94,7 @@ export default function SignupPage() {
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 className="mt-1 w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:border-[#0056D6] focus:outline-none"
-                placeholder="At least 6 characters"
+                placeholder="Your password"
               />
             </label>
 
@@ -116,25 +107,15 @@ export default function SignupPage() {
                   : "bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] hover:brightness-110"
               }`}
             >
-              {isSubmitting ? "Creating your account..." : "Create account"}
+              {isSubmitting ? "Signing you in..." : "Sign in"}
             </button>
           </form>
 
-          {statusMessage && (
-            <p className="mt-4 text-sm text-green-600">{statusMessage}</p>
-          )}
-
           {errorMessage && (
-            <p className="mt-4 text-sm text-red-600">{errorMessage}</p>
+            <p className="mt-4 text-sm text-red-600 text-center">
+              {errorMessage}
+            </p>
           )}
-
-          <p className="mt-6 text-xs text-gray-500 text-center">
-            Already on the list?{" "}
-            <Link href="/" className="text-[#0056D6] font-medium">
-              Sign in from the homepage
-            </Link>
-            .
-          </p>
         </div>
       </section>
     </main>

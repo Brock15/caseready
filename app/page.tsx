@@ -1,7 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState, ChangeEvent } from "react";
+import { useRouter } from "next/navigation";
+import {
+  useRef,
+  useState,
+  ChangeEvent,
+  useEffect,
+  useMemo,
+} from "react";
+import type { User } from "@supabase/supabase-js";
+import { createBrowserSupabaseClient } from "@/lib/createBrowserSupabaseClient";
 
 type SelectedFile = {
   id: string;
@@ -9,10 +18,68 @@ type SelectedFile = {
 };
 
 export default function Home() {
+  const router = useRouter();
+  const supabase = useMemo(() => createBrowserSupabaseClient(), []);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [files, setFiles] = useState<SelectedFile[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [serverMessage, setServerMessage] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [exportsUsed, setExportsUsed] = useState(0);
+  const [isSigningOut, setIsSigningOut] = useState(false);
+  const [isCheckingSession, setIsCheckingSession] = useState(true);
+  const isAuthenticated = Boolean(userId);
+  const exportsLeft = Math.max(0, 2 - exportsUsed);
+
+  useEffect(() => {
+    let active = true;
+
+    const applyUserState = (user: User | null) => {
+      setUserEmail(user?.email ?? null);
+      setUserId(user?.id ?? null);
+      const nextExports =
+        user?.user_metadata?.exportsUsed !== undefined
+          ? Number(user.user_metadata.exportsUsed)
+          : 0;
+      setExportsUsed(Number.isFinite(nextExports) ? nextExports : 0);
+    };
+
+    const syncSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (!active) return;
+      applyUserState(data.session?.user ?? null);
+      setIsCheckingSession(false);
+    };
+
+    syncSession();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, currentSession) => {
+      if (!active) return;
+      applyUserState(currentSession?.user ?? null);
+      setIsCheckingSession(false);
+    });
+
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
+  }, [supabase]);
+
+  const handleSignOut = async () => {
+    if (isSigningOut) return;
+    try {
+      setIsSigningOut(true);
+      await supabase.auth.signOut();
+      router.replace("/signin");
+    } catch (error) {
+      console.error("Failed to sign out", error);
+    } finally {
+      setIsSigningOut(false);
+    }
+  };
 
   const handleSelectFiles = () => {
     fileInputRef.current?.click();
@@ -41,6 +108,19 @@ export default function Home() {
 
   const handleGenerate = async () => {
     if (!files.length || isSubmitting) return;
+
+    if (!isAuthenticated) {
+      setServerMessage("Sign in to use your two free exports.");
+      router.push("/signin?redirectedFrom=/");
+      return;
+    }
+
+    if (exportsLeft <= 0) {
+      setServerMessage(
+        "You have used both free exports. Upgrade your plan to continue."
+      );
+      return;
+    }
 
     setIsSubmitting(true);
     setServerMessage(null);
@@ -81,6 +161,17 @@ export default function Home() {
         URL.revokeObjectURL(url);
 
         setServerMessage("Exhibit PDF generated and downloaded.");
+
+        const { data } = await supabase.auth.getUser();
+        if (data.user) {
+          const refreshedExports =
+            data.user.user_metadata?.exportsUsed !== undefined
+              ? Number(data.user.user_metadata.exportsUsed)
+              : 0;
+          setExportsUsed(
+            Number.isFinite(refreshedExports) ? refreshedExports : 0
+          );
+        }
       } else {
         setServerMessage("Unexpected response from server.");
       }
@@ -110,16 +201,45 @@ export default function Home() {
                 Evidence made effortless.
               </span>
             </div>
-          </div>
-
-          <Link
-            href="/signup"
-            className="hidden sm:inline-flex items-center rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
-          >
-            Sign up
-          </Link>
         </div>
-      </header>
+
+        {isAuthenticated ? (
+          <div className="flex items-center gap-3">
+            <div className="hidden sm:flex flex-col text-right">
+              <span className="text-xs text-gray-500">
+                {userEmail || "Account"}
+              </span>
+              <span className="text-[10px] text-gray-400">ID: {userId}</span>
+            </div>
+            <button
+              type="button"
+              onClick={handleSignOut}
+              disabled={isSigningOut}
+              className={`inline-flex items-center rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 ${
+                isSigningOut ? "opacity-60 cursor-not-allowed" : ""
+              }`}
+            >
+              {isSigningOut ? "Signing out..." : "Sign out"}
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2">
+            <Link
+              href="/signin"
+              className="inline-flex items-center rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
+            >
+              {isCheckingSession ? "Checking..." : "Sign in"}
+            </Link>
+            <Link
+              href="/signup"
+              className="hidden sm:inline-flex items-center rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
+            >
+              Early access
+            </Link>
+          </div>
+        )}
+      </div>
+    </header>
 
       {/* Main content */}
       <div className="flex-1 flex items-center">
@@ -137,6 +257,30 @@ export default function Home() {
                 Drag, drop, and let CaseReady handle the formatting. Bates
                 numbers, exhibits, timelines—done in minutes instead of hours.
               </p>
+
+              <div className="rounded-xl border border-blue-100 bg-white/70 px-4 py-3 text-xs text-gray-600 mb-4">
+                {isAuthenticated ? (
+                  <>
+                    <p className="font-semibold text-gray-900">
+                      Free plan: {exportsLeft} exports left of 2
+                    </p>
+                    <p>
+                      Need more? Reply to your welcome email and we&apos;ll
+                      upgrade your workspace.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="font-semibold text-gray-900">
+                      Free plan includes 2 exhibit exports.
+                    </p>
+                    <p>
+                      Sign in when you&apos;re ready to generate and we&apos;ll
+                      walk you through the free trial.
+                    </p>
+                  </>
+                )}
+              </div>
 
               {/* Upload card */}
               <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-5 sm:p-6">
@@ -170,14 +314,24 @@ export default function Home() {
                     <button
                       type="button"
                       onClick={handleGenerate}
-                      disabled={!files.length || isSubmitting}
+                      disabled={
+                        !files.length ||
+                        isSubmitting ||
+                        (isAuthenticated && exportsLeft <= 0)
+                      }
                       className={`inline-flex justify-center items-center rounded-full border px-5 py-2.5 text-sm font-medium transition ${
-                        files.length && !isSubmitting
+                        files.length &&
+                        !isSubmitting &&
+                        (!isAuthenticated || exportsLeft > 0)
                           ? "border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
                           : "border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed"
                       }`}
                     >
-                      {isSubmitting ? "Processing..." : "Generate Exhibit PDF"}
+                      {isSubmitting
+                        ? "Processing..."
+                        : isAuthenticated && exportsLeft <= 0
+                        ? "Upgrade for more exports"
+                        : "Generate Exhibit PDF"}
                     </button>
                   </div>
 
@@ -265,5 +419,3 @@ export default function Home() {
     </main>
   );
 }
-
-

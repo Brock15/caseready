@@ -1,8 +1,40 @@
 import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 
 export async function POST(req: NextRequest) {
   try {
+    const supabase = createRouteHandlerClient({ cookies });
+    const {
+      data: { session },
+      error: sessionError,
+    } = await supabase.auth.getSession();
+
+    if (sessionError || !session) {
+      return NextResponse.json(
+        { ok: false, message: "You need to sign in to continue." },
+        { status: 401 }
+      );
+    }
+
+    const user = session.user;
+    const exportsUsedRaw = user.user_metadata?.exportsUsed ?? 0;
+    const parsedExportsUsed = Number(exportsUsedRaw);
+    const exportsUsed = Number.isFinite(parsedExportsUsed)
+      ? parsedExportsUsed
+      : 0;
+
+    if (exportsUsed >= 2) {
+      return NextResponse.json(
+        {
+          ok: false,
+          message: "Free plan exhausted. Contact support to unlock more exports.",
+        },
+        { status: 403 }
+      );
+    }
+
     const formData = await req.formData();
 
     const inputFiles: File[] = [];
@@ -90,6 +122,24 @@ export async function POST(req: NextRequest) {
 
     const pdfBytes = await pdfDoc.save();
     const pdfBuffer = Buffer.from(pdfBytes);
+
+    const { error: updateError } = await supabase.auth.updateUser({
+      data: {
+        exportsUsed: exportsUsed + 1,
+      },
+    });
+
+    if (updateError) {
+      console.error("Failed to update export count", updateError);
+      return NextResponse.json(
+        {
+          ok: false,
+          message:
+            "Finished rendering, but could not update your export quota. Please try again.",
+        },
+        { status: 500 }
+      );
+    }
 
     return new Response(pdfBuffer, {
       status: 200,
