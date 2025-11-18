@@ -16,6 +16,32 @@ import { createBrowserSupabaseClient } from "@/lib/createBrowserSupabaseClient";
 type SelectedFile = {
   id: string;
   file: File;
+  label: string;
+  description: string;
+  assumedDate: string;
+  pages: string;
+};
+
+const ACCEPTED_MIME_TYPES = new Set([
+  "application/pdf",
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+]);
+
+const ACCEPTED_EXTENSIONS = new Set(["pdf", "jpeg", "jpg", "png"]);
+
+const formatDateForInput = (timestamp: number) => {
+  const date = new Date(timestamp || Date.now());
+  return date.toISOString().split("T")[0];
+};
+
+const isSupportedFile = (file: File) => {
+  if (ACCEPTED_MIME_TYPES.has(file.type)) {
+    return true;
+  }
+  const extension = file.name.split(".").pop()?.toLowerCase() ?? "";
+  return ACCEPTED_EXTENSIONS.has(extension);
 };
 
 export default function Home() {
@@ -32,6 +58,11 @@ export default function Home() {
   const [isCheckingSession, setIsCheckingSession] = useState(true);
   const isAuthenticated = Boolean(userId);
   const exportsLeft = Math.max(0, 2 - exportsUsed);
+  const [loadingProgress, setLoadingProgress] = useState(0);
+  const [orderingMode, setOrderingMode] = useState<
+    "upload" | "timestamp" | "detected"
+  >("upload");
+  const [draggingId, setDraggingId] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -87,25 +118,26 @@ export default function Home() {
   };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const newFiles = Array.from(e.target.files || []);
-    if (!newFiles.length) return;
-
-    setFiles((prev) => [
-      ...prev,
-      ...newFiles.map((f) => ({
-        id: `${f.name}-${f.lastModified}-${Math.random()
-          .toString(36)
-          .slice(2)}`,
-        file: f,
-      })),
-    ]);
-
-    // allow selecting the same file again
+    const incoming = Array.from(e.target.files || []);
+    addFiles(incoming);
     e.target.value = "";
   };
 
   const totalSizeBytes = files.reduce((sum, f) => sum + f.file.size, 0);
   const totalSizeMB = totalSizeBytes / (1024 * 1024);
+  const orderedFiles = useMemo(() => {
+    if (orderingMode === "timestamp") {
+      return [...files].sort(
+        (a, b) => a.file.lastModified - b.file.lastModified
+      );
+    }
+    if (orderingMode === "detected") {
+      return [...files].sort((a, b) =>
+        a.assumedDate.localeCompare(b.assumedDate)
+      );
+    }
+    return files;
+  }, [files, orderingMode]);
 
   const handleGenerate = async () => {
     if (!files.length || isSubmitting) return;
@@ -125,12 +157,38 @@ export default function Home() {
 
     setIsSubmitting(true);
     setServerMessage(null);
+    setLoadingProgress(0);
+    const progressTimer =
+      typeof window !== "undefined"
+        ? window.setInterval(() => {
+            setLoadingProgress((current) =>
+              current >= 95 ? current : current + 5
+            );
+          }, 250)
+        : null;
 
     try {
       const formData = new FormData();
-      files.forEach(({ file }) => {
+      orderedFiles.forEach(({ file }) => {
         formData.append("files", file);
       });
+
+      formData.append("orderingMode", orderingMode);
+      formData.append(
+        "fileMetadata",
+        JSON.stringify(
+          orderedFiles.map((item, index) => ({
+            id: item.id,
+            order: index + 1,
+            label: item.label,
+            description: item.description,
+            assumedDate: item.assumedDate,
+            pages: item.pages,
+            filename: item.file.name,
+            lastModified: item.file.lastModified,
+          }))
+        )
+      );
 
       const res = await fetch("/api/generate-exhibit", {
         method: "POST",
@@ -181,8 +239,77 @@ export default function Home() {
       setServerMessage("Network error. Please try again.");
     } finally {
       setIsSubmitting(false);
+      if (progressTimer) {
+        window.clearInterval(progressTimer);
+      }
+      setLoadingProgress(100);
+      setTimeout(() => setLoadingProgress(0), 500);
     }
   };
+
+  function addFiles(incoming: File[]) {
+    if (!incoming.length) return;
+    setFiles((prev) => {
+      const additions: SelectedFile[] = [];
+      incoming.forEach((file) => {
+        if (!isSupportedFile(file)) return;
+        additions.push({
+          id: `${file.name}-${file.lastModified}-${Math.random()
+            .toString(36)
+            .slice(2)}`,
+          file,
+          label: `Exhibit ${prev.length + additions.length + 1}`,
+          description: "",
+          assumedDate: formatDateForInput(file.lastModified),
+          pages: "",
+        });
+      });
+      if (!additions.length) return prev;
+      return [...prev, ...additions];
+    });
+  }
+
+  const handleDropZone = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    const droppedFiles = Array.from(event.dataTransfer?.files || []);
+    addFiles(droppedFiles);
+  };
+
+  const handleOrderingChange = (
+    event: ChangeEvent<HTMLSelectElement>
+  ): void => {
+    const value = event.target.value as "upload" | "timestamp" | "detected";
+    setOrderingMode(value);
+  };
+
+  const updateFileMeta = (id: string, updates: Partial<SelectedFile>) => {
+    setFiles((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, ...updates } : item))
+    );
+  };
+
+  const handleDragStart = (id: string) => {
+    if (orderingMode !== "upload") return;
+    setDraggingId(id);
+  };
+
+  const handleDragEnter = (targetId: string) => {
+    if (orderingMode !== "upload" || !draggingId || draggingId === targetId)
+      return;
+    setFiles((prev) => {
+      const next = [...prev];
+      const fromIndex = next.findIndex((file) => file.id === draggingId);
+      const toIndex = next.findIndex((file) => file.id === targetId);
+      if (fromIndex === -1 || toIndex === -1) {
+        return prev;
+      }
+      const [moved] = next.splice(fromIndex, 1);
+      next.splice(toIndex, 0, moved);
+      return next;
+    });
+  };
+
+  const handleDragEnd = () => setDraggingId(null);
 
   return (
     <main className="min-h-screen bg-[#FAF8F5] text-[#111827] flex flex-col">
@@ -312,7 +439,11 @@ export default function Home() {
 
               {/* Upload card */}
               <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-5 sm:p-6">
-                <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 sm:p-8 text-center bg-gray-50/60">
+                <div
+                  className="border-2 border-dashed border-gray-300 rounded-xl p-6 sm:p-8 text-center bg-gray-50/60"
+                  onDragOver={(event) => event.preventDefault()}
+                  onDrop={handleDropZone}
+                >
                   <p className="text-sm font-medium text-gray-800 mb-2">
                     Drag & drop evidence files here
                   </p>
@@ -363,6 +494,148 @@ export default function Home() {
                     </button>
                   </div>
 
+                  {files.length > 0 && (
+                    <div className="mt-6 space-y-3">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs">
+                        <label className="flex flex-col text-left font-semibold text-gray-700">
+                          Ordering
+                          <select
+                            value={orderingMode}
+                            onChange={handleOrderingChange}
+                            className="mt-1 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-[13px] text-gray-700 focus:outline-none"
+                          >
+                            <option value="upload">Upload order</option>
+                            <option value="timestamp">File timestamp</option>
+                            <option value="detected">
+                              Detected date (experimental)
+                            </option>
+                          </select>
+                        </label>
+                        <p className="text-[11px] text-gray-500">
+                          {orderingMode === "upload"
+                            ? "Drag rows to reorder exhibits manually."
+                            : orderingMode === "timestamp"
+                            ? "Automatically sorting by file timestamps."
+                            : "Placeholder detected-date ordering. OCR will plug in soon."}
+                        </p>
+                      </div>
+
+                      <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white">
+                        <table className="min-w-full text-left text-xs text-gray-700">
+                          <thead className="text-[11px] uppercase tracking-wide text-gray-500">
+                            <tr>
+                              <th className="px-3 py-2 font-semibold">Order</th>
+                              <th className="px-3 py-2 font-semibold">
+                                Exhibit label
+                              </th>
+                              <th className="px-3 py-2 font-semibold">
+                                Filename
+                              </th>
+                              <th className="px-3 py-2 font-semibold">Date</th>
+                              <th className="px-3 py-2 font-semibold">
+                                Description
+                              </th>
+                              <th className="px-3 py-2 font-semibold">Pages</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {orderedFiles.map((item, index) => (
+                              <tr
+                                key={item.id}
+                                draggable={orderingMode === "upload"}
+                                onDragStart={() => handleDragStart(item.id)}
+                                onDragEnter={() => handleDragEnter(item.id)}
+                                onDragEnd={handleDragEnd}
+                                className={`border-t border-gray-100 text-[13px] ${
+                                  draggingId === item.id
+                                    ? "bg-blue-50"
+                                    : "bg-white"
+                                }`}
+                              >
+                                <td className="px-3 py-3 align-top text-gray-500 font-semibold">
+                                  {orderingMode === "upload" && (
+                                    <span className="mr-2 cursor-grab select-none text-gray-300">
+                                      ⋮⋮
+                                    </span>
+                                  )}
+                                  {index + 1}
+                                </td>
+                                <td className="px-3 py-3 align-top">
+                                  <input
+                                    value={item.label}
+                                    onChange={(event) =>
+                                      updateFileMeta(item.id, {
+                                        label: event.target.value,
+                                      })
+                                    }
+                                    className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm focus:border-[#0056D6] focus:outline-none"
+                                  />
+                                </td>
+                                <td className="px-3 py-3 align-top text-gray-600">
+                                  <p className="truncate text-sm">
+                                    {item.file.name}
+                                  </p>
+                                </td>
+                                <td className="px-3 py-3 align-top">
+                                  <input
+                                    type="date"
+                                    value={item.assumedDate}
+                                    onChange={(event) =>
+                                      updateFileMeta(item.id, {
+                                        assumedDate: event.target.value,
+                                      })
+                                    }
+                                    className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm focus:border-[#0056D6] focus:outline-none"
+                                  />
+                                </td>
+                                <td className="px-3 py-3 align-top">
+                                  <input
+                                    type="text"
+                                    value={item.description}
+                                    onChange={(event) =>
+                                      updateFileMeta(item.id, {
+                                        description: event.target.value,
+                                      })
+                                    }
+                                    placeholder="Optional notes"
+                                    className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm focus:border-[#0056D6] focus:outline-none"
+                                  />
+                                </td>
+                                <td className="px-3 py-3 align-top">
+                                  <input
+                                    type="number"
+                                    min={1}
+                                    value={item.pages}
+                                    onChange={(event) =>
+                                      updateFileMeta(item.id, {
+                                        pages: event.target.value,
+                                      })
+                                    }
+                                    className="w-20 rounded-xl border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm focus:border-[#0056D6] focus:outline-none"
+                                  />
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )}
+
+                  {isSubmitting && (
+                    <div className="mt-4">
+                      <div className="h-2 w-full rounded-full bg-gray-200 overflow-hidden">
+                        <div
+                          className="h-full rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] transition-all duration-200"
+                          style={{ width: `${loadingProgress}%` }}
+                        />
+                      </div>
+                      <p className="text-[11px] text-gray-500 mt-1 uppercase tracking-wide">
+                        Rendering your exhibit…
+                      </p>
+                    </div>
+                  )}
+
                   {/* File summary */}
                   <div className="mt-4 text-left text-xs text-gray-600">
                     {files.length === 0 ? (
@@ -377,7 +650,7 @@ export default function Home() {
                           {totalSizeMB.toFixed(2)} MB total
                         </p>
                         <ul className="max-h-32 overflow-auto space-y-1 text-[11px]">
-                          {files.map(({ id, file }) => (
+                          {orderedFiles.map(({ id, file }) => (
                             <li
                               key={id}
                               className="flex justify-between gap-2 border-b border-gray-100 pb-1 last:border-b-0"
@@ -486,11 +759,12 @@ export default function Home() {
               Pricing
             </p>
             <h3 className="text-2xl font-semibold mt-2">
-              First 10 firms lock $29/mo forever.
+              Founding offer seats are limited.
             </h3>
             <p className="text-sm text-blue-100 mt-2 max-w-xl">
-              Start free with two exports, then upgrade when your caseload calls
-              for unlimited matters and priority access.
+              Start free with two exports. When CaseReady becomes essential,
+              solo attorneys lock lifetime pricing at $29/mo and firms step into
+              the $79/mo plan.
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 text-sm font-medium">
@@ -503,9 +777,16 @@ export default function Home() {
             </div>
             <div className="rounded-2xl bg-white text-[#0056D6] px-4 py-3">
               <p className="text-xs uppercase tracking-wide text-[#0056D6]/70">
-                Launch offer
+                Solo launch
               </p>
-              <p className="text-xl font-semibold">$19</p>
+              <p className="text-xl font-semibold">$29</p>
+              <p className="text-xs text-[#0056D6]/70">First 50 solos</p>
+            </div>
+            <div className="rounded-2xl bg-white text-[#0056D6] px-4 py-3">
+              <p className="text-xs uppercase tracking-wide text-[#0056D6]/70">
+                Firm plan
+              </p>
+              <p className="text-xl font-semibold">$79</p>
               <p className="text-xs text-[#0056D6]/70">Unlimited matters</p>
             </div>
             <Link
