@@ -386,30 +386,31 @@ export default function Home() {
             </div>
           </div>
 
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => {
-              document
-                .getElementById("how-it-works")
-                ?.scrollIntoView({ behavior: "smooth" });
-            }}
-            className="inline-flex items-center rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
-          >
-            How it works
-          </button>
-
-          <Link
-            href="/pricing"
-            className="inline-flex items-center rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
-          >
-            Pricing
-          </Link>
+        <div className="flex flex-wrap items-center gap-2 justify-end max-sm:w-full max-sm:justify-end">
+          <div className="flex items-center gap-1 rounded-full border border-gray-200 bg-white/90 px-2 py-1 shadow-sm">
+            <button
+              type="button"
+              onClick={() =>
+                document
+                  .getElementById("how-it-works")
+                  ?.scrollIntoView({ behavior: "smooth" })
+              }
+              className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-100"
+            >
+              <span className="text-[#0056D6]">●</span>How it works
+            </button>
+            <Link
+              href="/pricing"
+              className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-100"
+            >
+              <span className="text-[#0056D6]">$</span>Pricing
+            </Link>
+          </div>
 
           {isAuthenticated ? (
-            <div className="flex items-center gap-3">
-              <div className="hidden sm:flex flex-col text-right">
-                <span className="text-xs text-gray-500">
+            <div className="flex items-center gap-3 rounded-full border border-gray-200 bg-white/90 px-3 py-1 shadow-sm">
+              <div className="hidden sm:flex flex-col text-right leading-tight">
+                <span className="text-xs font-semibold text-gray-700">
                   {userEmail || "Account"}
                 </span>
                 <span className="text-[10px] text-gray-400">ID: {userId}</span>
@@ -418,28 +419,28 @@ export default function Home() {
                 type="button"
                 onClick={handleSignOut}
                 disabled={isSigningOut}
-                className={`inline-flex items-center rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 ${
+                className={`inline-flex items-center rounded-full bg-[#0056D6] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:brightness-110 ${
                   isSigningOut ? "opacity-60 cursor-not-allowed" : ""
                 }`}
               >
-                {isSigningOut ? "Signing out..." : "Sign out"}
+                {isSigningOut ? "Signing out…" : "Sign out"}
               </button>
             </div>
           ) : (
-            <>
+            <div className="flex items-center gap-2 rounded-full border border-gray-200 bg-white/90 px-2 py-1 shadow-sm">
               <Link
                 href="/signin"
-                className="inline-flex items-center rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
+                className="inline-flex items-center rounded-full bg-[#0056D6] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:brightness-110"
               >
-                {isCheckingSession ? "Checking..." : "Sign in"}
+                {isCheckingSession ? "Checking…" : "Sign in"}
               </Link>
               <Link
                 href="/signup"
-                className="hidden sm:inline-flex items-center rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
+                className="inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-100"
               >
                 Early access
               </Link>
-            </>
+            </div>
           )}
         </div>
       </div>
