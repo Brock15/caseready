@@ -361,7 +361,13 @@ export default function Home() {
   const handleDragEnd = () => setDraggingId(null);
 
   return (
-    <main className="min-h-screen bg-[#FAF8F5] text-[#111827] flex flex-col">
+    <main
+      className="relative min-h-screen flex flex-col overflow-hidden text-[#111827]"
+      style={{
+        backgroundImage:
+          "radial-gradient(130% 130% at 50% 0%, #fdfbff 0%, #f4f7ff 45%, #faf6f0 100%)",
+      }}
+    >
       {/* Top bar */}
       <header className="w-full border-b border-black/5 bg-white/60 backdrop-blur-sm">
         <div className="mx-auto max-w-5xl flex items-center justify-between py-4 px-4 sm:px-6">
@@ -386,26 +392,24 @@ export default function Home() {
             </div>
           </div>
 
-        <div className="flex flex-wrap items-center gap-2 justify-end max-sm:w-full max-sm:justify-end">
-          <div className="flex items-center gap-1 rounded-full border border-gray-200 bg-white/90 px-2 py-1 shadow-sm">
-            <button
-              type="button"
-              onClick={() =>
-                document
-                  .getElementById("how-it-works")
-                  ?.scrollIntoView({ behavior: "smooth" })
-              }
-              className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-100"
-            >
-              <span className="text-[#0056D6]">●</span>How it works
-            </button>
-            <Link
-              href="/pricing"
-              className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-100"
-            >
-              <span className="text-[#0056D6]">$</span>Pricing
-            </Link>
-          </div>
+        <div className="flex flex-wrap items-center gap-2 justify-end max-sm:w-full max-sm:justify-end text-[11px] font-semibold text-gray-600">
+          <button
+            type="button"
+            onClick={() =>
+              document
+                .getElementById("how-it-works")
+                ?.scrollIntoView({ behavior: "smooth" })
+            }
+            className="inline-flex items-center gap-1 rounded-full border border-transparent px-2.5 py-1 transition hover:border-gray-200 hover:bg-white/80"
+          >
+            <span className="text-[#0056D6]">●</span>How it works
+          </button>
+          <Link
+            href="/pricing"
+            className="inline-flex items-center gap-1 rounded-full border border-transparent px-2.5 py-1 transition hover:border-gray-200 hover:bg-white/80"
+          >
+            <span className="text-[#0056D6]">$</span>Pricing
+          </Link>
 
           {isAuthenticated ? (
             <div className="flex items-center gap-3 rounded-full border border-gray-200 bg-white/90 px-3 py-1 shadow-sm">
@@ -458,10 +462,15 @@ export default function Home() {
                   judge-ready exhibits.
                 </span>
               </h1>
+              <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white/80 px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm">
+                <span className="h-2 w-2 rounded-full bg-[#0056D6]" aria-hidden="true" />
+                Still in beta testing — feedback welcomed.
+              </p>
               <p className="text-sm sm:text-base text-gray-600 max-w-xl mb-6">
                 Drag, drop, and let CaseReady handle the formatting. Bates
                 numbers, exhibits, timelines—done in minutes instead of hours.
               </p>
+              <div className="h-px w-20 bg-gradient-to-r from-transparent via-[#0056D6]/50 to-transparent mb-6" />
 
               <div className="rounded-xl border border-blue-100 bg-white/70 px-4 py-3 text-xs text-gray-600 mb-4">
                 {isAuthenticated ? (
@@ -779,7 +788,7 @@ export default function Home() {
 
             {/* Right side */}
             <aside className="space-y-4">
-              <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm text-sm text-gray-700">
+              <div className="rounded-2xl border border-blue-100 bg-gradient-to-br from-white to-[#E8F0FF]/80 p-5 shadow-sm text-sm text-gray-700 backdrop-blur">
                 <h2 className="font-semibold text-gray-900 mb-2">
                   Built for busy attorneys.
                 </h2>
@@ -800,7 +809,7 @@ export default function Home() {
 
       <section
         id="how-it-works"
-        className="bg-white border-t border-black/5 scroll-mt-24"
+        className="border-t border-black/5 bg-gradient-to-b from-white via-white to-[#EEF2FF] scroll-mt-24"
       >
         <div className="mx-auto max-w-5xl w-full px-4 sm:px-6 py-12 sm:py-16 space-y-10">
           <div className="text-center max-w-2xl mx-auto">
@@ -833,9 +842,9 @@ export default function Home() {
             ].map((step, index) => (
               <div
                 key={step.title}
-                className="rounded-2xl border border-gray-200 bg-gray-50/70 p-6 flex flex-col gap-3 shadow-sm"
+                className="relative overflow-hidden rounded-2xl border border-blue-100 bg-white/90 p-6 flex flex-col gap-3 shadow-sm"
               >
-                <span className="h-10 w-10 rounded-2xl bg-gradient-to-br from-[#3FA9FF] to-[#0056D6] text-white font-semibold text-lg flex items-center justify-center">
+                <span className="h-10 w-10 rounded-2xl bg-gradient-to-br from-[#3FA9FF] to-[#0056D6] text-white font-semibold text-lg flex items-center justify-center shadow-sm">
                   {index + 1}
                 </span>
                 <h3 className="text-lg font-semibold text-gray-900">
