@@ -18,20 +18,20 @@ export const metadata: Metadata = {
     siteName,
     images: [
       {
-        url: "/og.jpg",
-        width: 1200,
-        height: 630,
-        alt: "CaseReady – Evidence made effortless",
+        url: "/logo.svg",
+        width: 512,
+        height: 512,
+        alt: "CaseReady folder-check logo",
       },
     ],
     locale: "en_US",
     type: "website",
   },
   twitter: {
-    card: "summary_large_image",
+    card: "summary",
     title: siteName,
     description: siteDescription,
-    images: ["/og.jpg"],
+    images: ["/logo.svg"],
   },
   manifest: "/site.webmanifest",
   icons: {

@@ -223,20 +223,15 @@ export default function Home() {
 
       formData.append("orderingMode", orderingMode);
       formData.append(
-        "fileMetadata",
-        JSON.stringify(
-          files.map((item, index) => ({
-            id: item.id,
-            order: index + 1,
+        "metadata",
+        JSON.stringify({
+          exhibits: files.map((item, index) => ({
+            fileIndex: index,
             label: item.label,
             description: item.description,
-            assumedDate: item.assumedDate,
-            pages: item.pages,
             detectedDate: item.detectedDate,
-            filename: item.file.name,
-            lastModified: item.file.lastModified,
-          }))
-        )
+          })),
+        })
       );
 
       const res = await fetch("/api/generate-exhibit", {
