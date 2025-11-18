@@ -192,7 +192,8 @@ export async function POST(req: NextRequest) {
     }
 
     const pdfDoc = await PDFDocument.create();
-    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const exhibitFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+    const batesFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
     let batesCounter = 1;
 
     for (let i = 0; i < exhibitsInput.length; i += 1) {
@@ -214,8 +215,8 @@ export async function POST(req: NextRequest) {
       const label = (exhibit.label || getExhibitLabel(i)).trim() || "A";
 
       pages.forEach((page) => {
-        drawExhibitStamp(page, label, font);
-        drawBatesStamp(page, batesCounter++, font);
+        drawExhibitStamp(page, label, exhibitFont);
+        drawBatesStamp(page, batesCounter++, batesFont);
       });
     }
 

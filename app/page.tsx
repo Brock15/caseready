@@ -118,6 +118,7 @@ export default function Home() {
     "upload" | "timestamp" | "detected"
   >("upload");
   const [draggingId, setDraggingId] = useState<string | null>(null);
+  const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const hasUnlimitedExports = useMemo(
     () =>
       UNLIMITED_EMAILS.has(userEmail ?? "") ||
@@ -161,6 +162,14 @@ export default function Home() {
     };
   }, [supabase]);
 
+  useEffect(() => {
+    return () => {
+      if (downloadUrl) {
+        URL.revokeObjectURL(downloadUrl);
+      }
+    };
+  }, [downloadUrl]);
+
   const handleSignOut = async () => {
     if (isSigningOut) return;
     try {
@@ -201,6 +210,11 @@ export default function Home() {
         "You have used both free exports. Upgrade your plan to continue."
       );
       return;
+    }
+
+    if (downloadUrl) {
+      URL.revokeObjectURL(downloadUrl);
+      setDownloadUrl(null);
     }
 
     setIsSubmitting(true);
@@ -254,16 +268,8 @@ export default function Home() {
       if (contentType.includes("application/pdf")) {
         const blob = await res.blob();
         const url = URL.createObjectURL(blob);
-
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "caseready-exhibit.pdf";
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
-
-        setServerMessage("Exhibit PDF generated and downloaded.");
+        setDownloadUrl(url);
+        setServerMessage("Exhibit PDF ready. Use the download button below.");
 
         const { data } = await supabase.auth.getUser();
         if (data.user) {
@@ -337,12 +343,20 @@ export default function Home() {
     );
   };
 
-  const handleDragStart = (id: string) => {
+  const handleDragStart = (
+    event: DragEvent<HTMLTableRowElement>,
+    id: string
+  ) => {
     if (orderingMode !== "upload") return;
+    event.dataTransfer?.setData("text/plain", id);
     setDraggingId(id);
   };
 
-  const handleDragEnter = (targetId: string) => {
+  const handleRowDrop = (
+    event: DragEvent<HTMLTableRowElement>,
+    targetId: string
+  ) => {
+    event.preventDefault();
     if (orderingMode !== "upload" || !draggingId || draggingId === targetId)
       return;
     setFiles((prev) => {
@@ -356,6 +370,7 @@ export default function Home() {
       next.splice(toIndex, 0, moved);
       return relabelFiles(next);
     });
+    setDraggingId(null);
   };
 
   const handleDragEnd = () => setDraggingId(null);
@@ -596,7 +611,7 @@ export default function Home() {
                             </option>
                           </select>
                         </label>
-                        <p className="text-[11px] text-gray-500">
+                        <p className="text-[11px] text-gray-700">
                           {orderingMode === "upload"
                             ? "Drag rows to reorder exhibits manually."
                             : orderingMode === "timestamp"
@@ -630,8 +645,11 @@ export default function Home() {
                               <tr
                                 key={item.id}
                                 draggable={orderingMode === "upload"}
-                                onDragStart={() => handleDragStart(item.id)}
-                                onDragEnter={() => handleDragEnter(item.id)}
+                                onDragStart={(event) =>
+                                  handleDragStart(event, item.id)
+                                }
+                                onDragOver={(event) => event.preventDefault()}
+                                onDrop={(event) => handleRowDrop(event, item.id)}
                                 onDragEnd={handleDragEnd}
                                 className={`border-t border-gray-100 text-[13px] ${
                                   draggingId === item.id
@@ -732,8 +750,8 @@ export default function Home() {
                       </p>
                     </div>
                   ) : (
-                    <div className="mt-4 text-left text-xs text-gray-600">
-                      <p className="mb-1 font-medium">
+                    <div className="mt-4 text-left text-xs text-gray-700">
+                      <p className="mb-1 font-medium text-gray-900">
                         {files.length} file
                         {files.length > 1 ? "s" : ""} selected ·{" "}
                         {totalSizeMB.toFixed(2)} MB total
@@ -744,10 +762,10 @@ export default function Home() {
                             key={id}
                             className="flex justify-between gap-2 border-b border-gray-100 pb-1 last:border-b-0"
                           >
-                            <span className="truncate">
+                            <span className="truncate text-gray-800">
                               {label} — {file.name}
                             </span>
-                            <span className="whitespace-nowrap text-gray-400">
+                            <span className="whitespace-nowrap text-gray-600">
                               {(file.size / 1024).toFixed(0)} KB
                             </span>
                           </li>
@@ -758,9 +776,19 @@ export default function Home() {
 
                   {/* Server response */}
                   {serverMessage && (
-                    <p className="mt-3 text-[11px] text-gray-500">
+                    <p className="mt-3 text-[11px] text-gray-700">
                       {serverMessage}
                     </p>
+                  )}
+
+                  {downloadUrl && (
+                    <a
+                      href={downloadUrl}
+                      download="caseready-exhibit.pdf"
+                      className="mt-3 inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:brightness-110 transition"
+                    >
+                      Download Exhibit PDF
+                    </a>
                   )}
 
                   <p className="mt-4 inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white/95 px-4 py-2 text-[11px] font-medium text-gray-700 shadow-sm">
