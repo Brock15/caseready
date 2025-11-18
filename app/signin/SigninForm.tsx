@@ -53,7 +53,6 @@ export default function SigninForm() {
           redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(
             redirectTo
           )}`,
-          flowType: "pkce",
         },
       });
       if (error) {

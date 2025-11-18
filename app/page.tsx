@@ -132,7 +132,7 @@ const FEATURE_SETS = [
 
 const HERO_METRICS = [
   { value: "22k+", label: "Pages cleaned this month" },
-  { value: "15 min", label: "Avg. timeline prep saved" },
+  { value: "45 min", label: "Avg. timeline prep saved" },
   { value: "98%", label: "OCR-ready formatting score" },
 ];
 
@@ -673,7 +673,10 @@ export default function Home() {
               </div>
 
               {/* Upload card */}
-              <div className="surface-card rounded-2xl border border-gray-200 bg-white shadow-sm p-5 sm:p-6">
+              <div
+                id="drop-zone"
+                className="surface-card rounded-2xl border border-gray-200 bg-white shadow-sm p-5 sm:p-6"
+              >
                 <div
                   className="border-2 border-dashed border-gray-200 rounded-xl p-6 sm:p-8 text-center shadow-inner"
                   style={{

@@ -24,7 +24,7 @@ const quickActions: QuickAction[] = [
     title: "Draft Exhibit",
     description: "Merge, label, and Bates stamp in minutes.",
     colors: "from-[#3FA9FF] via-[#4D7CFE] to-[#1D3EAF]",
-    href: "/",
+    href: "/#drop-zone",
   },
   {
     id: "timeline",

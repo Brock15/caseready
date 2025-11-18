@@ -61,7 +61,6 @@ export default function SignupPage() {
             prompt: "consent",
           },
           redirectTo: callbackUrl,
-          flowType: "pkce",
         },
       });
       if (error) {
