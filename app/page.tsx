@@ -9,6 +9,7 @@ import {
   ChangeEvent,
   useEffect,
   useMemo,
+  type DragEvent,
 } from "react";
 import type { User } from "@supabase/supabase-js";
 import { createBrowserSupabaseClient } from "@/lib/createBrowserSupabaseClient";
@@ -17,10 +18,15 @@ type SelectedFile = {
   id: string;
   file: File;
   label: string;
+  labelLocked: boolean;
   description: string;
   assumedDate: string;
   pages: string;
+  detectedDate: string;
 };
+
+const UNLIMITED_EMAILS = new Set(["brockstar1215@gmail.com"]);
+const UNLIMITED_IDS = new Set(["c46c028c-0e2c-41a0-bad4-900740c4a895"]);
 
 const ACCEPTED_MIME_TYPES = new Set([
   "application/pdf",
@@ -36,12 +42,61 @@ const formatDateForInput = (timestamp: number) => {
   return date.toISOString().split("T")[0];
 };
 
+const stripExtension = (filename: string) =>
+  filename.replace(/\.[^/.]+$/, "");
+
+const getExhibitLabel = (index: number) => {
+  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  let n = index;
+  let label = "";
+  do {
+    label = alphabet[n % 26] + label;
+    n = Math.floor(n / 26) - 1;
+  } while (n >= 0);
+  return label;
+};
+
 const isSupportedFile = (file: File) => {
   if (ACCEPTED_MIME_TYPES.has(file.type)) {
     return true;
   }
   const extension = file.name.split(".").pop()?.toLowerCase() ?? "";
   return ACCEPTED_EXTENSIONS.has(extension);
+};
+
+const getSortValue = (
+  file: SelectedFile,
+  mode: "upload" | "timestamp" | "detected"
+) => {
+  if (mode === "timestamp") {
+    return file.file.lastModified;
+  }
+  if (mode === "detected") {
+    return Date.parse(file.detectedDate) || file.file.lastModified;
+  }
+  return 0;
+};
+
+const sortFilesByMode = (
+  list: SelectedFile[],
+  mode: "upload" | "timestamp" | "detected"
+) => {
+  if (mode === "upload") return list;
+  return [...list].sort((a, b) => getSortValue(a, mode) - getSortValue(b, mode));
+};
+
+const relabelFiles = (list: SelectedFile[]) => {
+  let changed = false;
+  const next = list.map((file, index) => {
+    if (file.labelLocked) return file;
+    const generated = getExhibitLabel(index);
+    if (generated !== file.label) {
+      changed = true;
+      return { ...file, label: generated };
+    }
+    return file;
+  });
+  return changed ? next : list;
 };
 
 export default function Home() {
@@ -63,6 +118,12 @@ export default function Home() {
     "upload" | "timestamp" | "detected"
   >("upload");
   const [draggingId, setDraggingId] = useState<string | null>(null);
+  const hasUnlimitedExports = useMemo(
+    () =>
+      UNLIMITED_EMAILS.has(userEmail ?? "") ||
+      UNLIMITED_IDS.has(userId ?? ""),
+    [userEmail, userId]
+  );
 
   useEffect(() => {
     let active = true;
@@ -125,19 +186,6 @@ export default function Home() {
 
   const totalSizeBytes = files.reduce((sum, f) => sum + f.file.size, 0);
   const totalSizeMB = totalSizeBytes / (1024 * 1024);
-  const orderedFiles = useMemo(() => {
-    if (orderingMode === "timestamp") {
-      return [...files].sort(
-        (a, b) => a.file.lastModified - b.file.lastModified
-      );
-    }
-    if (orderingMode === "detected") {
-      return [...files].sort((a, b) =>
-        a.assumedDate.localeCompare(b.assumedDate)
-      );
-    }
-    return files;
-  }, [files, orderingMode]);
 
   const handleGenerate = async () => {
     if (!files.length || isSubmitting) return;
@@ -148,7 +196,7 @@ export default function Home() {
       return;
     }
 
-    if (exportsLeft <= 0) {
+    if (exportsLeft <= 0 && !hasUnlimitedExports) {
       setServerMessage(
         "You have used both free exports. Upgrade your plan to continue."
       );
@@ -169,7 +217,7 @@ export default function Home() {
 
     try {
       const formData = new FormData();
-      orderedFiles.forEach(({ file }) => {
+      files.forEach(({ file }) => {
         formData.append("files", file);
       });
 
@@ -177,13 +225,14 @@ export default function Home() {
       formData.append(
         "fileMetadata",
         JSON.stringify(
-          orderedFiles.map((item, index) => ({
+          files.map((item, index) => ({
             id: item.id,
             order: index + 1,
             label: item.label,
             description: item.description,
             assumedDate: item.assumedDate,
             pages: item.pages,
+            detectedDate: item.detectedDate,
             filename: item.file.name,
             lastModified: item.file.lastModified,
           }))
@@ -258,18 +307,22 @@ export default function Home() {
             .toString(36)
             .slice(2)}`,
           file,
-          label: `Exhibit ${prev.length + additions.length + 1}`,
-          description: "",
+          label: getExhibitLabel(prev.length + additions.length),
+          labelLocked: false,
+          description: stripExtension(file.name),
           assumedDate: formatDateForInput(file.lastModified),
           pages: "",
+          detectedDate: formatDateForInput(file.lastModified),
         });
       });
       if (!additions.length) return prev;
-      return [...prev, ...additions];
+      const combined = [...prev, ...additions];
+      const ordered = sortFilesByMode(combined, orderingMode);
+      return relabelFiles(ordered);
     });
   }
 
-  const handleDropZone = (event: React.DragEvent<HTMLDivElement>) => {
+  const handleDropZone = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     const droppedFiles = Array.from(event.dataTransfer?.files || []);
     addFiles(droppedFiles);
@@ -280,6 +333,7 @@ export default function Home() {
   ): void => {
     const value = event.target.value as "upload" | "timestamp" | "detected";
     setOrderingMode(value);
+    setFiles((prev) => relabelFiles(sortFilesByMode(prev, value)));
   };
 
   const updateFileMeta = (id: string, updates: Partial<SelectedFile>) => {
@@ -305,7 +359,7 @@ export default function Home() {
       }
       const [moved] = next.splice(fromIndex, 1);
       next.splice(toIndex, 0, moved);
-      return next;
+      return relabelFiles(next);
     });
   };
 
@@ -415,6 +469,17 @@ export default function Home() {
 
               <div className="rounded-xl border border-blue-100 bg-white/70 px-4 py-3 text-xs text-gray-600 mb-4">
                 {isAuthenticated ? (
+                  hasUnlimitedExports ? (
+                    <>
+                      <p className="font-semibold text-gray-900">
+                        Unlimited exports enabled
+                      </p>
+                      <p>
+                        Thanks for being an early tester—run as many exhibits as
+                        you need.
+                      </p>
+                    </>
+                  ) : (
                   <>
                     <p className="font-semibold text-gray-900">
                       Free plan: {exportsLeft} exports left of 2
@@ -424,6 +489,7 @@ export default function Home() {
                       upgrade your workspace.
                     </p>
                   </>
+                  )
                 ) : (
                   <>
                     <p className="font-semibold text-gray-900">
@@ -476,19 +542,23 @@ export default function Home() {
                       disabled={
                         !files.length ||
                         isSubmitting ||
-                        (isAuthenticated && exportsLeft <= 0)
+                        (isAuthenticated && exportsLeft <= 0 && !hasUnlimitedExports)
                       }
                       className={`inline-flex justify-center items-center rounded-full border px-5 py-2.5 text-sm font-medium transition ${
                         files.length &&
                         !isSubmitting &&
-                        (!isAuthenticated || exportsLeft > 0)
+                        (!isAuthenticated ||
+                          exportsLeft > 0 ||
+                          hasUnlimitedExports)
                           ? "border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
                           : "border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed"
                       }`}
                     >
                       {isSubmitting
                         ? "Processing..."
-                        : isAuthenticated && exportsLeft <= 0
+                        : isAuthenticated &&
+                          exportsLeft <= 0 &&
+                          !hasUnlimitedExports
                         ? "Upgrade for more exports"
                         : "Generate Exhibit PDF"}
                     </button>
@@ -531,7 +601,9 @@ export default function Home() {
                               <th className="px-3 py-2 font-semibold">
                                 Filename
                               </th>
-                              <th className="px-3 py-2 font-semibold">Date</th>
+                              <th className="px-3 py-2 font-semibold">
+                                Date (detected/assumed)
+                              </th>
                               <th className="px-3 py-2 font-semibold">
                                 Description
                               </th>
@@ -539,7 +611,7 @@ export default function Home() {
                             </tr>
                           </thead>
                           <tbody>
-                            {orderedFiles.map((item, index) => (
+                            {files.map((item, index) => (
                               <tr
                                 key={item.id}
                                 draggable={orderingMode === "upload"}
@@ -566,6 +638,7 @@ export default function Home() {
                                     onChange={(event) =>
                                       updateFileMeta(item.id, {
                                         label: event.target.value,
+                                        labelLocked: true,
                                       })
                                     }
                                     className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm focus:border-[#0056D6] focus:outline-none"
@@ -650,12 +723,14 @@ export default function Home() {
                           {totalSizeMB.toFixed(2)} MB total
                         </p>
                         <ul className="max-h-32 overflow-auto space-y-1 text-[11px]">
-                          {orderedFiles.map(({ id, file }) => (
+                          {files.map(({ id, file, label }) => (
                             <li
                               key={id}
                               className="flex justify-between gap-2 border-b border-gray-100 pb-1 last:border-b-0"
                             >
-                              <span className="truncate">{file.name}</span>
+                              <span className="truncate">
+                                {label} — {file.name}
+                              </span>
                               <span className="whitespace-nowrap text-gray-400">
                                 {(file.size / 1024).toFixed(0)} KB
                               </span>
