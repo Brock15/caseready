@@ -130,6 +130,19 @@ const FEATURE_SETS = [
   },
 ];
 
+const HERO_METRICS = [
+  { value: "22k+", label: "Pages cleaned this month" },
+  { value: "15 min", label: "Avg. timeline prep saved" },
+  { value: "98%", label: "OCR-ready formatting score" },
+];
+
+const TRUST_BADGES = [
+  "Solo firms",
+  "Boutique litigators",
+  "State hearings",
+  "AmLaw referrals",
+];
+
 export default function Home() {
   const router = useRouter();
   const supabase = useMemo(() => createBrowserSupabaseClient(), []);
@@ -553,7 +566,9 @@ export default function Home() {
         <div className="mx-auto max-w-5xl w-full px-4 sm:px-6 py-10 sm:py-16">
           <div className="grid gap-10 md:grid-cols-[1.2fr,1fr] items-start md:items-center">
             {/* Left side */}
-            <section>
+            <section className="relative">
+              <span className="pointer-events-none absolute -top-8 -left-6 h-48 w-48 rounded-full bg-[#3FA9FF]/30 blur-3xl" />
+              <span className="pointer-events-none absolute top-1/4 -right-10 h-40 w-40 rounded-full bg-[#F79CFF]/20 blur-3xl" />
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-gray-900 mb-4">
                 Turn messy evidence into
                 <span className="block text-[#0056D6]">
@@ -568,6 +583,57 @@ export default function Home() {
                 Drag, drop, and let CaseReady handle the formatting. Bates
                 numbers, exhibits, timelines—done in minutes instead of hours.
               </p>
+              <div className="grid gap-3 sm:grid-cols-3 mb-6">
+                {HERO_METRICS.map((metric) => (
+                  <div
+                    key={metric.label}
+                    className="surface-card rounded-2xl border border-white/60 px-4 py-3 text-center shadow-sm"
+                  >
+                    <p className="text-2xl font-semibold text-[#0056D6]">
+                      {metric.value}
+                    </p>
+                    <p className="text-xs text-gray-500">{metric.label}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="flex flex-wrap items-center gap-3 mb-6 text-xs text-gray-500">
+                <div className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white/80 px-4 py-1.5 text-xs font-semibold text-gray-700 shadow-sm">
+                  <span className="h-2 w-2 rounded-full bg-[#10B981]" />
+                  Live beta now open
+                </div>
+                <span className="uppercase tracking-[0.3em] text-[#0056D6] font-semibold">
+                  Trusted by
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {TRUST_BADGES.map((badge) => (
+                    <span
+                      key={badge}
+                      className="rounded-full border border-gray-200 bg-white/70 px-3 py-0.5 text-gray-600"
+                    >
+                      {badge}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-3 mb-6">
+                <Link
+                  href="/dashboard"
+                  className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:brightness-110"
+                >
+                  Launch dashboard
+                </Link>
+                <button
+                  type="button"
+                  onClick={() =>
+                    document
+                      .getElementById("how-it-works")
+                      ?.scrollIntoView({ behavior: "smooth" })
+                  }
+                  className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white/80 px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                >
+                  Watch workflow
+                </button>
+              </div>
               <div className="h-px w-20 bg-gradient-to-r from-transparent via-[#0056D6]/50 to-transparent mb-6" />
 
               <div className="surface-card rounded-xl border border-blue-100 bg-white/70 px-4 py-3 text-xs text-gray-600 mb-4">

@@ -56,14 +56,23 @@ export default function SignupPage() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
+          queryParams: {
+            access_type: "offline",
+            prompt: "consent",
+          },
           redirectTo: callbackUrl,
         },
       });
       if (error) {
         setErrorMessage(error.message);
+        setIsOauthLoading(false);
       }
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : "Failed to start Google sign-up.");
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "Failed to start Google sign-up."
+      );
       setIsOauthLoading(false);
     }
   };
@@ -177,14 +186,34 @@ export default function SignupPage() {
               type="button"
               onClick={handleGoogleSignup}
               disabled={isOauthLoading}
-              className={`mt-4 w-full inline-flex items-center justify-center gap-2 rounded-full border px-4 py-2.5 text-sm font-semibold ${
+              className={`mt-4 w-full inline-flex items-center justify-center gap-3 rounded-full border px-4 py-2.5 text-sm font-semibold ${
                 isOauthLoading
                   ? "border-gray-200 text-gray-400"
                   : "border-gray-300 text-gray-700 hover:bg-gray-50"
               }`}
             >
-              <span className="text-lg">🟢</span>
-              {isOauthLoading ? "Redirecting to Google..." : "Continue with Google"}
+              <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-white">
+                <svg viewBox="0 0 48 48" className="h-4 w-4">
+                  <path
+                    fill="#EA4335"
+                    d="M24 9.5c3.54 0 6.72 1.22 9.22 3.6l6.85-6.85C35.9 2.46 30.37 0 24 0 14.64 0 6.51 5.38 2.56 13.21l7.98 6.21C12.57 13.01 17.86 9.5 24 9.5z"
+                  />
+                  <path
+                    fill="#4285F4"
+                    d="M46.5 24.5c0-1.57-.14-3.08-.4-4.5H24v9h12.7c-.55 2.96-2.24 5.48-4.76 7.2l7.44 5.77C43.78 37.37 46.5 31.39 46.5 24.5z"
+                  />
+                  <path
+                    fill="#FBBC05"
+                    d="M10.54 28.04c-.48-1.43-.75-2.95-.75-4.54s.27-3.11.75-4.54l-7.98-6.21C1.09 15.8 0 20.27 0 24s1.09 8.2 2.56 11.25l7.98-6.21z"
+                  />
+                  <path
+                    fill="#34A853"
+                    d="M24 48c6.37 0 11.73-2.1 15.64-5.7l-7.44-5.77c-2.06 1.39-4.71 2.2-8.2 2.2-6.14 0-11.43-3.52-13.46-8.5l-7.98 6.21C6.51 42.62 14.64 48 24 48z"
+                  />
+                  <path fill="none" d="M0 0h48v48H0z" />
+                </svg>
+              </span>
+              {isOauthLoading ? "Redirecting..." : "Continue with Google"}
             </button>
           </div>
         </div>
