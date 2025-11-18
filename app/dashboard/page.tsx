@@ -24,7 +24,6 @@ const quickActions: QuickAction[] = [
     title: "Draft Exhibit",
     description: "Merge, label, and Bates stamp in minutes.",
     colors: "from-[#3FA9FF] via-[#4D7CFE] to-[#1D3EAF]",
-    href: "/#drop-zone",
   },
   {
     id: "timeline",
@@ -379,19 +378,26 @@ export default function DashboardPage() {
                   );
                 }
 
-                if (action.href) {
-                  return (
-                    <Link
-                      key={action.id}
-                      href={action.href ?? "/dashboard"}
-                      className={cardClasses}
-                    >
-                      {content}
-                    </Link>
-                  );
-                }
+                const handleActionClick = () => {
+                  if (action.id === "prepare") {
+                    if (typeof window !== "undefined") {
+                      window.location.hash = "drop-zone";
+                      const target = document.getElementById("drop-zone");
+                      target?.scrollIntoView({ behavior: "smooth", block: "start" });
+                      window.setTimeout(() => {
+                        window.scrollBy({ top: -120, behavior: "smooth" });
+                      }, 250);
+                    }
+                  }
+                };
+
                 return (
-                  <button key={action.id} className={cardClasses} type="button">
+                  <button
+                    key={action.id}
+                    className={cardClasses}
+                    type="button"
+                    onClick={handleActionClick}
+                  >
                     {content}
                   </button>
                 );
