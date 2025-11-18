@@ -47,9 +47,28 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const focusModeScript = `
+    (function() {
+      try {
+        const stored = localStorage.getItem("caseready:focusMode");
+        if (stored === "on") {
+          document.documentElement.dataset.focusMode = "true";
+        }
+      } catch (error) {
+        console.warn(error);
+      }
+    })();
+  `;
   return (
     <html lang="en">
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        <script
+          dangerouslySetInnerHTML={{
+            __html: focusModeScript,
+          }}
+        />
+        {children}
+      </body>
     </html>
   );
 }

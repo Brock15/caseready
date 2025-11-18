@@ -24,3 +24,25 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+html[data-focus-mode="true"] body {
+  background: #020617;
+  color: #e2e8f0;
+}
+
+.surface-card {
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+html[data-focus-mode="true"] .surface-card {
+  background-color: rgba(11, 18, 32, 0.92) !important;
+  border-color: rgba(51, 65, 85, 0.8) !important;
+  color: #e2e8f0;
+}
+
+html[data-focus-mode="true"] .surface-card p,
+html[data-focus-mode="true"] .surface-card span,
+html[data-focus-mode="true"] .surface-card label {
+  color: #e2e8f0;
+}

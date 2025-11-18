@@ -12,6 +12,7 @@ export default function SignupPage() {
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isOauthLoading, setIsOauthLoading] = useState(false);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -25,7 +26,7 @@ export default function SignupPage() {
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/`,
+        emailRedirectTo: `${window.location.origin}/dashboard`,
         data: {
           exportsUsed: 0,
         },
@@ -43,6 +44,28 @@ export default function SignupPage() {
     }
 
     setIsSubmitting(false);
+  };
+
+  const handleGoogleSignup = async () => {
+    if (isOauthLoading) return;
+    try {
+      setIsOauthLoading(true);
+      const callbackUrl = `${window.location.origin}/auth/callback?next=${encodeURIComponent(
+        "/dashboard"
+      )}`;
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: callbackUrl,
+        },
+      });
+      if (error) {
+        setErrorMessage(error.message);
+      }
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "Failed to start Google sign-up.");
+      setIsOauthLoading(false);
+    }
   };
 
   return (
@@ -143,6 +166,27 @@ export default function SignupPage() {
             </Link>
             .
           </p>
+
+          <div className="mt-6">
+            <div className="flex items-center gap-2 text-xs text-gray-400">
+              <span className="flex-1 h-px bg-gray-200" />
+              <span>or continue with</span>
+              <span className="flex-1 h-px bg-gray-200" />
+            </div>
+            <button
+              type="button"
+              onClick={handleGoogleSignup}
+              disabled={isOauthLoading}
+              className={`mt-4 w-full inline-flex items-center justify-center gap-2 rounded-full border px-4 py-2.5 text-sm font-semibold ${
+                isOauthLoading
+                  ? "border-gray-200 text-gray-400"
+                  : "border-gray-300 text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              <span className="text-lg">🟢</span>
+              {isOauthLoading ? "Redirecting to Google..." : "Continue with Google"}
+            </button>
+          </div>
         </div>
       </section>
     </main>

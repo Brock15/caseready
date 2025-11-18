@@ -150,6 +150,7 @@ export default function Home() {
   >("upload");
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+  const [globalFocusMode, setGlobalFocusMode] = useState(false);
   const hasUnlimitedExports = useMemo(
     () =>
       UNLIMITED_EMAILS.has(userEmail ?? "") ||
@@ -200,6 +201,34 @@ export default function Home() {
       }
     };
   }, [downloadUrl]);
+
+  useEffect(() => {
+    const sync = (value?: boolean) => {
+      if (value !== undefined) {
+        setGlobalFocusMode(value);
+        return;
+      }
+      if (typeof document !== "undefined") {
+        setGlobalFocusMode(document.documentElement.dataset.focusMode === "true");
+      }
+    };
+    sync();
+    const handler = (event: Event) => {
+      if ("detail" in event && event instanceof CustomEvent) {
+        sync(Boolean(event.detail?.value));
+      } else {
+        sync();
+      }
+    };
+    if (typeof window !== "undefined") {
+      window.addEventListener("caseready:focusModeChange", handler);
+    }
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("caseready:focusModeChange", handler);
+      }
+    };
+  }, []);
 
   const handleSignOut = async () => {
     if (isSigningOut) return;
@@ -408,14 +437,27 @@ export default function Home() {
 
   return (
     <main
-      className="relative min-h-screen flex flex-col overflow-hidden text-[#111827]"
-      style={{
-        backgroundImage:
-          "radial-gradient(130% 130% at 50% 0%, #fdfbff 0%, #f4f7ff 45%, #faf6f0 100%)",
-      }}
+      className={`relative min-h-screen flex flex-col overflow-hidden ${
+        globalFocusMode ? "text-slate-100 bg-[#020617]" : "text-[#111827]"
+      }`}
+      style={
+        globalFocusMode
+          ? {
+              backgroundImage:
+                "radial-gradient(120% 120% at 50% 0%, #0b1220 0%, #05060b 60%, #020617 100%)",
+            }
+          : {
+              backgroundImage:
+                "radial-gradient(130% 130% at 50% 0%, #fdfbff 0%, #f4f7ff 45%, #faf6f0 100%)",
+            }
+      }
     >
       {/* Top bar */}
-      <header className="w-full border-b border-black/5 bg-white/60 backdrop-blur-sm">
+      <header
+        className={`w-full border-b backdrop-blur-sm ${
+          globalFocusMode ? "bg-[#0B1220]/90 border-white/10" : "bg-white/60 border-black/5"
+        }`}
+      >
         <div className="mx-auto max-w-5xl flex items-center justify-between py-4 px-4 sm:px-6">
           <div className="flex items-center gap-3">
             <div className="h-12 w-12 rounded-2xl bg-white shadow-md flex items-center justify-center border border-gray-100">
@@ -438,7 +480,11 @@ export default function Home() {
             </div>
           </div>
 
-        <div className="flex flex-wrap items-center gap-2 justify-end max-sm:w-full max-sm:justify-end text-[11px] font-semibold text-gray-600">
+        <div
+          className={`flex flex-wrap items-center gap-2 justify-end max-sm:w-full max-sm:justify-end text-[11px] font-semibold ${
+            globalFocusMode ? "text-gray-300" : "text-gray-600"
+          }`}
+        >
           <button
             type="button"
             onClick={() =>
@@ -465,6 +511,12 @@ export default function Home() {
                 </span>
                 <span className="text-[10px] text-gray-400">ID: {userId}</span>
               </div>
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50"
+              >
+                Dashboard
+              </Link>
               <button
                 type="button"
                 onClick={handleSignOut}
@@ -518,7 +570,7 @@ export default function Home() {
               </p>
               <div className="h-px w-20 bg-gradient-to-r from-transparent via-[#0056D6]/50 to-transparent mb-6" />
 
-              <div className="rounded-xl border border-blue-100 bg-white/70 px-4 py-3 text-xs text-gray-600 mb-4">
+              <div className="surface-card rounded-xl border border-blue-100 bg-white/70 px-4 py-3 text-xs text-gray-600 mb-4">
                 {isAuthenticated ? (
                   hasUnlimitedExports ? (
                     <>
@@ -555,7 +607,7 @@ export default function Home() {
               </div>
 
               {/* Upload card */}
-              <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-5 sm:p-6">
+              <div className="surface-card rounded-2xl border border-gray-200 bg-white shadow-sm p-5 sm:p-6">
                 <div
                   className="border-2 border-dashed border-gray-200 rounded-xl p-6 sm:p-8 text-center shadow-inner"
                   style={{
@@ -651,7 +703,7 @@ export default function Home() {
                         </p>
                       </div>
 
-                      <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white">
+                      <div className="surface-card overflow-x-auto rounded-2xl border border-gray-200 bg-white">
                         <table className="min-w-full text-left text-xs text-gray-700">
                           <thead className="text-[11px] uppercase tracking-wide text-gray-500">
                             <tr>
@@ -847,7 +899,7 @@ export default function Home() {
 
             {/* Right side */}
             <aside className="space-y-4">
-              <div className="rounded-2xl border border-blue-100 bg-gradient-to-br from-white to-[#E8F0FF]/80 p-5 shadow-sm text-sm text-gray-700 backdrop-blur">
+              <div className="surface-card rounded-2xl border border-blue-100 bg-gradient-to-br from-white to-[#E8F0FF]/80 p-5 shadow-sm text-sm text-gray-700 backdrop-blur">
                 <h2 className="font-semibold text-gray-900 mb-2">
                   Built for busy attorneys.
                 </h2>
