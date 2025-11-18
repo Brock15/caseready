@@ -156,7 +156,7 @@ export default function DashboardPage() {
   }, [speedMode]);
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
+    await fetch("/auth/signout", { method: "POST" });
     router.replace("/signin");
   };
 

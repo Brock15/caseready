@@ -247,7 +247,7 @@ export default function Home() {
     if (isSigningOut) return;
     try {
       setIsSigningOut(true);
-      await supabase.auth.signOut();
+      await fetch("/auth/signout", { method: "POST" });
       router.replace("/signin");
     } catch (error) {
       console.error("Failed to sign out", error);
