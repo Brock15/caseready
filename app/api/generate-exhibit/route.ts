@@ -213,8 +213,7 @@ const loadPdfOrImageAsPages = async (
     return copies;
   }
 
-  const nodeBuffer = Buffer.from(fileBuffer);
-  let workingBuffer = nodeBuffer;
+  let workingBuffer: Buffer = Buffer.from(fileBuffer);
   let rotationDegrees = 0;
   if (fileType === "image/jpeg" || fileType === "image/jpg") {
     const orientation = getJpegOrientation(fileBuffer);
