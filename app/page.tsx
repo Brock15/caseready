@@ -502,16 +502,26 @@ export default function Home() {
               {/* Upload card */}
               <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-5 sm:p-6">
                 <div
-                  className="border-2 border-dashed border-gray-300 rounded-xl p-6 sm:p-8 text-center bg-gray-50/60"
+                  className="border-2 border-dashed border-gray-200 rounded-xl p-6 sm:p-8 text-center shadow-inner"
+                  style={{
+                    backgroundImage:
+                      "url('/ChatGPT Image Nov 17, 2025, 09_42_05 PM copy.svg')",
+                    backgroundSize: "260px",
+                    backgroundRepeat: "repeat",
+                    backgroundPosition: "center",
+                    backgroundColor: "rgba(255,255,255,0.9)",
+                  }}
                   onDragOver={(event) => event.preventDefault()}
                   onDrop={handleDropZone}
                 >
-                  <p className="text-sm font-medium text-gray-800 mb-2">
-                    Drag & drop evidence files here
-                  </p>
-                  <p className="text-xs text-gray-500 mb-4">
-                    Screenshots, PDFs, emails, photos — up to 100 pages.
-                  </p>
+                  <div className="inline-flex flex-col gap-1 rounded-xl bg-white/85 px-4 py-3 text-gray-800 shadow-sm backdrop-blur">
+                    <p className="text-sm font-semibold">
+                      Drag & drop evidence files here
+                    </p>
+                    <p className="text-xs text-gray-600">
+                      Screenshots, PDFs, emails, photos — up to 100 pages.
+                    </p>
+                  </div>
 
                   {/* Hidden input */}
                   <input
@@ -706,36 +716,36 @@ export default function Home() {
                   )}
 
                   {/* File summary */}
-                  <div className="mt-4 text-left text-xs text-gray-600">
-                    {files.length === 0 ? (
-                      <p className="text-center text-gray-400">
-                        No files selected yet.
+                  {files.length === 0 ? (
+                    <div className="mt-4 flex min-h-[88px] items-center justify-center">
+                      <p className="inline-flex items-center justify-center rounded-full border border-gray-200 bg-white/90 px-4 py-1.5 text-center text-[12px] font-semibold text-gray-600 shadow-sm">
+                        No files selected yet
                       </p>
-                    ) : (
-                      <>
-                        <p className="mb-1 font-medium">
-                          {files.length} file
-                          {files.length > 1 ? "s" : ""} selected ·{" "}
-                          {totalSizeMB.toFixed(2)} MB total
-                        </p>
-                        <ul className="max-h-32 overflow-auto space-y-1 text-[11px]">
-                          {files.map(({ id, file, label }) => (
-                            <li
-                              key={id}
-                              className="flex justify-between gap-2 border-b border-gray-100 pb-1 last:border-b-0"
-                            >
-                              <span className="truncate">
-                                {label} — {file.name}
-                              </span>
-                              <span className="whitespace-nowrap text-gray-400">
-                                {(file.size / 1024).toFixed(0)} KB
-                              </span>
-                            </li>
-                          ))}
-                        </ul>
-                      </>
-                    )}
-                  </div>
+                    </div>
+                  ) : (
+                    <div className="mt-4 text-left text-xs text-gray-600">
+                      <p className="mb-1 font-medium">
+                        {files.length} file
+                        {files.length > 1 ? "s" : ""} selected ·{" "}
+                        {totalSizeMB.toFixed(2)} MB total
+                      </p>
+                      <ul className="max-h-32 overflow-auto space-y-1 text-[11px]">
+                        {files.map(({ id, file, label }) => (
+                          <li
+                            key={id}
+                            className="flex justify-between gap-2 border-b border-gray-100 pb-1 last:border-b-0"
+                          >
+                            <span className="truncate">
+                              {label} — {file.name}
+                            </span>
+                            <span className="whitespace-nowrap text-gray-400">
+                              {(file.size / 1024).toFixed(0)} KB
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
 
                   {/* Server response */}
                   {serverMessage && (
@@ -744,9 +754,24 @@ export default function Home() {
                     </p>
                   )}
 
-                  <p className="mt-3 text-[11px] text-gray-400">
-                    End-to-end encrypted in transit. Files are processed
-                    securely and never used for training.
+                  <p className="mt-4 inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white/95 px-4 py-2 text-[11px] font-medium text-gray-700 shadow-sm">
+                    <span className="flex h-5 w-5 items-center justify-center rounded-full border border-gray-300 bg-gray-50">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.6"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="h-3.5 w-3.5 text-gray-700"
+                        aria-hidden="true"
+                      >
+                        <rect x="5" y="11" width="14" height="9" rx="2" />
+                        <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+                        <path d="M12 15v2" />
+                      </svg>
+                    </span>
+                    End-to-end encrypted in transit. Files are processed securely and never used for training.
                   </p>
                 </div>
               </div>

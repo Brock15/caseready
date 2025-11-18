@@ -40,7 +40,7 @@ const plansByTier = [
     ],
     cta: {
       label: "Lock in founding rate",
-      href: "mailto:founders@caseready.io?subject=Founding%20Attorney%20Solo%20Plan",
+      href: "mailto:hello@caseready.io?subject=Founding%20Attorney%20Solo%20Plan",
     },
     highlighted: true,
     note: "Founder pricing is locked in for life for the first 50 attorneys.",
