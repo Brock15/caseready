@@ -99,6 +99,37 @@ const relabelFiles = (list: SelectedFile[]) => {
   return changed ? next : list;
 };
 
+const FEATURE_SETS = [
+  {
+    title: "Available now",
+    subtitle: "Live inside CaseReady today.",
+    icon: "check",
+    items: [
+      "Bulk upload up to 100 files per run",
+      "Auto Bates stamping & exhibit labeling",
+      "Auto-rotate and normalize page sizing",
+      "Auto-detect document & image types",
+      "Auto file renaming + metadata sorting",
+    ],
+  },
+  {
+    title: "In active build",
+    subtitle: "Shipping through the beta cycle.",
+    icon: "spark",
+    items: [
+      "Timeline builder & storyboarding mode",
+      "Redaction toolkit with templates",
+      "AI exhibit categorization suggestions",
+      "Client portal sharing + secure uploads",
+      "Case folders stored in our cloud vault",
+      "AI case summaries & predictive insights",
+      "Motion and brief drafting assist",
+      "Full-text OCR search across matters",
+      "eDiscovery-style review workspace",
+    ],
+  },
+];
+
 export default function Home() {
   const router = useRouter();
   const supabase = useMemo(() => createBrowserSupabaseClient(), []);
@@ -880,7 +911,53 @@ export default function Home() {
                 </h3>
                 <p className="text-sm text-gray-600">{step.body}</p>
               </div>
-            ))}
+              ))}
+          </div>
+
+          <div className="rounded-3xl border border-blue-100 bg-white/90 px-6 py-6 sm:py-8 shadow-sm">
+            <div className="text-center max-w-2xl mx-auto mb-6">
+              <p className="text-xs uppercase tracking-[0.3em] text-[#0056D6] font-semibold">
+                Feature roadmap
+              </p>
+              <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 mt-1">
+                Core automations now, deeper workflows rolling out weekly.
+              </h3>
+              <p className="text-sm text-gray-600 mt-2">
+                Some capabilities are live today, while others are in active beta build. Early users see them first.
+              </p>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {FEATURE_SETS.map((set) => (
+                <div
+                  key={set.title}
+                  className="rounded-2xl border border-gray-100 bg-white/80 p-4 sm:p-5 text-sm text-gray-600 backdrop-blur"
+                >
+                  <div className="mb-3 flex items-center gap-2">
+                    <span
+                      className={`inline-flex h-8 w-8 items-center justify-center rounded-full ${
+                        set.icon === "check"
+                          ? "bg-green-100 text-green-700"
+                          : "bg-amber-100 text-amber-700"
+                      } text-xs font-semibold uppercase tracking-wide`}
+                    >
+                      {set.icon === "check" ? "Live" : "Beta"}
+                    </span>
+                    <div>
+                      <p className="text-gray-900 font-semibold">{set.title}</p>
+                      <p className="text-[12px] text-gray-500">{set.subtitle}</p>
+                    </div>
+                  </div>
+                  <ul className="space-y-2">
+                    {set.items.map((item) => (
+                      <li key={item} className="flex items-start gap-2">
+                        <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[#0056D6]" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
