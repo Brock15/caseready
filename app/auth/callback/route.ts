@@ -9,10 +9,8 @@ export async function GET(request: Request) {
 
   if (code) {
     const supabase = createRouteHandlerClient({ cookies });
-    // This exchanges the OAuth code for a session and sets cookies for caseready.io
     await supabase.auth.exchangeCodeForSession(code);
   }
 
-  // Redirect the user to the intended page (defaults to /dashboard)
   return NextResponse.redirect(new URL(next, requestUrl.origin));
 }

@@ -6,7 +6,8 @@ import DashboardClient from "./DashboardClient";
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const supabase = createServerComponentClient({ cookies });
+  const cookieStore = cookies();
+  const supabase = createServerComponentClient({ cookies: () => cookieStore });
   const {
     data: { session },
   } = await supabase.auth.getSession();
