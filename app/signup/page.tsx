@@ -4,6 +4,7 @@ import NextImage from "next/image";
 import Link from "next/link";
 import { FormEvent, useMemo, useState } from "react";
 import { createBrowserSupabaseClient } from "@/lib/createBrowserSupabaseClient";
+import { SUPABASE_URL } from "@/lib/supabaseConfig";
 
 export default function SignupPage() {
   const supabase = useMemo(() => createBrowserSupabaseClient(), []);
@@ -50,6 +51,7 @@ export default function SignupPage() {
     if (isOauthLoading) return;
     try {
       setIsOauthLoading(true);
+      const finalUrl = `${window.location.origin}/dashboard`;
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
@@ -57,8 +59,8 @@ export default function SignupPage() {
             access_type: "offline",
             prompt: "consent",
           },
-          redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(
-            "/dashboard"
+          redirectTo: `${SUPABASE_URL}/auth/v1/callback?redirect_to=${encodeURIComponent(
+            finalUrl
           )}`,
         },
       });
