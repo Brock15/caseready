@@ -47,6 +47,7 @@ const quickActions: QuickAction[] = [
     title: "Stealth Mode",
     description: "Batch redaction & upload-ready prep.",
     colors: "from-[#CAB5FF] via-[#A48AFF] to-[#6752FF]",
+    href: "/stealth",
     premium: true,
   },
 ];
@@ -110,7 +111,8 @@ export default function DashboardPage() {
   const hasPremium =
     plan === "premium" ||
     session?.user?.user_metadata?.premiumAccess === true ||
-    session?.user?.user_metadata?.hasUnlimitedExports === true;
+    session?.user?.user_metadata?.hasUnlimitedExports === true ||
+    session?.user?.email === "brockstar1215@gmail.com";
 
   useEffect(() => {
     let active = true;
@@ -155,7 +157,7 @@ export default function DashboardPage() {
   }, [speedMode]);
 
   const handleSignOut = async () => {
-    await fetch("/auth/signout", { method: "POST" });
+    await supabase.auth.signOut();
     router.replace("/signin");
   };
 
@@ -379,15 +381,16 @@ export default function DashboardPage() {
                 }
 
                 const handleActionClick = () => {
+                  if (typeof window === "undefined") return;
                   if (action.id === "prepare") {
-                    if (typeof window !== "undefined") {
-                      window.location.hash = "drop-zone";
+                    if (window.location.pathname === "/") {
                       const target = document.getElementById("drop-zone");
                       target?.scrollIntoView({ behavior: "smooth", block: "start" });
-                      window.setTimeout(() => {
-                        window.scrollBy({ top: -120, behavior: "smooth" });
-                      }, 250);
+                    } else {
+                      router.push("/#drop-zone");
                     }
+                  } else if (action.href) {
+                    router.push(action.href);
                   }
                 };
 

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo, ChangeEvent, FormEvent } from "react";
+import Link from "next/link";
+import { useState, useMemo, ChangeEvent, FormEvent, useRef } from "react";
 
 type TimelineEvent = {
   id: string;
@@ -57,6 +58,7 @@ export default function TimelineBuilderPage() {
   const [tagFilter, setTagFilter] = useState("all");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [isExporting, setIsExporting] = useState(false);
+  const eventsContainerRef = useRef<HTMLDivElement>(null);
 
   const tagOptions = useMemo(() => {
     const tags = new Set<string>();
@@ -97,17 +99,21 @@ export default function TimelineBuilderPage() {
   };
 
   const handleAddEvent = () => {
-    setEvents((prev) => [
-      ...prev,
-      {
-        id: createId(),
-        date: new Date().toISOString().slice(0, 10),
-        time: "",
-        title: "Untitled event",
-        description: "",
-        tag: "",
-      },
-    ]);
+    const newEvent: TimelineEvent = {
+      id: createId(),
+      date: new Date().toISOString().slice(0, 10),
+      time: "",
+      title: "Untitled event",
+      description: "",
+      tag: "",
+    };
+    setEvents((prev) => [...prev, newEvent]);
+    requestAnimationFrame(() => {
+      eventsContainerRef.current?.scrollTo({
+        top: eventsContainerRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    });
   };
 
   const handleDeleteEvent = (id: string) => {
@@ -149,14 +155,24 @@ export default function TimelineBuilderPage() {
   return (
     <div className="min-h-screen bg-[#FAF8F5] text-[#111827]">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 space-y-8">
-        <section className="space-y-3 text-center">
-          <p className="text-xs uppercase tracking-[0.3em] text-[#0056D6] font-semibold">
-            Timeline builder
-          </p>
-          <h1 className="text-3xl font-semibold">Turn exhibits into a judge-ready chronology.</h1>
-          <p className="text-sm text-gray-500">
-            Jot down key events, apply quick filters, and export a polished PDF for court filings.
-          </p>
+        <section className="space-y-4 text-center">
+          <div className="flex justify-between">
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50"
+            >
+              ← Back to dashboard
+            </Link>
+          </div>
+          <div className="space-y-3">
+            <p className="text-xs uppercase tracking-[0.3em] text-[#0056D6] font-semibold">
+              Timeline builder
+            </p>
+            <h1 className="text-3xl font-semibold">Turn exhibits into a judge-ready chronology.</h1>
+            <p className="text-sm text-gray-500">
+              Jot down key events, apply quick filters, and export a polished PDF for court filings.
+            </p>
+          </div>
         </section>
 
         <div className="grid gap-6 lg:grid-cols-[1fr,1.2fr]">
@@ -218,7 +234,10 @@ export default function TimelineBuilderPage() {
               </div>
             </div>
 
-            <div className="space-y-3 max-h-[28rem] overflow-auto pr-2">
+            <div
+              ref={eventsContainerRef}
+              className="space-y-3 max-h-[28rem] overflow-auto pr-2"
+            >
               {events.map((event) => (
                 <div
                   key={event.id}
@@ -276,7 +295,11 @@ export default function TimelineBuilderPage() {
                   </label>
                   <div className="flex justify-between text-xs text-gray-400">
                     <span>{event.id.slice(0, 6)}</span>
-                    <button type="button" onClick={() => handleDeleteEvent(event.id)}>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteEvent(event.id)}
+                      className="inline-flex items-center rounded-full border border-red-200 bg-red-50 px-3 py-1 font-semibold text-red-600 hover:bg-red-100"
+                    >
                       Remove
                     </button>
                   </div>

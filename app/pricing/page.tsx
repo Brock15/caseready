@@ -2,6 +2,9 @@
 
 import NextImage from "next/image";
 import Link from "next/link";
+import { useMemo, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { createBrowserSupabaseClient } from "@/lib/createBrowserSupabaseClient";
 
 const plansByTier = [
   {
@@ -86,6 +89,51 @@ const enterprisePlan = {
 };
 
 export default function PricingPage() {
+  const supabase = useMemo(() => createBrowserSupabaseClient(), []);
+  const router = useRouter();
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [isCheckingSession, setIsCheckingSession] = useState(true);
+  const [isSigningOut, setIsSigningOut] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+
+    const applyUserState = (email: string | null) => {
+      if (!active) return;
+      setUserEmail(email);
+      setIsCheckingSession(false);
+    };
+
+    const syncSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      applyUserState(data.session?.user?.email ?? null);
+    };
+
+    syncSession();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      applyUserState(session?.user?.email ?? null);
+    });
+
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
+  }, [supabase]);
+
+  const handleSignOut = async () => {
+    if (isSigningOut) return;
+    try {
+      setIsSigningOut(true);
+      await supabase.auth.signOut();
+      router.replace("/signin");
+    } finally {
+      setIsSigningOut(false);
+    }
+  };
+
   return (
     <main className="min-h-screen bg-[#F5F2ED] text-[#111827] flex flex-col">
       {/* Top nav */}
@@ -127,12 +175,44 @@ export default function PricingPage() {
             </Link>
           </nav>
 
-          <Link
-            href="/signup"
-            className="inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-800 shadow-sm hover:bg-gray-50 transition"
-          >
-            Sign in / Sign up
-          </Link>
+          {userEmail ? (
+            <div className="flex items-center gap-3 rounded-full border border-gray-200 bg-white/90 px-3 py-1 shadow-sm">
+              <span className="text-xs font-semibold text-gray-700">
+                {userEmail}
+              </span>
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50"
+              >
+                Dashboard
+              </Link>
+              <button
+                type="button"
+                onClick={handleSignOut}
+                disabled={isSigningOut}
+                className={`inline-flex items-center rounded-full bg-[#0056D6] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:brightness-110 ${
+                  isSigningOut ? "opacity-60 cursor-not-allowed" : ""
+                }`}
+              >
+                {isSigningOut ? "Signing out…" : "Sign out"}
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 rounded-full border border-gray-200 bg-white/90 px-2 py-1 shadow-sm">
+              <Link
+                href="/signin"
+                className="inline-flex items-center rounded-full bg-[#0056D6] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:brightness-110"
+              >
+                {isCheckingSession ? "Checking…" : "Sign in"}
+              </Link>
+              <Link
+                href="/signup"
+                className="inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-100"
+              >
+                Sign up
+              </Link>
+            </div>
+          )}
         </div>
       </header>
 

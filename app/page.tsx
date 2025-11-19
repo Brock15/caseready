@@ -136,12 +136,6 @@ const HERO_METRICS = [
   { value: "98%", label: "OCR-ready formatting score" },
 ];
 
-const TRUST_BADGES = [
-  "Solo firms",
-  "Boutique litigators",
-  "State hearings",
-  "AmLaw referrals",
-];
 
 export default function Home() {
   const router = useRouter();
@@ -243,11 +237,19 @@ export default function Home() {
     };
   }, []);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (window.location.hash === "#drop-zone") {
+      const target = document.getElementById("drop-zone");
+      target?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, []);
+
   const handleSignOut = async () => {
     if (isSigningOut) return;
     try {
       setIsSigningOut(true);
-      await fetch("/auth/signout", { method: "POST" });
+      await supabase.auth.signOut();
       router.replace("/signin");
     } catch (error) {
       console.error("Failed to sign out", error);
@@ -448,6 +450,8 @@ export default function Home() {
 
   const handleDragEnd = () => setDraggingId(null);
 
+  const dropZoneScrollMargin = globalFocusMode ? "160px" : "120px";
+
   return (
     <main
       className={`relative min-h-screen flex flex-col overflow-hidden ${
@@ -583,7 +587,7 @@ export default function Home() {
                 Drag, drop, and let CaseReady handle the formatting. Bates
                 numbers, exhibits, timelines—done in minutes instead of hours.
               </p>
-              <div className="grid gap-3 sm:grid-cols-3 mb-6">
+              <div className="grid gap-3 sm:grid-cols-3 mb-4">
                 {HERO_METRICS.map((metric) => (
                   <div
                     key={metric.label}
@@ -596,23 +600,10 @@ export default function Home() {
                   </div>
                 ))}
               </div>
-              <div className="flex flex-wrap items-center gap-3 mb-6 text-xs text-gray-500">
+              <div className="mb-5">
                 <div className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white/80 px-4 py-1.5 text-xs font-semibold text-gray-700 shadow-sm">
                   <span className="h-2 w-2 rounded-full bg-[#10B981]" />
                   Live beta now open
-                </div>
-                <span className="uppercase tracking-[0.3em] text-[#0056D6] font-semibold">
-                  Trusted by
-                </span>
-                <div className="flex flex-wrap gap-2">
-                  {TRUST_BADGES.map((badge) => (
-                    <span
-                      key={badge}
-                      className="rounded-full border border-gray-200 bg-white/70 px-3 py-0.5 text-gray-600"
-                    >
-                      {badge}
-                    </span>
-                  ))}
                 </div>
               </div>
               <div className="flex flex-wrap gap-3 mb-6">
@@ -634,7 +625,7 @@ export default function Home() {
                   Watch workflow
                 </button>
               </div>
-              <div className="h-px w-20 bg-gradient-to-r from-transparent via-[#0056D6]/50 to-transparent mb-6" />
+              <div className="h-px w-20 bg-gradient-to-r from-transparent via-[#0056D6]/50 to-transparent mb-3" />
 
               <div className="surface-card rounded-xl border border-blue-100 bg-white/70 px-4 py-3 text-xs text-gray-600 mb-4">
                 {isAuthenticated ? (
@@ -676,6 +667,7 @@ export default function Home() {
               <div
                 id="drop-zone"
                 className="surface-card rounded-2xl border border-gray-200 bg-white shadow-sm p-5 sm:p-6"
+                style={{ scrollMarginTop: dropZoneScrollMargin }}
               >
                 <div
                   className="border-2 border-dashed border-gray-200 rounded-xl p-6 sm:p-8 text-center shadow-inner"
