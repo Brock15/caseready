@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useMemo, useState } from "react";
 import { createBrowserSupabaseClient } from "@/lib/createBrowserSupabaseClient";
+import { SUPABASE_URL } from "@/lib/supabaseConfig";
 
 export default function SigninForm() {
   const supabase = useMemo(() => createBrowserSupabaseClient(), []);
@@ -43,6 +44,7 @@ export default function SigninForm() {
     try {
       setIsOauthLoading(true);
       const redirectTo = searchParams.get("redirectedFrom") || "/dashboard";
+      const finalUrl = `${window.location.origin}${redirectTo}`;
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
@@ -50,8 +52,8 @@ export default function SigninForm() {
             access_type: "offline",
             prompt: "consent",
           },
-          redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(
-            redirectTo
+          redirectTo: `${SUPABASE_URL}/auth/v1/callback?redirect_to=${encodeURIComponent(
+            finalUrl
           )}`,
         },
       });
