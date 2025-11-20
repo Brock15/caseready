@@ -52,32 +52,51 @@ export async function POST(request: NextRequest) {
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const bold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
-  pdfDoc.getPages().forEach((page) => {
+  pdfDoc.getPages().forEach((page, pageIndex) => {
     const { width, height } = page.getSize();
+    const margin = 48;
+    const headerHeight = 120;
+    const redactHeight = Math.max(0, height - headerHeight - margin);
+
+    // Header stays readable so users know why the page is blanked
     page.drawRectangle({
-      x: 50,
-      y: 90,
-      width: width - 100,
-      height: height - 180,
-      color: rgb(0, 0, 0),
-      opacity: 0.08,
-      borderOpacity: 0.0,
+      x: 0,
+      y: height - headerHeight,
+      width,
+      height: headerHeight,
+      color: rgb(0.97, 0.97, 0.97),
     });
-    page.drawText("Redacted", {
-      x: 60,
-      y: height - 130,
+
+    page.drawRectangle({
+      x: margin,
+      y: margin,
+      width: width - margin * 2,
+      height: redactHeight,
+      color: rgb(0, 0, 0),
+    });
+
+    page.drawText("CaseReady Redaction", {
+      x: margin,
+      y: height - 60,
       size: 18,
       font: bold,
-      color: rgb(0.05, 0.05, 0.05),
+      color: rgb(0.1, 0.1, 0.1),
     });
-    page.drawText(`Rules applied: ${sanitizedPrompt}`, {
-      x: 60,
-      y: height - 160,
-      maxWidth: width - 120,
+    page.drawText(`Instructions: ${sanitizedPrompt}`, {
+      x: margin,
+      y: height - 85,
+      maxWidth: width - margin * 2,
       size: 11,
       font,
-      color: rgb(0.15, 0.15, 0.15),
+      color: rgb(0.2, 0.2, 0.2),
       lineHeight: 14,
+    });
+    page.drawText(`Page ${pageIndex + 1}`, {
+      x: width - margin - 50,
+      y: margin - 20,
+      size: 10,
+      font,
+      color: rgb(0.4, 0.4, 0.4),
     });
   });
 
