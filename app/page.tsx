@@ -499,7 +499,7 @@ export default function Home() {
 
         <div
           className={`flex flex-wrap items-center gap-2 justify-end max-sm:w-full max-sm:justify-end text-[11px] font-semibold ${
-            globalFocusMode ? "text-gray-300" : "text-gray-600"
+            globalFocusMode ? "text-gray-200" : "text-gray-600"
           }`}
         >
           <button
@@ -509,15 +509,19 @@ export default function Home() {
                 .getElementById("how-it-works")
                 ?.scrollIntoView({ behavior: "smooth" })
             }
-            className="inline-flex items-center gap-1 rounded-full border border-transparent px-2.5 py-1 transition hover:border-gray-200 hover:bg-white/80"
+            className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/80 px-3 py-1.5 text-gray-700 shadow-sm transition hover:shadow-md hover:bg-white"
           >
-            <span className="text-[#0056D6]">●</span>How it works
+            <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#E4EEFF] text-[#0056D6] text-xs font-bold">
+              i
+            </span>
+            How it works
           </button>
           <Link
             href="/pricing"
-            className="inline-flex items-center gap-1 rounded-full border border-transparent px-2.5 py-1 transition hover:border-gray-200 hover:bg-white/80"
+            className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-3.5 py-1.5 text-white shadow-sm transition hover:brightness-110"
           >
-            <span className="text-[#0056D6]">$</span>Pricing
+            <span className="text-sm">$</span>
+            Pricing
           </Link>
 
           {isAuthenticated ? (
@@ -587,16 +591,16 @@ export default function Home() {
                 Drag, drop, and let CaseReady handle the formatting. Bates
                 numbers, exhibits, timelines—done in minutes instead of hours.
               </p>
-              <div className="grid gap-3 sm:grid-cols-3 mb-4">
+              <div className="flex flex-wrap gap-2 mb-4">
                 {HERO_METRICS.map((metric) => (
                   <div
                     key={metric.label}
-                    className="surface-card rounded-2xl border border-white/60 px-4 py-3 text-center shadow-sm"
+                    className="inline-flex items-center gap-2 rounded-full border border-white/60 bg-white/80 px-3 py-1.5 text-[11px] font-semibold text-gray-700 shadow-sm"
                   >
-                    <p className="text-2xl font-semibold text-[#0056D6]">
+                    <span className="text-sm text-[#0056D6]">
                       {metric.value}
-                    </p>
-                    <p className="text-xs text-gray-500">{metric.label}</p>
+                    </span>
+                    <span className="text-[11px] text-gray-600">{metric.label}</span>
                   </div>
                 ))}
               </div>
