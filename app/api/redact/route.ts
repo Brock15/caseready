@@ -207,9 +207,18 @@ async function extractImageBoxes(
     logger: () => {},
   });
 
-  const words = data?.words ?? [];
-  const imageWidth = data?.imageSize?.width ?? meta.width;
-  const imageHeight = data?.imageSize?.height ?? meta.height;
+  // Tesseract types mark word data loosely; coerce to avoid build-time errors.
+  const pageData = data as {
+    words?: Array<{
+      text?: string;
+      bbox?: { x0: number; y0: number; x1: number; y1: number };
+    }>;
+    imageSize?: { width?: number; height?: number };
+  };
+
+  const words = pageData?.words ?? [];
+  const imageWidth = pageData?.imageSize?.width ?? meta.width;
+  const imageHeight = pageData?.imageSize?.height ?? meta.height;
   const widthScale = meta.width / imageWidth;
   const heightScale = meta.height / imageHeight;
 
