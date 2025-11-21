@@ -595,11 +595,9 @@ export default function Home() {
                 {HERO_METRICS.map((metric) => (
                   <div
                     key={metric.label}
-                    className="inline-flex items-center gap-2 rounded-full border border-white/60 bg-white/80 px-3 py-1.5 text-[11px] font-semibold text-gray-700 shadow-sm"
+                    className="inline-flex items-center gap-2 rounded-md border border-white/80 bg-white/90 px-3 py-1.5 text-[11px] font-semibold text-gray-700 shadow-sm"
                   >
-                    <span className="text-sm text-[#0056D6]">
-                      {metric.value}
-                    </span>
+                    <span className="text-sm text-[#0056D6]">{metric.value}</span>
                     <span className="text-[11px] text-gray-600">{metric.label}</span>
                   </div>
                 ))}

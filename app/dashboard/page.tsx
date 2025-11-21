@@ -48,7 +48,7 @@ const quickActions: QuickAction[] = [
     title: "Stealth Mode",
     description: "Batch redaction & upload-ready prep.",
     colors: "from-[#CAB5FF] via-[#A48AFF] to-[#6752FF]",
-    href: "/stealth",
+    href: "/redact",
     premium: true,
   },
 ];
