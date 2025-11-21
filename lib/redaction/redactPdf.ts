@@ -28,7 +28,7 @@ type RedactionBox = {
 const emailRegex = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i;
 const phoneRegex = /(\+?\d[\d\s().-]{7,}\d)/i;
 
-const pdfjsLibPromise = import("pdfjs-dist/legacy/build/pdf.node.js");
+const pdfjsLibPromise = import("pdfjs-dist/legacy/build/pdf.mjs");
 
 // Minimal canvas factory for pdfjs in Node; we only use text content, not rendering.
 class NodeCanvasFactory {
@@ -116,6 +116,14 @@ async function rasterizePdfPage(
 
 function normalizePdfJs(raw: any) {
   const lib = raw?.default ?? raw;
+  const gwo = lib.GlobalWorkerOptions;
+  if (gwo && typeof gwo === "object" && "workerSrc" in gwo) {
+    try {
+      (gwo as any).workerSrc = undefined;
+    } catch {
+      /* ignore */
+    }
+  }
   return lib;
 }
 
