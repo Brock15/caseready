@@ -54,10 +54,9 @@ const quickActions: QuickAction[] = [
 ];
 
 const sidebarNav = [
-  { id: "generator", label: "PDF Generator", href: "/" },
-  { id: "dashboard", label: "Dashboard", href: "/dashboard" },
+  { id: "home", label: "Home", href: "/" },
   { id: "timeline", label: "Timelines", href: "/timeline" },
-  { id: "redactions", label: "Redactions", href: "/dashboard#stealth" },
+  { id: "redactions", label: "Redactions", href: "/redact" },
   { id: "portal", label: "Client Portal", href: "/dashboard#portal" },
 ];
 
