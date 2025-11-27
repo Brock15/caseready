@@ -25,6 +25,7 @@ const PAGE_MARGIN = 36; // 0.5 inch
 const STICKER_WIDTH = 108; // ~1.5 in
 const STICKER_HEIGHT = 44;
 const DEFAULT_PAGE = { width: 612, height: 792 }; // Letter
+const MAX_IMAGE_DIMENSION = 2400; // cap large mobile photos for lambda memory
 
 const sanitizeText = (value: string) => (value || "").replace(/\u202f/g, " ");
 
@@ -385,8 +386,18 @@ const normalizeImageType = (fileType: string, fileName?: string) => {
 };
 
 const toJpegBuffer = async (input: Buffer): Promise<Buffer> => {
-  // Rotate based on EXIF, convert to JPEG for consistent embedding
-  return sharp(input).rotate().jpeg({ quality: 85 }).toBuffer();
+  // Rotate based on EXIF, cap size, convert to JPEG for consistent embedding
+  return sharp(input)
+    .rotate()
+    .resize({
+      width: MAX_IMAGE_DIMENSION,
+      height: MAX_IMAGE_DIMENSION,
+      fit: "inside",
+      withoutEnlargement: true,
+      background: { r: 255, g: 255, b: 255, alpha: 1 },
+    })
+    .jpeg({ quality: 85 })
+    .toBuffer();
 };
 
 const loadPdfOrImageAsPages = async (
@@ -413,11 +424,22 @@ const loadPdfOrImageAsPages = async (
     else if (orientation === 8) rotationDegrees = 270;
   }
   if (!rotationDegrees) {
-    rotationDegrees = await determineVisualRotation(workingBuffer);
+    try {
+      rotationDegrees = await determineVisualRotation(workingBuffer);
+    } catch {
+      rotationDegrees = 0;
+    }
   }
   if (rotationDegrees) {
     workingBuffer = await sharp(workingBuffer)
       .rotate(rotationDegrees, {
+        background: { r: 255, g: 255, b: 255, alpha: 1 },
+      })
+      .resize({
+        width: MAX_IMAGE_DIMENSION,
+        height: MAX_IMAGE_DIMENSION,
+        fit: "inside",
+        withoutEnlargement: true,
         background: { r: 255, g: 255, b: 255, alpha: 1 },
       })
       .toBuffer();
@@ -589,7 +611,7 @@ export async function POST(req: NextRequest) {
 
       const pages = await loadPdfOrImageAsPages(
         buffer,
-        file.type || file.name.split(".").pop() || "",
+        file.type || "",
         pdfDoc,
         file.name
       );
