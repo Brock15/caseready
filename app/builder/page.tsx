@@ -607,7 +607,7 @@ export default function ExhibitBuilderPage() {
                   <button
                     type="button"
                     onClick={handleSelectFiles}
-                    className="inline-flex justify-center items-center rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:brightness-110 transition"
+                    className="inline-flex w-full sm:w-auto justify-center items-center rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-5 py-2.5 min-h-[44px] text-sm font-semibold text-white shadow-sm hover:brightness-110 transition"
                   >
                     Select files
                   </button>
@@ -620,7 +620,7 @@ export default function ExhibitBuilderPage() {
                       isSubmitting ||
                       (isAuthenticated && exportsLeft <= 0 && !hasUnlimitedExports)
                     }
-                    className={`inline-flex justify-center items-center rounded-full border px-5 py-2.5 text-sm font-medium transition ${
+                    className={`inline-flex w-full sm:w-auto justify-center items-center rounded-full border px-5 py-2.5 min-h-[44px] text-sm font-medium transition ${
                       files.length &&
                       !isSubmitting &&
                       (!isAuthenticated ||

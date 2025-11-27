@@ -633,7 +633,7 @@ export default function Home() {
                       router.push("/signin?redirectedFrom=/builder");
                     }
                   }}
-                  className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:brightness-110"
+                  className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-5 py-2.5 min-h-[44px] text-sm font-semibold text-white shadow-sm hover:brightness-110"
                 >
                   Try Exhibit Builder Free
                 </button>
@@ -644,7 +644,7 @@ export default function Home() {
                       .getElementById("how-it-works")
                       ?.scrollIntoView({ behavior: "smooth" })
                   }
-                  className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white/80 px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                  className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full border border-gray-200 bg-white/80 px-5 py-2.5 min-h-[44px] text-sm font-semibold text-gray-700 hover:bg-gray-50"
                 >
                   Watch workflow
                 </button>
@@ -725,24 +725,24 @@ export default function Home() {
                     accept=".pdf,.png,.jpg,.jpeg,.heic,.tif,.tiff"
                   />
 
-                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                    <button
-                      type="button"
-                      onClick={handleSelectFiles}
-                      className="inline-flex justify-center items-center rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:brightness-110 transition"
-                    >
-                      Select files
-                    </button>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <button
+                    type="button"
+                    onClick={handleSelectFiles}
+                    className="inline-flex w-full sm:w-auto justify-center items-center rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-5 py-2.5 min-h-[44px] text-sm font-semibold text-white shadow-sm hover:brightness-110 transition"
+                  >
+                    Select files
+                  </button>
 
-                    <button
-                      type="button"
+                  <button
+                    type="button"
                       onClick={handleGenerate}
                       disabled={
                         !files.length ||
                         isSubmitting ||
                         (isAuthenticated && exportsLeft <= 0 && !hasUnlimitedExports)
                       }
-                    className={`inline-flex justify-center items-center rounded-full border px-5 py-2.5 text-sm font-medium transition ${
+                    className={`inline-flex w-full sm:w-auto justify-center items-center rounded-full border px-5 py-2.5 min-h-[44px] text-sm font-medium transition ${
                       files.length &&
                       !isSubmitting &&
                       (!isAuthenticated ||
