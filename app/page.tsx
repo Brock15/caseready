@@ -520,7 +520,7 @@ export default function Home() {
           </div>
 
           <div
-            className={`flex flex-wrap items-center gap-2 justify-end max-sm:w-full max-sm:justify-end text-[11px] font-semibold ${
+            className={`flex flex-wrap items-center gap-2 justify-end max-sm:w-full max-sm:justify-center max-sm:gap-3 text-[11px] font-semibold ${
               globalFocusMode ? "text-gray-200" : "text-gray-600"
             }`}
           >
@@ -531,7 +531,7 @@ export default function Home() {
                   .getElementById("how-it-works")
                   ?.scrollIntoView({ behavior: "smooth" })
               }
-              className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/80 px-3 py-1.5 text-gray-700 shadow-sm transition hover:shadow-md hover:bg-white"
+              className="inline-flex items-center justify-center gap-2 rounded-full border border-white/30 bg-white/80 px-3 py-1.5 min-h-[40px] text-gray-700 shadow-sm transition hover:shadow-md hover:bg-white max-sm:w-full"
             >
               <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#E4EEFF] text-[#0056D6] text-xs font-bold">
                 i
@@ -540,7 +540,7 @@ export default function Home() {
             </button>
             <Link
               href="/pricing"
-              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-3.5 py-1.5 text-white shadow-sm transition hover:brightness-110"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-3.5 py-1.5 min-h-[40px] text-white shadow-sm transition hover:brightness-110 max-sm:w-full"
             >
               <span className="text-sm">$</span>
               Pricing
@@ -612,43 +612,43 @@ export default function Home() {
               <p className="text-sm sm:text-base text-gray-600 max-w-xl mb-6">
                 Drag, drop, and let CaseReady auto-sort, auto-rotate, Bates stamp, and merge a clean exhibit packet in minutes.
               </p>
-              <div className="flex flex-wrap gap-2 mb-4">
-                {HERO_METRICS.map((metric) => (
-                  <div
-                    key={metric.label}
-                    className="inline-flex items-center gap-2 rounded-md border border-white/80 bg-white/90 px-3 py-1.5 text-[11px] font-semibold text-gray-700 shadow-sm"
-                  >
-                    <span className="text-sm text-[#0056D6]">{metric.value}</span>
-                    <span className="text-[11px] text-gray-600">{metric.label}</span>
-                  </div>
-                ))}
+          <div className="flex flex-wrap gap-2 mb-4 max-sm:w-full max-sm:justify-center">
+            {HERO_METRICS.map((metric) => (
+              <div
+                key={metric.label}
+                className="inline-flex items-center gap-2 rounded-md border border-white/80 bg-white/90 px-3 py-1.5 text-[11px] font-semibold text-gray-700 shadow-sm max-sm:flex-1 max-sm:justify-center"
+              >
+                <span className="text-sm text-[#0056D6]">{metric.value}</span>
+                <span className="text-[11px] text-gray-600">{metric.label}</span>
               </div>
-              <div className="flex flex-wrap gap-3 mb-6">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (isAuthenticated) {
-                      router.push("/builder");
-                    } else {
-                      router.push("/signin?redirectedFrom=/builder");
-                    }
-                  }}
-                  className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-5 py-2.5 min-h-[44px] text-sm font-semibold text-white shadow-sm hover:brightness-110"
-                >
-                  Try Exhibit Builder Free
-                </button>
-                <button
-                  type="button"
-                  onClick={() =>
-                    document
-                      .getElementById("how-it-works")
-                      ?.scrollIntoView({ behavior: "smooth" })
-                  }
-                  className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full border border-gray-200 bg-white/80 px-5 py-2.5 min-h-[44px] text-sm font-semibold text-gray-700 hover:bg-gray-50"
-                >
-                  Watch workflow
-                </button>
-              </div>
+            ))}
+          </div>
+          <div className="flex flex-wrap gap-3 mb-6 max-sm:flex-col max-sm:w-full max-sm:items-stretch">
+            <button
+              type="button"
+              onClick={() => {
+                if (isAuthenticated) {
+                  router.push("/builder");
+                } else {
+                  router.push("/signin?redirectedFrom=/builder");
+                }
+              }}
+              className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-5 py-2.5 min-h-[44px] text-sm font-semibold text-white shadow-sm hover:brightness-110"
+            >
+              Try Exhibit Builder Free
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                document
+                  .getElementById("how-it-works")
+                  ?.scrollIntoView({ behavior: "smooth" })
+              }
+              className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full border border-gray-200 bg-white/80 px-5 py-2.5 min-h-[44px] text-sm font-semibold text-gray-700 hover:bg-gray-50"
+            >
+              Watch workflow
+            </button>
+          </div>
               <div className="h-px w-20 bg-gradient-to-r from-transparent via-[#0056D6]/50 to-transparent mb-3" />
 
               <div className="surface-card rounded-xl border border-blue-100 bg-white/70 px-4 py-3 text-xs text-gray-600 mb-4">
