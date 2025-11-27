@@ -68,19 +68,13 @@ export async function redactPdf(
   const rawPdfjsLib = await pdfjsLibPromise;
   const pdfjsLib = (rawPdfjsLib as any).default ?? rawPdfjsLib;
 
-  let standardFontDataUrl: string | undefined;
-  try {
-    standardFontDataUrl = new URL("pdfjs-dist/standard_fonts/", import.meta.url).toString();
-  } catch {
-    standardFontDataUrl = undefined;
-  }
-
   const loadingTask = pdfjsLib.getDocument({
     data: pdfBytes,
     disableWorker: true,
     useSystemFonts: true,
     isEvalSupported: true,
-    standardFontDataUrl,
+    // Avoid bundling standard fonts path on serverless; rely on built-ins.
+    standardFontDataUrl: undefined,
     disableFontFace: true,
   });
 

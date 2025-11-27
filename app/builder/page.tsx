@@ -11,6 +11,7 @@ import {
   useMemo,
   type DragEvent,
 } from "react";
+import { PDFDocument } from "pdf-lib";
 import type { User } from "@supabase/supabase-js";
 import { createBrowserSupabaseClient } from "@/lib/createBrowserSupabaseClient";
 
