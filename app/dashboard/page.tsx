@@ -17,17 +17,19 @@ type QuickAction = {
   premium?: boolean;
 };
 
+const COMING_SOON_FEATURES = new Set(["chat", "stealth"]);
+
 const quickActions: QuickAction[] = [
   {
     id: "prepare",
-    label: "Prepare",
+    label: "",
     title: "Draft Exhibit",
     description: "Merge, label, and Bates stamp in minutes.",
     colors: "from-[#3FA9FF] via-[#4D7CFE] to-[#1D3EAF]",
   },
   {
     id: "timeline",
-    label: "Timeline",
+    label: "",
     title: "Build Timeline",
     description: "Drop events to build courtroom timelines.",
     colors: "from-[#FF9A5E] via-[#FF6F6F] to-[#E348A2]",
@@ -36,7 +38,7 @@ const quickActions: QuickAction[] = [
   },
   {
     id: "chat",
-    label: "Notes",
+    label: "",
     title: "Evidence Chat",
     description: "Summaries, memos, and tasking assistants.",
     colors: "from-[#FFB5D2] via-[#F383F1] to-[#BC6CFF]",
@@ -44,7 +46,7 @@ const quickActions: QuickAction[] = [
   },
   {
     id: "stealth",
-    label: "Redact",
+    label: "",
     title: "Stealth Mode",
     description: "Batch redaction & upload-ready prep.",
     colors: "from-[#CAB5FF] via-[#A48AFF] to-[#6752FF]",
@@ -56,7 +58,7 @@ const quickActions: QuickAction[] = [
 const sidebarNav = [
   { id: "home", label: "Home", href: "/" },
   { id: "timeline", label: "Timelines", href: "/timeline" },
-  { id: "redactions", label: "Redactions", href: "/redact" },
+  { id: "redactions", label: "Redactions", href: "/coming-soon" },
   { id: "portal", label: "Client Portal", href: "/dashboard#portal" },
 ];
 
@@ -339,17 +341,24 @@ export default function DashboardClient({
               {quickActions.map((action, index) => {
                 if (speedMode && index > 1) return null;
                 const isLocked = action.premium && !hasPremium;
-                const cardClasses = `relative rounded-2xl bg-gradient-to-br ${action.colors} text-left text-white p-4 shadow-sm hover:scale-[1.02] transition`;
+                const isComingSoon = COMING_SOON_FEATURES.has(action.id);
+                const cardClasses = `relative rounded-2xl bg-gradient-to-br ${action.colors} text-left text-white p-4 shadow-sm ${
+                  isComingSoon ? "opacity-80" : "hover:scale-[1.02]"
+                } transition`;
                 const content = (
                   <>
-                    {action.premium && (
-                      <span className="absolute right-3 top-3 rounded-full bg-white/25 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
-                        Premium
-                      </span>
-                    )}
-                    <p className="text-xs uppercase tracking-wide font-semibold">
-                      {action.label}
-                    </p>
+                    <div className="flex flex-wrap items-center gap-2 text-[10px] font-semibold uppercase tracking-wide">
+                      {isComingSoon && (
+                        <span className="rounded-full bg-white/25 px-2 py-0.5 text-white">
+                          Coming Soon
+                        </span>
+                      )}
+                      {action.premium && (
+                        <span className="rounded-full bg-white/25 px-2 py-0.5 text-white">
+                          Premium
+                        </span>
+                      )}
+                    </div>
                     <p className="mt-2 text-xl font-bold">{action.title}</p>
                     <p className="mt-1 text-sm opacity-90">{action.description}</p>
                     {isLocked && (
@@ -359,6 +368,24 @@ export default function DashboardClient({
                     )}
                   </>
                 );
+
+                const handleActionClick = () => {
+                  if (typeof window === "undefined") return;
+                  if (isComingSoon) {
+                    router.push("/coming-soon");
+                    return;
+                  }
+                  if (action.id === "prepare") {
+                    if (window.location.pathname === "/") {
+                      const target = document.getElementById("drop-zone");
+                      target?.scrollIntoView({ behavior: "smooth", block: "start" });
+                    } else {
+                      router.push("/#drop-zone");
+                    }
+                  } else if (action.href) {
+                    router.push(action.href);
+                  }
+                };
 
                 if (isLocked) {
                   return (
@@ -373,26 +400,13 @@ export default function DashboardClient({
                   );
                 }
 
-                const handleActionClick = () => {
-                  if (typeof window === "undefined") return;
-                  if (action.id === "prepare") {
-                    if (window.location.pathname === "/") {
-                      const target = document.getElementById("drop-zone");
-                      target?.scrollIntoView({ behavior: "smooth", block: "start" });
-                    } else {
-                      router.push("/#drop-zone");
-                    }
-                  } else if (action.href) {
-                    router.push(action.href);
-                  }
-                };
-
                 return (
                   <button
                     key={action.id}
                     className={cardClasses}
                     type="button"
                     onClick={handleActionClick}
+                    disabled={isComingSoon}
                   >
                     {content}
                   </button>
