@@ -387,17 +387,22 @@ const normalizeImageType = (fileType: string, fileName?: string) => {
 
 const toJpegBuffer = async (input: Buffer): Promise<Buffer> => {
   // Rotate based on EXIF, cap size, convert to JPEG for consistent embedding
-  return sharp(input)
-    .rotate()
-    .resize({
-      width: MAX_IMAGE_DIMENSION,
-      height: MAX_IMAGE_DIMENSION,
-      fit: "inside",
-      withoutEnlargement: true,
-      background: { r: 255, g: 255, b: 255, alpha: 1 },
-    })
-    .jpeg({ quality: 85 })
-    .toBuffer();
+  try {
+    return await sharp(input)
+      .rotate()
+      .resize({
+        width: MAX_IMAGE_DIMENSION,
+        height: MAX_IMAGE_DIMENSION,
+        fit: "inside",
+        withoutEnlargement: true,
+        background: { r: 255, g: 255, b: 255, alpha: 1 },
+      })
+      .jpeg({ quality: 85 })
+      .toBuffer();
+  } catch (err) {
+    // Common on platforms without HEIC support
+    throw new Error("Image conversion failed (possible HEIC/unsupported format).");
+  }
 };
 
 const loadPdfOrImageAsPages = async (
@@ -609,12 +614,25 @@ export async function POST(req: NextRequest) {
       const startBates = batesCounter;
       const startPage = runningPageNumber;
 
-      const pages = await loadPdfOrImageAsPages(
-        buffer,
-        file.type || "",
-        pdfDoc,
-        file.name
-      );
+      let pages: PDFPage[];
+      try {
+        pages = await loadPdfOrImageAsPages(
+          buffer,
+          file.type || "",
+          pdfDoc,
+          file.name
+        );
+      } catch (fileError) {
+        console.error("Failed to process file", { name: file.name, type: file.type, fileError });
+        return NextResponse.json(
+          {
+            ok: false,
+            message:
+              "We couldn’t process one of the uploads. If it’s an iPhone HEIC photo, try exporting as JPEG/PNG and re-upload.",
+          },
+          { status: 400 }
+        );
+      }
       const endBates = startBates + pages.length - 1;
       const endPage = startPage + pages.length - 1;
 
