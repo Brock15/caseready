@@ -373,10 +373,27 @@ const determineVisualRotation = async (buffer: Buffer): Promise<number> => {
   return best.angle;
 };
 
+const normalizeImageType = (fileType: string, fileName?: string) => {
+  const lower = (fileType || "").toLowerCase();
+  if (lower) return lower;
+  const ext = (fileName || "").split(".").pop()?.toLowerCase();
+  if (ext === "heic" || ext === "heif") return "image/heic";
+  if (ext === "png") return "image/png";
+  if (ext === "jpg" || ext === "jpeg") return "image/jpeg";
+  if (ext === "tif" || ext === "tiff") return "image/tiff";
+  return "";
+};
+
+const toJpegBuffer = async (input: Buffer): Promise<Buffer> => {
+  // Rotate based on EXIF, convert to JPEG for consistent embedding
+  return sharp(input).rotate().jpeg({ quality: 85 }).toBuffer();
+};
+
 const loadPdfOrImageAsPages = async (
   fileBuffer: ArrayBuffer,
   fileType: string,
-  targetDoc: PDFDocument
+  targetDoc: PDFDocument,
+  fileName?: string
 ): Promise<PDFPage[]> => {
   if (fileType === "application/pdf") {
     const src = await PDFDocument.load(fileBuffer);
@@ -385,9 +402,11 @@ const loadPdfOrImageAsPages = async (
     return copies;
   }
 
+  const normalizedType = normalizeImageType(fileType, fileName);
   let workingBuffer: Buffer = Buffer.from(fileBuffer);
+
   let rotationDegrees = 0;
-  if (fileType === "image/jpeg" || fileType === "image/jpg") {
+  if (normalizedType === "image/jpeg" || normalizedType === "image/jpg") {
     const orientation = getJpegOrientation(fileBuffer);
     if (orientation === 3) rotationDegrees = 180;
     else if (orientation === 6) rotationDegrees = 90;
@@ -404,14 +423,20 @@ const loadPdfOrImageAsPages = async (
       .toBuffer();
   }
 
-  let embedded;
-  if (fileType === "image/png") {
-    embedded = await targetDoc.embedPng(workingBuffer);
-  } else if (fileType === "image/jpeg" || fileType === "image/jpg") {
-    embedded = await targetDoc.embedJpg(workingBuffer);
-  } else {
-    throw new Error(`Unsupported file type: ${fileType}`);
+  // Convert everything except PNG to JPEG for consistent handling (HEIC/TIFF/web uploads)
+  let embeddedBuffer = workingBuffer;
+  if (
+    normalizedType !== "image/png" &&
+    normalizedType !== "image/jpeg" &&
+    normalizedType !== "image/jpg"
+  ) {
+    embeddedBuffer = await toJpegBuffer(workingBuffer);
   }
+
+  const embedded =
+    normalizedType === "image/png"
+      ? await targetDoc.embedPng(embeddedBuffer)
+      : await targetDoc.embedJpg(embeddedBuffer);
 
   const page = targetDoc.addPage([DEFAULT_PAGE.width, DEFAULT_PAGE.height]);
   const pageWidth = DEFAULT_PAGE.width;
@@ -562,7 +587,12 @@ export async function POST(req: NextRequest) {
       const startBates = batesCounter;
       const startPage = runningPageNumber;
 
-      const pages = await loadPdfOrImageAsPages(buffer, file.type, pdfDoc);
+      const pages = await loadPdfOrImageAsPages(
+        buffer,
+        file.type || file.name.split(".").pop() || "",
+        pdfDoc,
+        file.name
+      );
       const endBates = startBates + pages.length - 1;
       const endPage = startPage + pages.length - 1;
 
