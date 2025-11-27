@@ -32,6 +32,25 @@ export default function SigninForm() {
     if (error) {
       setErrorMessage(error.message);
     } else {
+      // Attempt to prompt browser/passkey managers to save credentials
+      try {
+        if (
+          typeof window !== "undefined" &&
+          "PasswordCredential" in window &&
+          (navigator as any).credentials &&
+          typeof (navigator as any).credentials.store === "function"
+        ) {
+          const cred = new (window as any).PasswordCredential({
+            id: email,
+            name: email,
+            password,
+          });
+          await (navigator as any).credentials.store(cred);
+        }
+      } catch {
+        // silently ignore if Credential Management API is unavailable
+      }
+
       const redirectTo = searchParams.get("redirectedFrom") || "/dashboard";
       router.replace(redirectTo);
     }
@@ -93,9 +112,9 @@ export default function SigninForm() {
 
           <Link
             href="/signup"
-            className="inline-flex items-center rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
+            className="inline-flex items-center rounded-full border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50 shadow-sm"
           >
-            Need an invite?
+            Create an account
           </Link>
         </div>
       </header>
@@ -114,7 +133,7 @@ export default function SigninForm() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" autoComplete="on">
             <label className="block text-sm font-medium text-gray-700">
               Email
               <input
@@ -122,6 +141,8 @@ export default function SigninForm() {
                 required
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
+                autoComplete="username"
+                name="email"
                 className="mt-1 w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:border-[#0056D6] focus:outline-none"
                 placeholder="you@example.com"
               />
@@ -135,6 +156,8 @@ export default function SigninForm() {
                 minLength={6}
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
+                autoComplete="current-password"
+                name="password"
                 className="mt-1 w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:border-[#0056D6] focus:outline-none"
                 placeholder="Your password"
               />

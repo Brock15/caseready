@@ -21,6 +21,12 @@ type ExhibitInput = {
 const BATES_PREFIX = "CR_";
 const UNLIMITED_EMAILS = new Set(["brockstar1215@gmail.com"]);
 const UNLIMITED_IDS = new Set(["c46c028c-0e2c-41a0-bad4-900740c4a895"]);
+const PAGE_MARGIN = 36; // 0.5 inch
+const STICKER_WIDTH = 108; // ~1.5 in
+const STICKER_HEIGHT = 44;
+const DEFAULT_PAGE = { width: 612, height: 792 }; // Letter
+
+const sanitizeText = (value: string) => (value || "").replace(/\u202f/g, " ");
 
 const getExhibitLabel = (index: number): string => {
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -33,17 +39,13 @@ const getExhibitLabel = (index: number): string => {
   return result;
 };
 
-const drawExhibitStamp = (
-  page: PDFPage,
-  label: string,
-  font: PDFFont,
-  size = 9
-) => {
-  // Coordinates assume 0,0 in bottom-left and 72pt per inch.
-  const { height } = page.getSize();
-  page.drawText(`EXHIBIT ${label}`, {
-    x: 36,
-    y: height - 36,
+const drawExhibitStamp = (page: PDFPage, label: string, font: PDFFont, size = 12) => {
+  const { height, width } = page.getSize();
+  const text = sanitizeText(`EXHIBIT ${label}`);
+  const textWidth = font.widthOfTextAtSize(text, size);
+  page.drawText(text, {
+    x: (width - textWidth) / 2,
+    y: height - PAGE_MARGIN - 12,
     size,
     font,
     color: rgb(0.13, 0.13, 0.13),
@@ -60,11 +62,181 @@ const drawBatesStamp = (
   const { width } = page.getSize();
   const textWidth = font.widthOfTextAtSize(value, size);
   page.drawText(value, {
-    x: width - 36 - textWidth,
-    y: 36,
+    x: width - PAGE_MARGIN - textWidth,
+    y: PAGE_MARGIN,
     size,
     font,
     color: rgb(0.05, 0.11, 0.25),
+  });
+};
+
+const drawExhibitSticker = (
+  page: PDFPage,
+  label: string,
+  batesValue: string,
+  font: PDFFont
+) => {
+  const { width, height } = page.getSize();
+  const x = PAGE_MARGIN;
+  const y = PAGE_MARGIN;
+  page.drawRectangle({
+    x,
+    y,
+    width: STICKER_WIDTH,
+    height: STICKER_HEIGHT,
+    color: rgb(0.99, 0.99, 0.99),
+    borderColor: rgb(0.8, 0.85, 0.9),
+    borderWidth: 1,
+  });
+  page.drawText(sanitizeText(`Exhibit ${label}`), {
+    x: x + 8,
+    y: y + STICKER_HEIGHT - 16,
+    size: 10,
+    font,
+    color: rgb(0.1, 0.1, 0.1),
+  });
+  page.drawText(sanitizeText(`Bates: ${batesValue}`), {
+    x: x + 8,
+    y: y + 12,
+    size: 9,
+    font,
+    color: rgb(0.2, 0.2, 0.25),
+  });
+};
+
+const drawPageNumber = (page: PDFPage, pageNumber: number, totalPages: number, font: PDFFont) => {
+  const label = sanitizeText(`Page ${pageNumber} of ${totalPages}`);
+  const size = 9;
+  const { width } = page.getSize();
+  const textWidth = font.widthOfTextAtSize(label, size);
+  page.drawText(label, {
+    x: (width - textWidth) / 2,
+    y: PAGE_MARGIN - 6,
+    size,
+    font,
+    color: rgb(0.2, 0.2, 0.25),
+  });
+};
+
+type TocEntry = {
+  description: string;
+  range: string;
+};
+
+const drawIndexPage = (
+  page: PDFPage,
+  entries: TocEntry[],
+  font: PDFFont,
+  boldFont: PDFFont
+) => {
+  const { width, height } = page.getSize();
+  const title = "Index of Exhibits";
+  const titleSize = 18;
+  const titleWidth = boldFont.widthOfTextAtSize(title, titleSize);
+  page.drawText(title, {
+    x: (width - titleWidth) / 2,
+    y: height - 140,
+    size: titleSize,
+    font: boldFont,
+    color: rgb(0.1, 0.1, 0.1),
+  });
+
+  page.drawLine({
+    start: { x: PAGE_MARGIN, y: height - 155 },
+    end: { x: width - PAGE_MARGIN, y: height - 155 },
+    thickness: 0.75,
+    color: rgb(0.78, 0.82, 0.86),
+  });
+
+  const startY = height - 190;
+  const lineHeight = 20;
+  entries.forEach((entry, idx) => {
+    const y = startY - idx * lineHeight;
+    const desc = sanitizeText(entry.description);
+    const range = sanitizeText(entry.range);
+    page.drawText(desc, {
+      x: PAGE_MARGIN,
+      y,
+      size: 12,
+      font,
+      color: rgb(0.15, 0.16, 0.18),
+      maxWidth: width - PAGE_MARGIN * 2 - 120,
+    });
+    const rangeWidth = font.widthOfTextAtSize(range, 12);
+    page.drawText(range, {
+      x: width - PAGE_MARGIN - rangeWidth,
+      y,
+      size: 12,
+      font,
+      color: rgb(0.15, 0.16, 0.18),
+    });
+  });
+};
+
+const drawCoverPage = (
+  page: PDFPage,
+  options: {
+    exhibitLabel: string;
+    matterName: string;
+    caseNumber?: string | null;
+    generatedDate: string;
+    batesRange: string;
+    font: PDFFont;
+    boldFont: PDFFont;
+  }
+) => {
+  const { exhibitLabel, matterName, caseNumber, generatedDate, batesRange, font, boldFont } =
+    options;
+  const { width, height } = page.getSize();
+  const centerX = width / 2;
+
+  const title = sanitizeText(`EXHIBIT ${exhibitLabel}`);
+  const titleWidth = boldFont.widthOfTextAtSize(title, 28);
+  page.drawText(title, {
+    x: centerX - titleWidth / 2,
+    y: height - 170,
+    size: 28,
+    font: boldFont,
+    color: rgb(0.1, 0.1, 0.1),
+  });
+
+  page.drawLine({
+    start: { x: PAGE_MARGIN, y: height - 190 },
+    end: { x: width - PAGE_MARGIN, y: height - 190 },
+    thickness: 0.5,
+    color: rgb(0.8, 0.82, 0.85),
+  });
+
+  const lines = [
+    sanitizeText(matterName),
+    caseNumber ? sanitizeText(`Case No.: ${caseNumber}`) : "",
+    sanitizeText(`Generated: ${generatedDate}`),
+    sanitizeText("Prepared with CaseReady Exhibit Builder"),
+    sanitizeText(`Bates: ${batesRange}`),
+  ].filter(Boolean);
+
+  let offsetY = height - 230;
+  lines.forEach((line, index) => {
+    const size = index === 0 ? 15 : index === lines.length - 1 ? 12 : 13;
+    const useBold = index === 0;
+    const currentFont = useBold ? boldFont : font;
+    const textWidth = currentFont.widthOfTextAtSize(line, size);
+    page.drawText(line, {
+      x: centerX - textWidth / 2,
+      y: offsetY,
+      size,
+      font: currentFont,
+      color: rgb(0.2, 0.2, 0.2),
+    });
+    offsetY -= 24;
+    if (index === 0 || index === lines.length - 2) {
+      page.drawLine({
+        start: { x: centerX - 120, y: offsetY + 12 },
+        end: { x: centerX + 120, y: offsetY + 12 },
+        thickness: 0.4,
+        color: rgb(0.85, 0.87, 0.9),
+      });
+    }
   });
 };
 
@@ -241,20 +413,22 @@ const loadPdfOrImageAsPages = async (
     throw new Error(`Unsupported file type: ${fileType}`);
   }
 
-  const page = targetDoc.addPage();
-  const { width: pageWidth, height: pageHeight } = page.getSize();
+  const page = targetDoc.addPage([DEFAULT_PAGE.width, DEFAULT_PAGE.height]);
+  const pageWidth = DEFAULT_PAGE.width;
+  const pageHeight = DEFAULT_PAGE.height;
+  const drawableWidth = pageWidth - PAGE_MARGIN * 2;
+  // Leave room at bottom for sticker and footer
+  const drawableHeight = pageHeight - PAGE_MARGIN * 2 - STICKER_HEIGHT - 12;
   const scale = Math.min(
-    pageWidth / embedded.width,
-    pageHeight / embedded.height
+    drawableWidth / embedded.width,
+    drawableHeight / embedded.height,
+    1
   );
   const drawWidth = embedded.width * scale;
   const drawHeight = embedded.height * scale;
-  page.drawImage(embedded, {
-    x: (pageWidth - drawWidth) / 2,
-    y: (pageHeight - drawHeight) / 2,
-    width: drawWidth,
-    height: drawHeight,
-  });
+  const x = (pageWidth - drawWidth) / 2;
+  const y = (pageHeight - drawHeight) / 2 + STICKER_HEIGHT / 2;
+  page.drawImage(embedded, { x, y, width: drawWidth, height: drawHeight });
   return [page];
 };
 
@@ -326,11 +500,17 @@ export async function POST(req: NextRequest) {
     }
 
     let exhibitsInput: ExhibitInput[] = [];
+    let matterName = "CaseReady Exhibit Packet";
+    let caseNumber: string | null = null;
     try {
       const parsed = JSON.parse(metadataRaw);
-      exhibitsInput = Array.isArray(parsed?.exhibits)
-        ? parsed.exhibits
-        : [];
+      exhibitsInput = Array.isArray(parsed?.exhibits) ? parsed.exhibits : [];
+      if (parsed?.matterName) {
+        matterName = String(parsed.matterName);
+      }
+      if (parsed?.caseNumber) {
+        caseNumber = String(parsed.caseNumber);
+      }
     } catch {
       return NextResponse.json(
         { ok: false, message: "Invalid exhibit metadata JSON." },
@@ -348,7 +528,17 @@ export async function POST(req: NextRequest) {
     const pdfDoc = await PDFDocument.create();
     const exhibitFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
     const batesFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const pageNumberFont = batesFont;
     let batesCounter = 1;
+    const firstLabel =
+      (exhibitsInput[0]?.label || getExhibitLabel(0)).trim() || "A";
+
+    // Cover and index placeholders
+    const cover = pdfDoc.addPage([DEFAULT_PAGE.width, DEFAULT_PAGE.height]);
+    const indexPage = pdfDoc.addPage([DEFAULT_PAGE.width, DEFAULT_PAGE.height]);
+
+    const tocEntries: TocEntry[] = [];
+    let runningPageNumber = 3; // cover + index already added
 
     for (let i = 0; i < exhibitsInput.length; i += 1) {
       const exhibit = exhibitsInput[i];
@@ -365,14 +555,55 @@ export async function POST(req: NextRequest) {
       }
 
       const buffer = await file.arrayBuffer();
-      const pages = await loadPdfOrImageAsPages(buffer, file.type, pdfDoc);
       const label = (exhibit.label || getExhibitLabel(i)).trim() || "A";
+      const description =
+        sanitizeText(exhibit.description?.trim() || file.name || `Exhibit ${label}`);
+
+      const startBates = batesCounter;
+      const startPage = runningPageNumber;
+
+      const pages = await loadPdfOrImageAsPages(buffer, file.type, pdfDoc);
+      const endBates = startBates + pages.length - 1;
+      const endPage = startPage + pages.length - 1;
 
       pages.forEach((page) => {
         drawExhibitStamp(page, label, exhibitFont);
+        const batesValue = `${BATES_PREFIX}${String(batesCounter).padStart(4, "0")}`;
+        drawExhibitSticker(page, label, batesValue, batesFont);
         drawBatesStamp(page, batesCounter++, batesFont);
       });
+
+      tocEntries.push({
+        description,
+        range: `pp. ${startPage}–${endPage}`,
+      });
+
+      runningPageNumber = endPage + 1;
+
     }
+
+    // Draw index after we know ranges
+    drawIndexPage(indexPage, tocEntries, batesFont, exhibitFont);
+
+    // Overall Bates range for cover
+    const overallEndBates = Math.max(1, batesCounter - 1);
+    drawCoverPage(cover, {
+      exhibitLabel: firstLabel,
+      matterName,
+      caseNumber,
+      generatedDate: new Date().toLocaleDateString(),
+      batesRange: `${BATES_PREFIX}${String(1).padStart(4, "0")} – ${BATES_PREFIX}${String(
+        overallEndBates
+      ).padStart(4, "0")}`,
+      font: batesFont,
+      boldFont: exhibitFont,
+    });
+
+    const allPages = pdfDoc.getPages();
+    const totalPages = allPages.length;
+    allPages.forEach((page, idx) => {
+      drawPageNumber(page, idx + 1, totalPages, pageNumberFont);
+    });
 
     const pdfBytes = await pdfDoc.save();
     const pdfBuffer = Buffer.from(pdfBytes);

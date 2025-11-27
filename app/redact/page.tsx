@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useEffect, DragEvent, ChangeEvent } from "react";
 import { PDFDocument } from "pdf-lib";
 

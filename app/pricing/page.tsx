@@ -39,10 +39,10 @@ const plansByTier = [
       "Unlimited files per packet",
       "Exhibit labels (Ex. A, Ex. B…) and page stamping",
       "Bates numbering (e.g. CR-0001, 0002…)",
-      "Higher-priority processing",
+      "Higher-priority processing queue",
     ],
     cta: {
-      label: "Lock in founding rate",
+      label: "Join early access",
       href: "mailto:hello@caseready.io?subject=Founding%20Attorney%20Solo%20Plan",
     },
     highlighted: true,
@@ -59,12 +59,12 @@ const plansByTier = [
     perks: [
       "Everything in Solo",
       "Up to 5 attorney or staff accounts",
-      "Unlimited client upload links",
-      "Shared matter templates & presets",
+      "Preferred processing window",
+      "Shared exhibit presets (coming soon)",
       "Priority email support",
     ],
     cta: {
-      label: "Talk to us about your firm",
+      label: "Reserve founding rate",
       href: "mailto:hello@caseready.io?subject=Firm%20plan%20inquiry",
     },
     highlighted: false,

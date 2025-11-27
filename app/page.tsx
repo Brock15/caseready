@@ -132,8 +132,8 @@ const FEATURE_SETS = [
 
 const HERO_METRICS = [
   { value: "22k+", label: "Pages cleaned this month" },
-  { value: "45 min", label: "Avg. timeline prep saved" },
-  { value: "98%", label: "OCR-ready formatting score" },
+  { value: "45 min", label: "Avg. bundle time saved" },
+  { value: "98%", label: "Court-ready formatting score" },
 ];
 
 
@@ -149,6 +149,9 @@ export default function Home() {
   const [exportsUsed, setExportsUsed] = useState(0);
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [isCheckingSession, setIsCheckingSession] = useState(true);
+  const [matterPromptOpen, setMatterPromptOpen] = useState(false);
+  const [pendingGenerate, setPendingGenerate] = useState(false);
+  const [matterInput, setMatterInput] = useState("");
   const isAuthenticated = Boolean(userId);
   const exportsLeft = Math.max(0, 2 - exportsUsed);
   const [loadingProgress, setLoadingProgress] = useState(0);
@@ -273,6 +276,10 @@ export default function Home() {
 
   const handleGenerate = async () => {
     if (!files.length || isSubmitting) return;
+    if (!matterInput.trim()) {
+      setMatterPromptOpen(true);
+      return;
+    }
 
     if (!isAuthenticated) {
       setServerMessage("Sign in to use your two free exports.");
@@ -320,6 +327,9 @@ export default function Home() {
             description: item.description,
             detectedDate: item.detectedDate,
           })),
+          matterName:
+            matterInput.trim() ||
+            `Exhibit Packet ${new Date().toLocaleDateString()}`,
         })
       );
 
@@ -370,6 +380,18 @@ export default function Home() {
       setLoadingProgress(100);
       setTimeout(() => setLoadingProgress(0), 500);
     }
+  };
+
+  const confirmMatterAndGenerate = () => {
+    if (!matterInput.trim()) return;
+    setMatterPromptOpen(false);
+    setPendingGenerate(false);
+    handleGenerate();
+  };
+
+  const openMatterPrompt = () => {
+    setMatterPromptOpen(true);
+    setPendingGenerate(true);
   };
 
   function addFiles(incoming: File[]) {
@@ -497,77 +519,77 @@ export default function Home() {
             </div>
           </div>
 
-        <div
-          className={`flex flex-wrap items-center gap-2 justify-end max-sm:w-full max-sm:justify-end text-[11px] font-semibold ${
-            globalFocusMode ? "text-gray-200" : "text-gray-600"
-          }`}
-        >
-          <button
-            type="button"
-            onClick={() =>
-              document
-                .getElementById("how-it-works")
-                ?.scrollIntoView({ behavior: "smooth" })
-            }
-            className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/80 px-3 py-1.5 text-gray-700 shadow-sm transition hover:shadow-md hover:bg-white"
+          <div
+            className={`flex flex-wrap items-center gap-2 justify-end max-sm:w-full max-sm:justify-end text-[11px] font-semibold ${
+              globalFocusMode ? "text-gray-200" : "text-gray-600"
+            }`}
           >
-            <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#E4EEFF] text-[#0056D6] text-xs font-bold">
-              i
-            </span>
-            How it works
-          </button>
-          <Link
-            href="/pricing"
-            className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-3.5 py-1.5 text-white shadow-sm transition hover:brightness-110"
-          >
-            <span className="text-sm">$</span>
-            Pricing
-          </Link>
+            <button
+              type="button"
+              onClick={() =>
+                document
+                  .getElementById("how-it-works")
+                  ?.scrollIntoView({ behavior: "smooth" })
+              }
+              className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/80 px-3 py-1.5 text-gray-700 shadow-sm transition hover:shadow-md hover:bg-white"
+            >
+              <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#E4EEFF] text-[#0056D6] text-xs font-bold">
+                i
+              </span>
+              How it works
+            </button>
+            <Link
+              href="/pricing"
+              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-3.5 py-1.5 text-white shadow-sm transition hover:brightness-110"
+            >
+              <span className="text-sm">$</span>
+              Pricing
+            </Link>
 
-          {isAuthenticated ? (
-            <div className="flex items-center gap-3 rounded-full border border-gray-200 bg-white/90 px-3 py-1 shadow-sm">
-              <div className="hidden sm:flex flex-col text-right leading-tight">
-                <span className="text-xs font-semibold text-gray-700">
-                  {userEmail || "Account"}
-                </span>
-                <span className="text-[10px] text-gray-400">ID: {userId}</span>
+            {isAuthenticated ? (
+              <div className="flex items-center gap-3 rounded-full border border-gray-200 bg-white/90 px-3 py-1 shadow-sm">
+                <div className="hidden sm:flex flex-col text-right leading-tight">
+                  <span className="text-xs font-semibold text-gray-700">
+                    {userEmail || "Account"}
+                  </span>
+                  <span className="text-[10px] text-gray-400">ID: {userId}</span>
+                </div>
+                <Link
+                  href="/dashboard"
+                  className="inline-flex items-center rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50"
+                >
+                  Dashboard
+                </Link>
+                <button
+                  type="button"
+                  onClick={handleSignOut}
+                  disabled={isSigningOut}
+                  className={`inline-flex items-center rounded-full bg-[#0056D6] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:brightness-110 ${
+                    isSigningOut ? "opacity-60 cursor-not-allowed" : ""
+                  }`}
+                >
+                  {isSigningOut ? "Signing out…" : "Sign out"}
+                </button>
               </div>
-              <Link
-                href="/dashboard"
-                className="inline-flex items-center rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50"
-              >
-                Dashboard
-              </Link>
-              <button
-                type="button"
-                onClick={handleSignOut}
-                disabled={isSigningOut}
-                className={`inline-flex items-center rounded-full bg-[#0056D6] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:brightness-110 ${
-                  isSigningOut ? "opacity-60 cursor-not-allowed" : ""
-                }`}
-              >
-                {isSigningOut ? "Signing out…" : "Sign out"}
-              </button>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2 rounded-full border border-gray-200 bg-white/90 px-2 py-1 shadow-sm">
-              <Link
-                href="/signin"
-                className="inline-flex items-center rounded-full bg-[#0056D6] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:brightness-110"
-              >
-                {isCheckingSession ? "Checking…" : "Sign in"}
-              </Link>
-              <Link
-                href="/signup"
-                className="inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-100"
-              >
-                Early access
-              </Link>
-            </div>
-          )}
+            ) : (
+              <div className="flex items-center gap-2 rounded-full border border-gray-200 bg-white/90 px-2 py-1 shadow-sm">
+                <Link
+                  href="/signin"
+                  className="inline-flex items-center rounded-full bg-[#0056D6] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:brightness-110"
+                >
+                  {isCheckingSession ? "Checking…" : "Sign in"}
+                </Link>
+                <Link
+                  href="/signup"
+                  className="inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-100"
+                >
+                  Early access
+                </Link>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
 
       {/* Main content */}
       <div className="flex-1 flex items-center">
@@ -578,9 +600,9 @@ export default function Home() {
               <span className="pointer-events-none absolute -top-8 -left-6 h-48 w-48 rounded-full bg-[#3FA9FF]/30 blur-3xl" />
               <span className="pointer-events-none absolute top-1/4 -right-10 h-40 w-40 rounded-full bg-[#F79CFF]/20 blur-3xl" />
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-gray-900 mb-4">
-                Turn messy evidence into
+                The automatic exhibit builder for lawyers.
                 <span className="block text-[#0056D6]">
-                  judge-ready exhibits.
+                  Turn messy screenshots into court-ready PDFs.
                 </span>
               </h1>
               <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white/80 px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm">
@@ -588,8 +610,7 @@ export default function Home() {
                 Still in beta testing — feedback welcomed.
               </p>
               <p className="text-sm sm:text-base text-gray-600 max-w-xl mb-6">
-                Drag, drop, and let CaseReady handle the formatting. Bates
-                numbers, exhibits, timelines—done in minutes instead of hours.
+                Drag, drop, and let CaseReady auto-sort, auto-rotate, Bates stamp, and merge a clean exhibit packet in minutes.
               </p>
               <div className="flex flex-wrap gap-2 mb-4">
                 {HERO_METRICS.map((metric) => (
@@ -602,19 +623,20 @@ export default function Home() {
                   </div>
                 ))}
               </div>
-              <div className="mb-5">
-                <div className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white/80 px-4 py-1.5 text-xs font-semibold text-gray-700 shadow-sm">
-                  <span className="h-2 w-2 rounded-full bg-[#10B981]" />
-                  Live beta now open
-                </div>
-              </div>
               <div className="flex flex-wrap gap-3 mb-6">
-                <Link
-                  href="/dashboard"
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (isAuthenticated) {
+                      router.push("/builder");
+                    } else {
+                      router.push("/signin?redirectedFrom=/builder");
+                    }
+                  }}
                   className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:brightness-110"
                 >
-                  Launch dashboard
-                </Link>
+                  Try Exhibit Builder Free
+                </button>
                 <button
                   type="button"
                   onClick={() =>
@@ -720,24 +742,24 @@ export default function Home() {
                         isSubmitting ||
                         (isAuthenticated && exportsLeft <= 0 && !hasUnlimitedExports)
                       }
-                      className={`inline-flex justify-center items-center rounded-full border px-5 py-2.5 text-sm font-medium transition ${
-                        files.length &&
-                        !isSubmitting &&
-                        (!isAuthenticated ||
-                          exportsLeft > 0 ||
-                          hasUnlimitedExports)
-                          ? "border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
-                          : "border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed"
-                      }`}
-                    >
-                      {isSubmitting
-                        ? "Processing..."
-                        : isAuthenticated &&
-                          exportsLeft <= 0 &&
-                          !hasUnlimitedExports
-                        ? "Upgrade for more exports"
-                        : "Generate Exhibit PDF"}
-                    </button>
+                    className={`inline-flex justify-center items-center rounded-full border px-5 py-2.5 text-sm font-medium transition ${
+                      files.length &&
+                      !isSubmitting &&
+                      (!isAuthenticated ||
+                        exportsLeft > 0 ||
+                        hasUnlimitedExports)
+                        ? "border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+                        : "border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed"
+                    }`}
+                  >
+                    {isSubmitting
+                      ? "Processing..."
+                      : isAuthenticated &&
+                        exportsLeft <= 0 &&
+                        !hasUnlimitedExports
+                      ? "Upgrade for more exports"
+                      : "Generate Exhibit PDF"}
+                  </button>
                   </div>
 
                   {files.length > 0 && (
@@ -1127,9 +1149,59 @@ export default function Home() {
       <footer className="border-t border-black/5 bg-white/60">
         <div className="mx-auto max-w-5xl flex items-center justify-between py-3 px-4 sm:px-6 text-[11px] text-gray-500">
           <span>© {new Date().getFullYear()} CaseReady.io</span>
-          <span>Privacy • Terms</span>
+          <span className="flex items-center gap-2">
+            <Link href="/privacy" className="hover:text-gray-700">
+              Privacy
+            </Link>
+            <span>•</span>
+            <Link href="/terms" className="hover:text-gray-700">
+              Terms
+            </Link>
+            <span>•</span>
+            <Link href="/security" className="hover:text-gray-700">
+              Security
+            </Link>
+          </span>
         </div>
       </footer>
+
+      {matterPromptOpen && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-md rounded-3xl border border-blue-100 bg-white p-6 shadow-xl">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Name this matter
+            </h3>
+            <p className="text-sm text-gray-600 mt-1">
+              Enter a matter name before generating your exhibit packet.
+            </p>
+            <input
+              value={matterInput}
+              onChange={(e) => setMatterInput(e.target.value)}
+              placeholder="e.g., Acme v. Smith – Hearing Prep"
+              className="mt-3 w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 focus:border-[#0056D6] focus:outline-none"
+            />
+            <div className="mt-4 flex justify-end gap-2 text-sm">
+              <button
+                type="button"
+                onClick={() => {
+                  setMatterPromptOpen(false);
+                  setPendingGenerate(false);
+                }}
+                className="rounded-full border border-gray-200 bg-white px-4 py-2 font-semibold text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmMatterAndGenerate}
+                className="rounded-full bg-[#0056D6] px-4 py-2 font-semibold text-white shadow-sm hover:brightness-110"
+              >
+                Continue
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
