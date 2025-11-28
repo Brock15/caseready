@@ -1098,18 +1098,6 @@ export default function Home() {
 
           <div className="grid gap-8 lg:grid-cols-[1.05fr,0.95fr] items-start">
             <div className="space-y-6">
-              <div className="flex flex-wrap gap-2 justify-start lg:justify-between">
-                {HERO_METRICS.map((metric) => (
-                  <div
-                    key={metric.label}
-                    className="inline-flex items-center gap-2 rounded-md border border-blue-100 bg-white/90 px-3 py-1.5 text-[11px] font-semibold text-gray-700 shadow-sm"
-                  >
-                    <span className="text-sm text-[#0056D6]">{metric.value}</span>
-                    <span className="text-[11px] text-gray-600">{metric.label}</span>
-                  </div>
-                ))}
-              </div>
-
               <div className="grid gap-6 sm:gap-8 md:grid-cols-3">
                 {[
                   {
