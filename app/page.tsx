@@ -163,6 +163,12 @@ export default function Home() {
   const [globalFocusMode, setGlobalFocusMode] = useState(false);
   const tableRef = useRef<HTMLDivElement | null>(null);
   const [redirectingToBuilder, setRedirectingToBuilder] = useState(false);
+
+  const scrollToHowItWorksGif = () => {
+    document
+      .getElementById("how-it-works-gif")
+      ?.scrollIntoView({ behavior: "smooth", block: "center" });
+  };
   const hasUnlimitedExports = useMemo(
     () =>
       UNLIMITED_EMAILS.has(userEmail ?? "") ||
@@ -619,7 +625,7 @@ export default function Home() {
       {/* Main content */}
       <div className="flex-1 flex items-center">
         <div className="mx-auto max-w-5xl w-full px-4 sm:px-6 py-10 sm:py-16">
-          <div className="grid gap-10 md:grid-cols-[1.2fr,1fr] items-start md:items-center">
+          <div className="grid gap-10 md:grid-cols-[1.2fr,1fr] items-start md:items-center relative">
             {/* Left side */}
             <section className="relative">
               <span className="pointer-events-none absolute -top-8 -left-6 h-48 w-48 rounded-full bg-[#3FA9FF]/30 blur-3xl" />
@@ -662,6 +668,35 @@ export default function Home() {
             >
               Watch workflow
             </button>
+          </div>
+
+          <div className="hidden xl:block absolute right-2 top-36 w-[260px]">
+            <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white/90 shadow-sm">
+              <div className="absolute inset-0 bg-gradient-to-br from-[#EEF3FF] via-white to-[#F7F8FD] opacity-70" />
+              <div className="relative p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-semibold text-gray-800">See it in action</p>
+                  <span className="rounded-full bg-blue-50 px-2.5 py-0.5 text-[10px] font-semibold text-[#0F2F8F] border border-blue-100">
+                    Live flow
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={scrollToHowItWorksGif}
+                  className="rounded-xl overflow-hidden border border-gray-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0056D6]"
+                >
+                  <video
+                    src="/case1.mp4"
+                    poster="/casereadyvid.gif"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="w-full h-auto"
+                  />
+                </button>
+              </div>
+            </div>
           </div>
               <div className="h-px w-20 bg-gradient-to-r from-transparent via-[#0056D6]/50 to-transparent mb-3" />
 
@@ -1061,34 +1096,77 @@ export default function Home() {
             ))}
           </div>
 
-          <div className="grid gap-6 sm:gap-8 md:grid-cols-3">
-            {[
-              {
-                title: "Upload evidence",
-                body: "Drag up to 100 screenshots, PDFs, or photos at once. Everything stays encrypted in transit.",
-              },
-              {
-                title: "Let CaseReady format",
-                body: "We merge PDFs, resize images, add page numbers, and keep your files in order automatically.",
-              },
-              {
-                title: "Download & file",
-                body: "Get a single exhibit-ready PDF that drops straight into your judge’s preferred format.",
-              },
-            ].map((step, index) => (
-              <div
-                key={step.title}
-                className="relative overflow-hidden rounded-2xl border border-blue-100 bg-white/90 p-6 flex flex-col gap-3 shadow-sm"
-              >
-                <span className="h-10 w-10 rounded-2xl bg-gradient-to-br from-[#3FA9FF] to-[#0056D6] text-white font-semibold text-lg flex items-center justify-center shadow-sm">
-                  {index + 1}
-                </span>
-                <h3 className="text-lg font-semibold text-gray-900">
-                  {step.title}
-                </h3>
-                <p className="text-sm text-gray-600">{step.body}</p>
+          <div className="grid gap-8 lg:grid-cols-[1.05fr,0.95fr] items-start">
+            <div className="space-y-6">
+              <div className="flex flex-wrap gap-2 justify-start lg:justify-between">
+                {HERO_METRICS.map((metric) => (
+                  <div
+                    key={metric.label}
+                    className="inline-flex items-center gap-2 rounded-md border border-blue-100 bg-white/90 px-3 py-1.5 text-[11px] font-semibold text-gray-700 shadow-sm"
+                  >
+                    <span className="text-sm text-[#0056D6]">{metric.value}</span>
+                    <span className="text-[11px] text-gray-600">{metric.label}</span>
+                  </div>
+                ))}
               </div>
-              ))}
+
+              <div className="grid gap-6 sm:gap-8 md:grid-cols-3">
+                {[
+                  {
+                    title: "Upload evidence",
+                    body: "Drag up to 100 screenshots, PDFs, or photos at once. Everything stays encrypted in transit.",
+                  },
+                  {
+                    title: "Let CaseReady format",
+                    body: "We merge PDFs, resize images, add page numbers, and keep your files in order automatically.",
+                  },
+                  {
+                    title: "Download & file",
+                    body: "Get a single exhibit-ready PDF that drops straight into your judge’s preferred format.",
+                  },
+                ].map((step, index) => (
+                  <div
+                    key={step.title}
+                    className="relative overflow-hidden rounded-2xl border border-blue-100 bg-white/90 p-6 flex flex-col gap-3 shadow-sm"
+                  >
+                    <span className="h-10 w-10 rounded-2xl bg-gradient-to-br from-[#3FA9FF] to-[#0056D6] text-white font-semibold text-lg flex items-center justify-center shadow-sm">
+                      {index + 1}
+                    </span>
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      {step.title}
+                    </h3>
+                    <p className="text-sm text-gray-600">{step.body}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div
+              id="how-it-works-gif"
+              className="relative overflow-hidden rounded-3xl border border-gray-200 bg-white/90 shadow-sm"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-[#EEF3FF] via-white to-[#F7F8FD] opacity-70" />
+              <div className="relative p-4 sm:p-5">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-semibold text-gray-800">Full flow preview</p>
+                  <span className="rounded-full bg-blue-50 px-3 py-1 text-[11px] font-semibold text-[#0F2F8F] border border-blue-100">
+                    See steps 1–3
+                  </span>
+                </div>
+                <div className="rounded-2xl overflow-hidden border border-gray-200 shadow-sm">
+                  <video
+                    src="/case1.mp4"
+                    poster="/casereadyvid.gif"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    controls
+                    className="w-full h-auto"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="rounded-3xl border border-blue-100 bg-white/90 px-6 py-6 sm:py-8 shadow-sm">
