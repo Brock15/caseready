@@ -14,6 +14,18 @@ import {
 import { PDFDocument } from "pdf-lib";
 import type { User } from "@supabase/supabase-js";
 import { createBrowserSupabaseClient } from "@/lib/createBrowserSupabaseClient";
+import {
+  FormatOptions,
+  FormatPreset,
+  StickerPosition,
+  getDefaultFormatOptions,
+  resolveFormattingForPlan,
+} from "@/lib/formatting";
+import {
+  getUserFormatPermissions,
+  getUserPlan,
+  type UserPlan,
+} from "@/lib/userPlan";
 
 type SelectedFile = {
   id: string;
@@ -104,6 +116,7 @@ export default function ExhibitBuilderPage() {
   const router = useRouter();
   const supabase = useMemo(() => createBrowserSupabaseClient(), []);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const matterNameRef = useRef<HTMLInputElement | null>(null);
   const [files, setFiles] = useState<SelectedFile[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [serverMessage, setServerMessage] = useState<string | null>(null);
@@ -119,9 +132,25 @@ export default function ExhibitBuilderPage() {
     "upload" | "timestamp" | "detected"
   >("upload");
   const [draggingId, setDraggingId] = useState<string | null>(null);
+  const tableRef = useRef<HTMLDivElement | null>(null);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [matterName, setMatterName] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [userPlan, setUserPlan] = useState<UserPlan>("free");
+  const [formatPermissions, setFormatPermissions] = useState<{
+    plan: UserPlan;
+    allowPresets: FormatPreset[];
+    allowAdvanced: boolean;
+  }>({
+    plan: "free",
+    allowPresets: ["quick"],
+    allowAdvanced: false,
+  });
+  const [formatPreset, setFormatPreset] = useState<FormatPreset>("quick");
+  const [formatOptions, setFormatOptions] = useState<
+    ReturnType<typeof getDefaultFormatOptions>
+  >(getDefaultFormatOptions("quick"));
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   const hasUnlimitedExports = useMemo(
     () =>
@@ -141,6 +170,21 @@ export default function ExhibitBuilderPage() {
           ? Number(user.user_metadata.exportsUsed)
           : 0;
       setExportsUsed(Number.isFinite(nextExports) ? nextExports : 0);
+      const plan = getUserPlan(user);
+      const perms = getUserFormatPermissions(user);
+      setUserPlan(plan);
+      setFormatPermissions({
+        plan,
+        allowPresets: Array.from(perms.allowPresets) as FormatPreset[],
+        allowAdvanced: perms.allowAdvanced,
+      });
+      if (!perms.allowPresets.includes(formatPreset)) {
+        setFormatPreset("quick");
+        setFormatOptions(getDefaultFormatOptions("quick"));
+      }
+      if (!perms.allowAdvanced) {
+        setShowAdvanced(false);
+      }
     };
 
     const syncSession = async () => {
@@ -206,10 +250,38 @@ export default function ExhibitBuilderPage() {
   const totalSizeBytes = files.reduce((sum, f) => sum + f.file.size, 0);
   const totalSizeMB = totalSizeBytes / (1024 * 1024);
 
+  const handlePresetSelect = (preset: FormatPreset) => {
+    if (!formatPermissions.allowPresets.includes(preset)) return;
+    setFormatPreset(preset);
+    setFormatOptions(getDefaultFormatOptions(preset));
+    setShowAdvanced(preset !== "quick");
+  };
+
+  const toggleFormatOption = (key: keyof FormatOptions) => {
+    if (formatPreset === "quick") return;
+    setFormatOptions((prev) => ({
+      ...prev,
+      [key]:
+        typeof prev[key as keyof FormatOptions] === "boolean"
+          ? !prev[key as keyof FormatOptions]
+          : prev[key as keyof FormatOptions],
+    }));
+  };
+
+  const setStickerPosition = (position: StickerPosition) => {
+    if (formatPreset === "quick") return;
+    setFormatOptions((prev) => ({
+      ...prev,
+      sticker_position: position,
+    }));
+  };
+
   const handleGenerate = async () => {
     if (!files.length || isSubmitting) return;
     if (!matterName.trim()) {
       setError("Enter a matter name before generating.");
+      matterNameRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      matterNameRef.current?.focus({ preventScroll: true });
       return;
     }
 
@@ -235,6 +307,11 @@ export default function ExhibitBuilderPage() {
     setIsSubmitting(true);
     setServerMessage(null);
     setLoadingProgress(0);
+    const sanitizedFormat = resolveFormattingForPlan({
+      preset: formatPreset,
+      options: formatOptions,
+      plan: userPlan,
+    });
     const progressTimer =
       typeof window !== "undefined"
         ? window.setInterval(() => {
@@ -263,6 +340,8 @@ export default function ExhibitBuilderPage() {
           matterName:
             matterName.trim() ||
             `Exhibit Packet ${new Date().toLocaleDateString()}`,
+          formatPreset: sanitizedFormat.preset,
+          formatOptions: sanitizedFormat.options,
         })
       );
 
@@ -336,16 +415,35 @@ export default function ExhibitBuilderPage() {
           const storedPath = filePath;
 
           // Store the storage path; we'll generate signed URLs when needed.
-          const { error: insertError } = await supabase.from("matters").insert({
+          const insertPayload = {
             name: matterTitle,
             user_id: currentUser.id,
             pdf_url: storedPath,
             pages: pageCount,
             status: "ready",
-          });
+            format_preset: sanitizedFormat.preset,
+            format_options: sanitizedFormat.options,
+          };
+
+          let { error: insertError } = await supabase.from("matters").insert(insertPayload);
+
+          // Fallback: older schemas without format columns
+          if (insertError?.message?.toLowerCase().includes("column") && insertError.message.includes("format_")) {
+            const { error: retryError } = await supabase
+              .from("matters")
+              .insert({
+                name: matterTitle,
+                user_id: currentUser.id,
+                pdf_url: storedPath,
+                pages: pageCount,
+                status: "ready",
+              });
+            insertError = retryError ?? null;
+          }
 
           if (insertError) {
-            setServerMessage("Could not save matter. Please try again.");
+            console.error("Matter insert failed", insertError);
+            setServerMessage("Could not save matter. Please try again or run the latest DB migration.");
             return;
           }
 
@@ -417,6 +515,10 @@ export default function ExhibitBuilderPage() {
     setFiles((prev) => relabelFiles(sortFilesByMode(prev, value)));
   };
 
+  const handleRemoveFile = (id: string) => {
+    setFiles((prev) => relabelFiles(prev.filter((file) => file.id !== id)));
+  };
+
   const updateFileMeta = (id: string, updates: Partial<SelectedFile>) => {
     setFiles((prev) =>
       prev.map((item) => (item.id === id ? { ...item, ...updates } : item))
@@ -455,6 +557,40 @@ export default function ExhibitBuilderPage() {
 
   const handleDragEnd = () => setDraggingId(null);
 
+  const scrollToDetails = () => {
+    if (tableRef.current) {
+      tableRef.current.scrollTo({
+        left: tableRef.current.scrollWidth,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  const presetChoices: Array<{
+    value: FormatPreset;
+    title: string;
+    description: string;
+  }> = [
+    {
+      value: "quick",
+      title: "Quick Packet",
+      description:
+        "Fast, clean export with Bates + page numbers. Branding always on.",
+    },
+    {
+      value: "formal",
+      title: "Court Formal",
+      description:
+        "Cover + TOC, courtroom spacing, optional footer branding.",
+    },
+    {
+      value: "firm_branded",
+      title: "Firm Branded",
+      description:
+        "Firm logo, custom footer, templates, sticker colors, watermark.",
+    },
+  ];
+
   return (
     <main
       className="relative min-h-screen flex flex-col overflow-hidden text-[#111827]"
@@ -491,7 +627,6 @@ export default function ExhibitBuilderPage() {
                 <span className="text-xs font-semibold text-gray-700">
                   {userEmail || "Account"}
                 </span>
-                <span className="text-[10px] text-gray-400">ID: {userId}</span>
               </div>
               <Link
                 href="/dashboard"
@@ -545,6 +680,7 @@ export default function ExhibitBuilderPage() {
               <label className="w-full sm:w-1/2 text-sm font-semibold text-gray-800">
                 Matter name
                 <input
+                  ref={matterNameRef}
                   value={matterName}
                   onChange={(e) => {
                     setMatterName(e.target.value);
@@ -564,6 +700,477 @@ export default function ExhibitBuilderPage() {
               <div className="hidden sm:block text-xs text-gray-500">
                 Name your packet before generating. You can rename it later in the matter detail page.
               </div>
+            </div>
+
+            <div className="mt-5 rounded-2xl border border-gray-200 bg-white/90 p-4 sm:p-5 shadow-sm">
+              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-[#0056D6]">
+                    Formatting
+                  </p>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Pick a preset
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    Quick is free. Court Formal unlocks on Solo. Firm Branded unlocks on Firm.
+                  </p>
+                </div>
+                <span
+                  className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-semibold ${
+                    userPlan === "free"
+                      ? "bg-gray-100 text-gray-700"
+                      : "bg-green-100 text-green-800"
+                  }`}
+                >
+                  {userPlan === "free" ? "Free" : "Paid"}
+                </span>
+              </div>
+
+              <div className="mt-4 grid gap-3 md:grid-cols-3">
+                {presetChoices.map((choice) => {
+                  const locked = !formatPermissions.allowPresets.includes(choice.value);
+                  const active = formatPreset === choice.value;
+                  return (
+                    <button
+                      key={choice.value}
+                      type="button"
+                      onClick={() => handlePresetSelect(choice.value)}
+                      disabled={locked}
+                      title={locked ? "Upgrade to unlock" : undefined}
+                      className={`relative text-left rounded-xl border p-3 sm:p-4 transition ${
+                        active
+                          ? "border-[#0056D6] bg-[#EEF3FF] shadow-sm"
+                          : "border-gray-200 bg-white hover:border-[#0056D6]/40"
+                      } ${locked ? "cursor-not-allowed opacity-60" : ""}`}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-sm font-semibold text-gray-900">
+                          {choice.title}
+                        </span>
+                        {locked ? (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-1 text-[11px] font-semibold text-gray-600">
+                            <svg
+                              aria-hidden="true"
+                              viewBox="0 0 24 24"
+                              className="h-3.5 w-3.5"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="1.8"
+                            >
+                              <rect x="5" y="11" width="14" height="9" rx="2" />
+                              <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+                            </svg>
+                            Locked
+                          </span>
+                        ) : active ? (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-[#0056D6]/10 px-2 py-1 text-[11px] font-semibold text-[#0056D6]">
+                            Selected
+                          </span>
+                        ) : null}
+                      </div>
+                      <p className="mt-1 text-xs text-gray-600">{choice.description}</p>
+                      {locked && (
+                        <p className="mt-2 inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-1 text-[11px] font-semibold text-gray-600">
+                          Upgrade to unlock
+                        </p>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {formatPermissions.allowAdvanced ? (
+                <div className="mt-4 border-t border-gray-100 pt-4">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <button
+                      type="button"
+                      onClick={() => setShowAdvanced((prev) => !prev)}
+                      className="inline-flex items-center gap-2 text-sm font-semibold text-gray-800"
+                    >
+                      <span>{showAdvanced ? "Hide" : "Advanced formatting"}</span>
+                      <svg
+                        aria-hidden="true"
+                        viewBox="0 0 24 24"
+                        className={`h-4 w-4 transition-transform ${
+                          showAdvanced ? "rotate-180" : ""
+                        }`}
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.6"
+                      >
+                        <path d="m6 9 6 6 6-6" />
+                      </svg>
+                    </button>
+                    {formatPreset === "quick" && (
+                      <p className="text-[11px] text-gray-500">
+                        Quick Packet: cover/index off, branding on, top-right stickers.
+                      </p>
+                    )}
+                  </div>
+
+                  {showAdvanced && (
+                    <div className="mt-3 space-y-3">
+                      {formatPreset === "quick" && (
+                        <p className="rounded-xl border border-dashed border-gray-200 bg-gray-50 px-3 py-3 text-xs font-medium text-gray-600">
+                          Quick Packet is intentionally minimal. Upgrade to Solo or Firm to unlock formal layouts and branding controls.
+                        </p>
+                      )}
+
+                      {formatPreset === "formal" && (
+                        <div className="grid gap-3 md:grid-cols-2">
+                          <label className="flex items-start gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800">
+                            <input
+                              type="checkbox"
+                              checked={Boolean(formatOptions.include_cover)}
+                              onChange={() => toggleFormatOption("include_cover")}
+                              className="mt-1 h-4 w-4 rounded border-gray-300 text-[#0056D6] focus:ring-[#0056D6]"
+                            />
+                            <div className="space-y-0.5">
+                              <p className="font-semibold">Cover page</p>
+                              <p className="text-xs text-gray-600">
+                                Adds a professional cover with case title, court, and Bates range.
+                              </p>
+                            </div>
+                          </label>
+                          <label className="flex items-start gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800">
+                            <input
+                              type="checkbox"
+                              checked={Boolean(formatOptions.include_index)}
+                              onChange={() => toggleFormatOption("include_index")}
+                              className="mt-1 h-4 w-4 rounded border-gray-300 text-[#0056D6] focus:ring-[#0056D6]"
+                            />
+                            <div className="space-y-0.5">
+                              <p className="font-semibold">Table of Contents</p>
+                              <p className="text-xs text-gray-600">
+                                Adds page ranges for each exhibit.
+                              </p>
+                            </div>
+                          </label>
+                          <label className="flex items-start gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800">
+                            <input
+                              type="checkbox"
+                              checked={Boolean(formatOptions.show_caseready_branding)}
+                              onChange={() => toggleFormatOption("show_caseready_branding")}
+                              className="mt-1 h-4 w-4 rounded border-gray-300 text-[#0056D6] focus:ring-[#0056D6]"
+                            />
+                            <div className="space-y-0.5">
+                              <p className="font-semibold">CaseReady footer</p>
+                              <p className="text-xs text-gray-600">
+                                Toggle the “Prepared with CaseReady” footer on/off.
+                              </p>
+                            </div>
+                          </label>
+                          <div className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-3 text-sm text-gray-800">
+                            <p className="font-semibold">Sticker position</p>
+                            <p className="text-xs text-gray-600">Default top-right; adjust if needed.</p>
+                            <div className="mt-3 flex flex-wrap gap-2">
+                              {(["top-right", "bottom-right", "left-vertical"] as const).map((pos) => {
+                                const active = formatOptions.sticker_position === pos;
+                                return (
+                                  <button
+                                    key={pos}
+                                    type="button"
+                                    onClick={() => setStickerPosition(pos)}
+                                    className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                                      active
+                                        ? "border-[#0056D6] bg-white text-[#0056D6]"
+                                        : "border-gray-200 bg-white text-gray-700 hover:border-[#0056D6]/40"
+                                    }`}
+                                  >
+                                    {pos === "top-right"
+                                      ? "Top-right"
+                                      : pos === "bottom-right"
+                                      ? "Bottom-right"
+                                      : "Left vertical"}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                          <div className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-3 text-sm text-gray-800">
+                            <p className="font-semibold">Case details (optional)</p>
+                            <div className="mt-2 space-y-2">
+                              <input
+                                type="text"
+                                value={formatOptions.case_title || ""}
+                                onChange={(e) =>
+                                  setFormatOptions((prev) => ({
+                                    ...prev,
+                                    case_title: e.target.value,
+                                  }))
+                                }
+                                placeholder="Case title"
+                                className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:border-[#0056D6] focus:outline-none"
+                              />
+                              <input
+                                type="text"
+                                value={formatOptions.court_name || ""}
+                                onChange={(e) =>
+                                  setFormatOptions((prev) => ({
+                                    ...prev,
+                                    court_name: e.target.value,
+                                  }))
+                                }
+                                placeholder="Court name"
+                                className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:border-[#0056D6] focus:outline-none"
+                              />
+                              <textarea
+                                value={formatOptions.contact_block_text || ""}
+                                onChange={(e) =>
+                                  setFormatOptions((prev) => ({
+                                    ...prev,
+                                    contact_block_text: e.target.value,
+                                    include_contact_block: true,
+                                  }))
+                                }
+                                placeholder="Attorney contact block (optional)"
+                                className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:border-[#0056D6] focus:outline-none"
+                                rows={2}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {formatPreset === "firm_branded" && (
+                        <div className="space-y-3">
+                          <div className="grid gap-3 md:grid-cols-2">
+                            <label className="flex items-start gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800">
+                              <input
+                                type="checkbox"
+                                checked={Boolean(formatOptions.include_cover)}
+                                onChange={() => toggleFormatOption("include_cover")}
+                                className="mt-1 h-4 w-4 rounded border-gray-300 text-[#0056D6] focus:ring-[#0056D6]"
+                              />
+                              <div className="space-y-0.5">
+                                <p className="font-semibold">Cover page</p>
+                                <p className="text-xs text-gray-600">
+                                  Professional cover with court + case details.
+                                </p>
+                              </div>
+                            </label>
+                            <label className="flex items-start gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800">
+                              <input
+                                type="checkbox"
+                                checked={Boolean(formatOptions.include_index)}
+                                onChange={() => toggleFormatOption("include_index")}
+                                className="mt-1 h-4 w-4 rounded border-gray-300 text-[#0056D6] focus:ring-[#0056D6]"
+                              />
+                              <div className="space-y-0.5">
+                                <p className="font-semibold">Table of Contents</p>
+                                <p className="text-xs text-gray-600">
+                                  Adds page ranges for each exhibit.
+                                </p>
+                              </div>
+                            </label>
+                            <label className="flex items-start gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800">
+                              <input
+                                type="checkbox"
+                                checked={Boolean(formatOptions.show_caseready_branding)}
+                                onChange={() => toggleFormatOption("show_caseready_branding")}
+                                className="mt-1 h-4 w-4 rounded border-gray-300 text-[#0056D6] focus:ring-[#0056D6]"
+                              />
+                              <div className="space-y-0.5">
+                                <p className="font-semibold">CaseReady footer</p>
+                                <p className="text-xs text-gray-600">
+                                  Hide for white-label, or keep for co-branding.
+                                </p>
+                              </div>
+                            </label>
+                            <label className="flex items-start gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800">
+                              <input
+                                type="checkbox"
+                                checked={Boolean(formatOptions.color_coded_stickers)}
+                                onChange={() => toggleFormatOption("color_coded_stickers")}
+                                className="mt-1 h-4 w-4 rounded border-gray-300 text-[#0056D6] focus:ring-[#0056D6]"
+                              />
+                              <div className="space-y-0.5">
+                                <p className="font-semibold">Color-coded stickers</p>
+                                <p className="text-xs text-gray-600">
+                                  Adds subtle color by exhibit label.
+                                </p>
+                              </div>
+                            </label>
+                            <label className="flex items-start gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800">
+                              <input
+                                type="checkbox"
+                                checked={Boolean(formatOptions.slip_sheets)}
+                                onChange={() => toggleFormatOption("slip_sheets")}
+                                className="mt-1 h-4 w-4 rounded border-gray-300 text-[#0056D6] focus:ring-[#0056D6]"
+                              />
+                              <div className="space-y-0.5">
+                                <p className="font-semibold">Slip sheets</p>
+                                <p className="text-xs text-gray-600">
+                                  Inserts firm-branded separators before each exhibit.
+                                </p>
+                              </div>
+                            </label>
+                          </div>
+
+                          <div className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-3 text-sm text-gray-800">
+                            <p className="font-semibold">Sticker position</p>
+                            <p className="text-xs text-gray-600">
+                              Choose from top-right, bottom-right, or left-vertical.
+                            </p>
+                            <div className="mt-3 flex flex-wrap gap-2">
+                              {(["top-right", "bottom-right", "left-vertical"] as const).map((pos) => {
+                                const active = formatOptions.sticker_position === pos;
+                                return (
+                                  <button
+                                    key={pos}
+                                    type="button"
+                                    onClick={() => setStickerPosition(pos)}
+                                    className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                                      active
+                                        ? "border-[#0056D6] bg-white text-[#0056D6]"
+                                        : "border-gray-200 bg-white text-gray-700 hover:border-[#0056D6]/40"
+                                    }`}
+                                  >
+                                    {pos === "top-right"
+                                      ? "Top-right"
+                                      : pos === "bottom-right"
+                                      ? "Bottom-right"
+                                      : "Left vertical"}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+
+                          <div className="grid gap-3 md:grid-cols-2">
+                            <div className="rounded-xl border border-gray-200 bg-white px-3 py-3 text-sm text-gray-800">
+                              <p className="font-semibold">Cover template</p>
+                              <div className="mt-2 flex flex-wrap gap-2">
+                                {(["classic", "modern", "black-bar"] as const).map((template) => {
+                                  const active = formatOptions.cover_template === template;
+                                  return (
+                                    <button
+                                      key={template}
+                                      type="button"
+                                      onClick={() =>
+                                        setFormatOptions((prev) => ({
+                                          ...prev,
+                                          cover_template: template,
+                                        }))
+                                      }
+                                      className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                                        active
+                                          ? "border-[#0056D6] bg-[#EEF3FF] text-[#0056D6]"
+                                          : "border-gray-200 bg-gray-50 text-gray-700 hover:border-[#0056D6]/40"
+                                      }`}
+                                    >
+                                      {template === "classic"
+                                        ? "Classic"
+                                        : template === "modern"
+                                        ? "Modern"
+                                        : "Black bar"}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                              <div className="mt-3 space-y-2">
+                                <input
+                                  type="text"
+                                  value={formatOptions.case_title || ""}
+                                  onChange={(e) =>
+                                    setFormatOptions((prev) => ({
+                                      ...prev,
+                                      case_title: e.target.value,
+                                    }))
+                                  }
+                                  placeholder="Case title"
+                                  className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:border-[#0056D6] focus:outline-none"
+                                />
+                                <input
+                                  type="text"
+                                  value={formatOptions.court_name || ""}
+                                  onChange={(e) =>
+                                    setFormatOptions((prev) => ({
+                                      ...prev,
+                                      court_name: e.target.value,
+                                    }))
+                                  }
+                                  placeholder="Court name"
+                                  className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:border-[#0056D6] focus:outline-none"
+                                />
+                              </div>
+                            </div>
+                            <div className="rounded-xl border border-gray-200 bg-white px-3 py-3 text-sm text-gray-800">
+                              <p className="font-semibold">Branding & extras</p>
+                              <div className="mt-2 space-y-2">
+                                <textarea
+                                  value={formatOptions.contact_block_text || ""}
+                                  onChange={(e) =>
+                                    setFormatOptions((prev) => ({
+                                      ...prev,
+                                      contact_block_text: e.target.value,
+                                      include_contact_block: true,
+                                    }))
+                                  }
+                                  placeholder="Attorney contact block (optional)"
+                                  rows={2}
+                                  className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:border-[#0056D6] focus:outline-none"
+                                />
+                                <input
+                                  type="text"
+                                  value={formatOptions.footer_text || ""}
+                                  onChange={(e) =>
+                                    setFormatOptions((prev) => ({
+                                      ...prev,
+                                      footer_text: e.target.value,
+                                    }))
+                                  }
+                                  placeholder="Custom footer line (address/phone/email)"
+                                  className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:border-[#0056D6] focus:outline-none"
+                                />
+                                <input
+                                  type="text"
+                                  value={formatOptions.firm_logo_url || ""}
+                                  onChange={(e) =>
+                                    setFormatOptions((prev) => ({
+                                      ...prev,
+                                      firm_logo_url: e.target.value,
+                                    }))
+                                  }
+                                  placeholder="Firm logo URL (optional)"
+                                  className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:border-[#0056D6] focus:outline-none"
+                                />
+                                <input
+                                  type="text"
+                                  value={formatOptions.watermark_text || ""}
+                                  onChange={(e) =>
+                                    setFormatOptions((prev) => ({
+                                      ...prev,
+                                      watermark_text: e.target.value,
+                                    }))
+                                  }
+                                  placeholder='Watermark text (e.g., "CONFIDENTIAL")'
+                                  className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:border-[#0056D6] focus:outline-none"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <p className="mt-3 inline-flex items-center gap-2 rounded-xl bg-gray-50 px-3 py-2 text-[11px] font-semibold text-gray-600">
+                  <svg
+                    aria-hidden="true"
+                    viewBox="0 0 24 24"
+                    className="h-3.5 w-3.5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                  >
+                    <rect x="5" y="11" width="14" height="9" rx="2" />
+                    <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+                  </svg>
+                  Upgrade to unlock formatting presets and Advanced controls.
+                </p>
+              )}
             </div>
 
             {/* Upload card */}
@@ -641,11 +1248,11 @@ export default function ExhibitBuilderPage() {
                 </div>
 
                 {files.length > 0 && (
-                  <div className="mt-6 space-y-3">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs">
-                      <label className="flex flex-col text-left font-semibold text-gray-700">
-                        Ordering
-                        <select
+                    <div className="mt-6 space-y-3">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs">
+                        <label className="flex flex-col text-left font-semibold text-gray-700">
+                          Ordering
+                          <select
                           value={orderingMode}
                           onChange={handleOrderingChange}
                           className="mt-1 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-[13px] text-gray-700 focus:outline-none"
@@ -655,18 +1262,20 @@ export default function ExhibitBuilderPage() {
                           <option value="detected">
                             Detected date (experimental)
                           </option>
-                        </select>
-                      </label>
-                      <p className="text-[11px] text-gray-700">
-                        {orderingMode === "upload"
-                          ? "Drag rows to reorder exhibits manually."
-                          : orderingMode === "timestamp"
-                          ? "Automatically sorting by file timestamps."
-                          : "Placeholder detected-date ordering. OCR will plug in soon."}
-                      </p>
-                    </div>
-
-                    <div className="surface-card overflow-x-auto rounded-2xl border border-gray-200 bg-white">
+                          </select>
+                        </label>
+                        <p className="text-[11px] text-gray-700">
+                          {orderingMode === "upload"
+                            ? "Drag rows to reorder exhibits manually."
+                            : orderingMode === "timestamp"
+                            ? "Automatically sorting by file timestamps."
+                            : "Placeholder detected-date ordering. OCR will plug in soon."}
+                        </p>
+                      </div>
+                    <div
+                      ref={tableRef}
+                      className="surface-card overflow-x-auto rounded-2xl border border-gray-200 bg-white"
+                    >
                       <table className="min-w-full text-left text-xs text-gray-700">
                         <thead className="text-[11px] uppercase tracking-wide text-gray-500">
                           <tr>
@@ -675,7 +1284,17 @@ export default function ExhibitBuilderPage() {
                               Exhibit label
                             </th>
                             <th className="px-3 py-2 font-semibold">
-                              Filename
+                              <span className="flex items-center justify-between gap-2">
+                                <span>Filename</span>
+                                <button
+                                  type="button"
+                                  onClick={scrollToDetails}
+                                  className="inline-flex items-center rounded-full border border-gray-200 bg-white px-2 py-0.5 text-[11px] font-semibold text-gray-600 hover:border-[#0056D6]/50"
+                                  title="Scroll to description and delete"
+                                >
+                                  →
+                                </button>
+                              </span>
                             </th>
                             <th className="px-3 py-2 font-semibold">
                               Date (detected/assumed)
@@ -684,6 +1303,9 @@ export default function ExhibitBuilderPage() {
                               Description
                             </th>
                             <th className="px-3 py-2 font-semibold">Pages</th>
+                            <th className="px-3 py-2 font-semibold text-right">
+                              Remove
+                            </th>
                           </tr>
                         </thead>
                         <tbody>
@@ -765,6 +1387,15 @@ export default function ExhibitBuilderPage() {
                                   }
                                   className="w-20 rounded-xl border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm focus:border-[#0056D6] focus:outline-none"
                                 />
+                              </td>
+                              <td className="px-3 py-3 align-top text-right">
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveFile(item.id)}
+                                  className="inline-flex items-center rounded-full border border-gray-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-gray-700 hover:border-red-200 hover:text-red-700"
+                                >
+                                  Delete
+                                </button>
                               </td>
                             </tr>
                           ))}

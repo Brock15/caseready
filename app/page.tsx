@@ -161,6 +161,8 @@ export default function Home() {
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [globalFocusMode, setGlobalFocusMode] = useState(false);
+  const tableRef = useRef<HTMLDivElement | null>(null);
+  const [redirectingToBuilder, setRedirectingToBuilder] = useState(false);
   const hasUnlimitedExports = useMemo(
     () =>
       UNLIMITED_EMAILS.has(userEmail ?? "") ||
@@ -262,7 +264,13 @@ export default function Home() {
   };
 
   const handleSelectFiles = () => {
-    fileInputRef.current?.click();
+    redirectToBuilder();
+  };
+
+  const redirectToBuilder = () => {
+    if (redirectingToBuilder) return;
+    setRedirectingToBuilder(true);
+    router.push("/builder");
   };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -275,6 +283,7 @@ export default function Home() {
   const totalSizeMB = totalSizeBytes / (1024 * 1024);
 
   const handleGenerate = async () => {
+    redirectToBuilder();
     if (!files.length || isSubmitting) return;
     if (!matterInput.trim()) {
       setMatterPromptOpen(true);
@@ -416,7 +425,11 @@ export default function Home() {
       if (!additions.length) return prev;
       const combined = [...prev, ...additions];
       const ordered = sortFilesByMode(combined, orderingMode);
-      return relabelFiles(ordered);
+      const relabeled = relabelFiles(ordered);
+      if (relabeled.length) {
+        redirectToBuilder();
+      }
+      return relabeled;
     });
   }
 
@@ -432,6 +445,10 @@ export default function Home() {
     const value = event.target.value as "upload" | "timestamp" | "detected";
     setOrderingMode(value);
     setFiles((prev) => relabelFiles(sortFilesByMode(prev, value)));
+  };
+
+  const handleRemoveFile = (id: string) => {
+    setFiles((prev) => relabelFiles(prev.filter((file) => file.id !== id)));
   };
 
   const updateFileMeta = (id: string, updates: Partial<SelectedFile>) => {
@@ -471,6 +488,15 @@ export default function Home() {
   };
 
   const handleDragEnd = () => setDraggingId(null);
+
+  const scrollToDetails = () => {
+    if (tableRef.current) {
+      tableRef.current.scrollTo({
+        left: tableRef.current.scrollWidth,
+        behavior: "smooth",
+      });
+    }
+  };
 
   const dropZoneScrollMargin = globalFocusMode ? "160px" : "120px";
 
@@ -552,7 +578,6 @@ export default function Home() {
                   <span className="text-xs font-semibold text-gray-700">
                     {userEmail || "Account"}
                   </span>
-                  <span className="text-[10px] text-gray-400">ID: {userId}</span>
                 </div>
                 <Link
                   href="/dashboard"
@@ -612,17 +637,6 @@ export default function Home() {
               <p className="text-sm sm:text-base text-gray-600 max-w-xl mb-6">
                 Drag, drop, and let CaseReady auto-sort, auto-rotate, Bates stamp, and merge a clean exhibit packet in minutes.
               </p>
-          <div className="flex flex-wrap gap-2 mb-4 max-sm:w-full max-sm:justify-center">
-            {HERO_METRICS.map((metric) => (
-              <div
-                key={metric.label}
-                className="inline-flex items-center gap-2 rounded-md border border-white/80 bg-white/90 px-3 py-1.5 text-[11px] font-semibold text-gray-700 shadow-sm max-sm:flex-1 max-sm:justify-center"
-              >
-                <span className="text-sm text-[#0056D6]">{metric.value}</span>
-                <span className="text-[11px] text-gray-600">{metric.label}</span>
-              </div>
-            ))}
-          </div>
           <div className="flex flex-wrap gap-3 mb-6 max-sm:flex-col max-sm:w-full max-sm:items-stretch">
             <button
               type="button"
@@ -787,8 +801,10 @@ export default function Home() {
                             : "Placeholder detected-date ordering. OCR will plug in soon."}
                         </p>
                       </div>
-
-                      <div className="surface-card overflow-x-auto rounded-2xl border border-gray-200 bg-white">
+                      <div
+                        ref={tableRef}
+                        className="surface-card overflow-x-auto rounded-2xl border border-gray-200 bg-white"
+                      >
                         <table className="min-w-full text-left text-xs text-gray-700">
                           <thead className="text-[11px] uppercase tracking-wide text-gray-500">
                             <tr>
@@ -796,18 +812,21 @@ export default function Home() {
                               <th className="px-3 py-2 font-semibold">
                                 Exhibit label
                               </th>
-                              <th className="px-3 py-2 font-semibold">
-                                Filename
-                              </th>
+                            <th className="px-3 py-2 font-semibold">
+                              Filename
+                            </th>
                               <th className="px-3 py-2 font-semibold">
                                 Date (detected/assumed)
                               </th>
-                              <th className="px-3 py-2 font-semibold">
-                                Description
-                              </th>
-                              <th className="px-3 py-2 font-semibold">Pages</th>
-                            </tr>
-                          </thead>
+                            <th className="px-3 py-2 font-semibold">
+                              Description
+                            </th>
+                            <th className="px-3 py-2 font-semibold">Pages</th>
+                            <th className="px-3 py-2 font-semibold text-right">
+                              Remove
+                            </th>
+                          </tr>
+                        </thead>
                           <tbody>
                             {files.map((item, index) => (
                               <tr
@@ -887,6 +906,15 @@ export default function Home() {
                                     }
                                     className="w-20 rounded-xl border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm focus:border-[#0056D6] focus:outline-none"
                                   />
+                                </td>
+                                <td className="px-3 py-3 align-top text-right">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleRemoveFile(item.id)}
+                                    className="inline-flex items-center rounded-full border border-gray-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-gray-700 hover:border-red-200 hover:text-red-700"
+                                  >
+                                    Delete
+                                  </button>
                                 </td>
                               </tr>
                             ))}
@@ -1019,6 +1047,18 @@ export default function Home() {
               Designed for solos and small teams—no complicated onboarding, just
               a fast path from raw files to polished PDFs.
             </p>
+          </div>
+
+          <div className="flex flex-wrap gap-2 justify-center">
+            {HERO_METRICS.map((metric) => (
+              <div
+                key={metric.label}
+                className="inline-flex items-center gap-2 rounded-md border border-blue-100 bg-white/90 px-3 py-1.5 text-[11px] font-semibold text-gray-700 shadow-sm"
+              >
+                <span className="text-sm text-[#0056D6]">{metric.value}</span>
+                <span className="text-[11px] text-gray-600">{metric.label}</span>
+              </div>
+            ))}
           </div>
 
           <div className="grid gap-6 sm:gap-8 md:grid-cols-3">
