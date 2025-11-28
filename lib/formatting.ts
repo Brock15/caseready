@@ -122,23 +122,11 @@ export const mergeOptionsWithDefaults = (
   };
 };
 
-const pickFormalOptions = (options: Required<FormatOptions>) => ({
-  include_cover: options.include_cover,
-  include_index: options.include_index,
-  show_caseready_branding: options.show_caseready_branding,
-  sticker_position: options.sticker_position,
-  include_contact_block: options.include_contact_block,
-  contact_block_text: options.contact_block_text,
-  court_name: options.court_name,
-  case_title: options.case_title,
-  optimized_pdf: options.optimized_pdf,
-});
-
 export const resolveFormattingForPlan = (input: {
   preset?: string | null;
   options?: Partial<FormatOptions> | null;
   plan: UserPlan;
-}) => {
+}): { preset: FormatPreset; options: Required<FormatOptions> } => {
   if (input.plan === "free") {
     return {
       preset: "quick" as const,
@@ -173,13 +161,5 @@ export const resolveFormattingForPlan = (input: {
     };
   }
 
-  if (preset === "formal" && input.plan === "solo") {
-    return {
-      preset,
-      options: pickFormalOptions(merged),
-    };
-  }
-
-  // Firm preset (firm users) keeps all options
   return { preset, options: merged };
 };
