@@ -143,7 +143,7 @@ export default function ExhibitBuilderPage() {
     allowAdvanced: boolean;
   }>({
     plan: "free",
-    allowPresets: ["quick"],
+    allowPresets: ["quick"] as FormatPreset[],
     allowAdvanced: false,
   });
   const [formatPreset, setFormatPreset] = useState<FormatPreset>("quick");
@@ -178,7 +178,7 @@ export default function ExhibitBuilderPage() {
         allowPresets: Array.from(perms.allowPresets) as FormatPreset[],
         allowAdvanced: perms.allowAdvanced,
       });
-      if (!perms.allowPresets.includes(formatPreset as typeof formatPreset)) {
+      if (!perms.allowPresets.includes(formatPreset)) {
         setFormatPreset("quick");
         setFormatOptions(getDefaultFormatOptions("quick"));
       }
