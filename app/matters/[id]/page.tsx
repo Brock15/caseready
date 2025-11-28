@@ -222,7 +222,7 @@ export default function MatterDetailPage() {
               </span>
             ) : (
               <span className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1 text-[11px] font-semibold text-[#0F2F8F]">
-                {userPlan === "paid" ? "Paid access" : "Free preset"}
+                {userPlan === "free" ? "Free preset" : "Paid access"}
               </span>
             )}
           </div>
