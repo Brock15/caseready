@@ -178,7 +178,7 @@ export default function ExhibitBuilderPage() {
         allowPresets: Array.from(perms.allowPresets) as FormatPreset[],
         allowAdvanced: perms.allowAdvanced,
       });
-      const allowedPresets = perms.allowPresets as FormatPreset[];
+      const allowedPresets = Array.from(perms.allowPresets) as FormatPreset[];
       if (!allowedPresets.includes(formatPreset)) {
         setFormatPreset("quick");
         setFormatOptions(getDefaultFormatOptions("quick"));
