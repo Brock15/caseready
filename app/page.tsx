@@ -552,31 +552,45 @@ export default function Home() {
           </div>
 
           <div
-            className={`flex flex-wrap items-center gap-2 justify-end max-sm:w-full max-sm:justify-center max-sm:gap-3 text-[11px] font-semibold ${
+            className={`flex flex-wrap items-center gap-2 justify-end max-sm:w-full max-sm:justify-center max-sm:gap-2 text-[11px] font-semibold ${
               globalFocusMode ? "text-gray-200" : "text-gray-600"
             }`}
           >
-            <button
-              type="button"
-              onClick={() =>
-                document
-                  .getElementById("how-it-works")
-                  ?.scrollIntoView({ behavior: "smooth" })
-              }
-              className="inline-flex items-center justify-center gap-2 rounded-full border border-white/30 bg-white/80 px-3 py-1.5 min-h-[40px] text-gray-700 shadow-sm transition hover:shadow-md hover:bg-white max-sm:w-full"
-            >
-              <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#E4EEFF] text-[#0056D6] text-xs font-bold">
-                i
-              </span>
-              How it works
-            </button>
-            <Link
-              href="/pricing"
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-3.5 py-1.5 min-h-[40px] text-white shadow-sm transition hover:brightness-110 max-sm:w-full"
-            >
-              <span className="text-sm">$</span>
-              Pricing
-            </Link>
+            {/* Desktop buttons */}
+            <div className="hidden lg:flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() =>
+                  document
+                    .getElementById("how-it-works")
+                    ?.scrollIntoView({ behavior: "smooth" })
+                }
+                className="inline-flex items-center justify-center gap-1 rounded-full border border-white/30 bg-white/80 px-3 py-1.5 min-h-[36px] text-sm text-gray-700 shadow-sm transition hover:shadow-md hover:bg-white"
+              >
+                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#E4EEFF] text-[#0056D6] text-xs font-bold leading-none">
+                  i
+                </span>
+                How it works
+              </button>
+              <Link
+                href="/pricing"
+                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-3.5 py-1.5 min-h-[36px] text-sm text-white shadow-sm transition hover:brightness-110"
+              >
+                <span className="text-sm">$</span>
+                Pricing
+              </Link>
+            </div>
+
+            {/* Mobile/medium compact actions */}
+            <div className="flex items-center gap-2 lg:hidden">
+              <Link
+                href="/pricing"
+                aria-label="Pricing"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#0056D6] bg-white text-[#0056D6] text-xs shadow-sm hover:bg-[#eef3ff]"
+              >
+                $
+              </Link>
+            </div>
 
             {isAuthenticated ? (
               <div className="flex items-center gap-3 rounded-full border border-gray-200 bg-white/90 px-3 py-1 shadow-sm">
@@ -587,7 +601,7 @@ export default function Home() {
                 </div>
                 <Link
                   href="/dashboard"
-                  className="inline-flex items-center rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50"
+                  className="inline-flex items-center rounded-full bg-[#12326B] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:brightness-110"
                 >
                   Dashboard
                 </Link>
@@ -595,7 +609,7 @@ export default function Home() {
                   type="button"
                   onClick={handleSignOut}
                   disabled={isSigningOut}
-                  className={`inline-flex items-center rounded-full bg-[#0056D6] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:brightness-110 ${
+                  className={`inline-flex items-center rounded-full bg-[#12326B] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:brightness-110 ${
                     isSigningOut ? "opacity-60 cursor-not-allowed" : ""
                   }`}
                 >
@@ -625,7 +639,7 @@ export default function Home() {
       {/* Main content */}
       <div className="flex-1 flex items-center">
         <div className="mx-auto max-w-5xl w-full px-4 sm:px-6 py-10 sm:py-16">
-          <div className="grid gap-10 md:grid-cols-[1.2fr,1fr] items-start md:items-center relative">
+          <div className="grid gap-6 lg:grid-cols-[1.2fr,1fr] items-start md:items-center relative">
             {/* Left side */}
             <section className="relative">
               <span className="pointer-events-none absolute -top-8 -left-6 h-48 w-48 rounded-full bg-[#3FA9FF]/30 blur-3xl" />
@@ -653,7 +667,7 @@ export default function Home() {
                   router.push("/signin?redirectedFrom=/builder");
                 }
               }}
-              className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-5 py-2.5 min-h-[44px] text-sm font-semibold text-white shadow-sm hover:brightness-110"
+              className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-4 py-2 min-h-[40px] text-xs sm:px-5 sm:py-2.5 sm:min-h-[44px] sm:text-sm font-semibold text-white shadow-sm hover:brightness-110"
             >
               Try Exhibit Builder Free
             </button>
@@ -664,7 +678,7 @@ export default function Home() {
                   .getElementById("how-it-works")
                   ?.scrollIntoView({ behavior: "smooth" })
               }
-              className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full border border-gray-200 bg-white/80 px-5 py-2.5 min-h-[44px] text-sm font-semibold text-gray-700 hover:bg-gray-50"
+              className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full border border-gray-200 bg-white/80 px-4 py-2 min-h-[40px] text-xs sm:px-5 sm:py-2.5 sm:min-h-[44px] sm:text-sm font-semibold text-gray-700 hover:bg-gray-50"
             >
               Watch workflow
             </button>
