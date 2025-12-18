@@ -465,155 +465,10 @@ const drawCoverPage = (
   }
 };
 
-const getJpegOrientation = (buffer: ArrayBuffer): number | null => {
-  const view = new DataView(buffer);
-  if (view.byteLength < 2 || view.getUint16(0, false) !== 0xffd8) {
-    return null;
-  }
-  let offset = 2;
-  while (offset + 4 <= view.byteLength) {
-    const marker = view.getUint16(offset, false);
-    offset += 2;
-    if (marker === 0xffda) {
-      break;
-    }
-    if ((marker & 0xff00) !== 0xff00) {
-      break;
-    }
-    const segmentLength = view.getUint16(offset, false);
-    if (segmentLength < 2 || offset + segmentLength > view.byteLength) {
-      break;
-    }
-    if (marker === 0xffe1) {
-      const segmentStart = offset + 2;
-      if (view.getUint32(segmentStart, false) === 0x45786966) {
-        const tiffOffset = segmentStart + 6;
-        const endian = view.getUint16(tiffOffset, false);
-        const little = endian === 0x4949;
-        if (endian === 0x4949 || endian === 0x4d4d) {
-          const ifdOffset = view.getUint32(tiffOffset + 4, little);
-          let dirOffset = tiffOffset + ifdOffset;
-          if (dirOffset < view.byteLength) {
-            const entries = view.getUint16(dirOffset, little);
-            for (let i = 0; i < entries; i += 1) {
-              const entryOffset = dirOffset + 2 + i * 12;
-              if (entryOffset + 12 > view.byteLength) continue;
-              const tag = view.getUint16(entryOffset, little);
-              if (tag === 0x0112) {
-                return view.getUint16(entryOffset + 8, little);
-              }
-            }
-          }
-        }
-      }
-    }
-    offset += segmentLength;
-  }
-  return null;
-};
-
-type OrientationMetrics = {
-  angle: 0 | 90 | 180 | 270;
-  energyScore: number;
-  biasScore: number;
-};
-
-const computeOrientationMetrics = async (
-  buffer: Buffer,
-  angle: OrientationMetrics["angle"]
-): Promise<OrientationMetrics> => {
-  const { data, info } = await sharp(buffer)
-    .rotate(angle, { background: { r: 255, g: 255, b: 255, alpha: 1 } })
-    .resize(96, 128, {
-      fit: "contain",
-      background: { r: 255, g: 255, b: 255, alpha: 1 },
-    })
-    .grayscale()
-    .removeAlpha()
-    .raw()
-    .toBuffer({ resolveWithObject: true });
-
-  const { width, height } = info;
-  let horizontalEnergy = 0;
-  let verticalEnergy = 0;
-  let biasScore = 0;
-  for (let y = 0; y < height; y += 1) {
-    const weightY = 1 - (2 * y) / height;
-    for (let x = 0; x < width; x += 1) {
-      const idx = y * width + x;
-      const value = data[idx];
-      if (x + 1 < width) {
-        horizontalEnergy += Math.abs(value - data[idx + 1]);
-      }
-      if (y + 1 < height) {
-        const diff = data[idx + width] - value;
-        verticalEnergy += Math.abs(diff);
-        biasScore += diff * weightY;
-      }
-    }
-  }
-
-  return {
-    angle,
-    energyScore: verticalEnergy - horizontalEnergy,
-    biasScore,
-  };
-};
-
-const determineVisualRotation = async (buffer: Buffer): Promise<number> => {
-  const candidates: Array<0 | 90 | 180 | 270> = [0, 90, 180, 270];
-  const metrics: OrientationMetrics[] = [];
-  for (const angle of candidates) {
-    metrics.push(await computeOrientationMetrics(buffer, angle));
-  }
-
-  metrics.sort((a, b) => b.energyScore - a.energyScore);
-  const baseline = metrics.find((m) => m.angle === 0) ?? metrics[0];
-  let best = metrics[0];
-
-  if (
-    metrics.length > 1 &&
-    Math.abs(metrics[0].energyScore - metrics[1].energyScore) < 600
-  ) {
-    const competing = metrics
-      .filter(
-        (m) =>
-          Math.abs(m.energyScore - best.energyScore) < 600 ||
-          m.angle === best.angle
-      )
-      .sort((a, b) => a.biasScore - b.biasScore);
-    best = competing[0];
-  }
-
-  if (best.angle !== 0) {
-    const improvement = best.energyScore - baseline.energyScore;
-    const biasDelta = Math.abs(best.biasScore - baseline.biasScore);
-    const strongBias =
-      (best.angle === 180 && biasDelta > 1200) || biasDelta > 2000;
-    if (improvement < 800 && !strongBias) {
-      return 0;
-    }
-  }
-
-  return best.angle;
-};
-
-const normalizeImageType = (fileType: string, fileName?: string) => {
-  const lower = (fileType || "").toLowerCase();
-  if (lower) return lower;
-  const ext = (fileName || "").split(".").pop()?.toLowerCase();
-  if (ext === "heic" || ext === "heif") return "image/heic";
-  if (ext === "png") return "image/png";
-  if (ext === "jpg" || ext === "jpeg") return "image/jpeg";
-  if (ext === "tif" || ext === "tiff") return "image/tiff";
-  return "";
-};
-
 const toJpegBuffer = async (input: Buffer): Promise<Buffer> => {
-  // Rotate based on EXIF, cap size, convert to JPEG for consistent embedding
+  // Cap size and convert to JPEG for consistent embedding while preserving pixel orientation
   try {
     return await sharp(input)
-      .rotate()
       .resize({
         width: MAX_IMAGE_DIMENSION,
         height: MAX_IMAGE_DIMENSION,
@@ -643,52 +498,11 @@ const loadPdfOrImageAsPages = async (
     return copies;
   }
 
-  const normalizedType = normalizeImageType(fileType, fileName);
   let workingBuffer: Buffer = Buffer.from(fileBuffer);
 
-  let rotationDegrees = 0;
-  if (normalizedType === "image/jpeg" || normalizedType === "image/jpg") {
-    const orientation = getJpegOrientation(fileBuffer);
-    if (orientation === 3) rotationDegrees = 180;
-    else if (orientation === 6) rotationDegrees = 90;
-    else if (orientation === 8) rotationDegrees = 270;
-  }
-  if (!rotationDegrees) {
-    try {
-      rotationDegrees = await determineVisualRotation(workingBuffer);
-    } catch {
-      rotationDegrees = 0;
-    }
-  }
-  if (rotationDegrees) {
-    workingBuffer = await sharp(workingBuffer)
-      .rotate(rotationDegrees, {
-        background: { r: 255, g: 255, b: 255, alpha: 1 },
-      })
-      .resize({
-        width: MAX_IMAGE_DIMENSION,
-        height: MAX_IMAGE_DIMENSION,
-        fit: "inside",
-        withoutEnlargement: true,
-        background: { r: 255, g: 255, b: 255, alpha: 1 },
-      })
-      .toBuffer();
-  }
-
-  // Convert everything except PNG to JPEG for consistent handling (HEIC/TIFF/web uploads)
-  let embeddedBuffer = workingBuffer;
-  if (
-    normalizedType !== "image/png" &&
-    normalizedType !== "image/jpeg" &&
-    normalizedType !== "image/jpg"
-  ) {
-    embeddedBuffer = await toJpegBuffer(workingBuffer);
-  }
-
-  const embedded =
-    normalizedType === "image/png"
-      ? await targetDoc.embedPng(embeddedBuffer)
-      : await targetDoc.embedJpg(embeddedBuffer);
+  // Do not rotate automatically; images are assumed visually upright. Always re-encode to JPEG to strip EXIF orientation.
+  const embeddedBuffer = await toJpegBuffer(workingBuffer);
+  const embedded = await targetDoc.embedJpg(embeddedBuffer);
 
   const page = targetDoc.addPage([DEFAULT_PAGE.width, DEFAULT_PAGE.height]);
   const pageWidth = DEFAULT_PAGE.width;

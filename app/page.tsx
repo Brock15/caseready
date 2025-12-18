@@ -136,6 +136,29 @@ const HERO_METRICS = [
   { value: "98%", label: "Court-ready formatting score" },
 ];
 
+const brand = {
+  blue: "#1A3DE3",
+  blueSoft: "#EEF2FF",
+  border: "border-slate-200",
+  card: "bg-white",
+  cardTint: "bg-white/90 backdrop-blur",
+  textPrimary: "text-slate-900",
+  textSecondary: "text-slate-600",
+};
+
+const buttonVariants = {
+  primary:
+    "inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-[#1A3DE3] to-[#4F46E5] text-white font-semibold shadow-[0_10px_30px_rgba(26,61,227,0.25)] transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[0_18px_40px_rgba(26,61,227,0.28)] focus:outline-none focus:ring-2 focus:ring-[#1A3DE3]/50",
+  secondary:
+    "inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-800 font-semibold transition-all duration-150 hover:-translate-y-0.5 hover:bg-slate-50 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-200",
+};
+
+const badgeVariants = {
+  beta: "inline-flex items-center gap-1 rounded-full bg-slate-100 text-slate-700 px-3 py-1 text-[11px] font-semibold",
+  live: "inline-flex items-center gap-1 rounded-full bg-green-50 text-green-700 px-2.5 py-0.5 text-[10px] font-semibold border border-green-100",
+  info: "inline-flex items-center gap-1 rounded-full bg-blue-50 text-blue-700 px-2 py-0.5 text-[10px] font-semibold border border-blue-100",
+};
+
 
 export default function Home() {
   const router = useRouter();
@@ -519,19 +542,19 @@ export default function Home() {
             }
           : {
               backgroundImage:
-                "radial-gradient(130% 130% at 50% 0%, #fdfbff 0%, #f4f7ff 45%, #faf6f0 100%)",
+                "linear-gradient(180deg, #F5F3EE 0%, #F7F8FB 55%, #F1F5F9 100%)",
             }
       }
     >
       {/* Top bar */}
       <header
         className={`w-full border-b backdrop-blur-sm ${
-          globalFocusMode ? "bg-[#0B1220]/90 border-white/10" : "bg-white/60 border-black/5"
+          globalFocusMode ? "bg-[#0B1220]/90 border-white/10" : "bg-white/70 border-slate-200/80 shadow-sm"
         }`}
       >
         <div className="mx-auto max-w-5xl flex items-center justify-between py-4 px-4 sm:px-6">
           <div className="flex items-center gap-3">
-            <div className="h-12 w-12 rounded-2xl bg-white shadow-md flex items-center justify-center border border-gray-100">
+            <div className="h-12 w-12 rounded-2xl bg-white shadow-lg flex items-center justify-center border border-slate-200">
               <NextImage
                 src="/logo.svg"
                 alt="CaseReady logo"
@@ -567,14 +590,14 @@ export default function Home() {
                 }
                 className="inline-flex items-center justify-center gap-1 rounded-full border border-white/30 bg-white/80 px-3 py-1.5 min-h-[36px] text-sm text-gray-700 shadow-sm transition hover:shadow-md hover:bg-white"
               >
-                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#E4EEFF] text-[#0056D6] text-xs font-bold leading-none">
+                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#E4EEFF] text-[#1A3DE3] text-xs font-bold leading-none">
                   i
                 </span>
                 How it works
               </button>
               <Link
                 href="/pricing"
-                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-3.5 py-1.5 min-h-[36px] text-sm text-white shadow-sm transition hover:brightness-110"
+                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-gradient-to-r from-[#0F1F3F] to-[#1A3DE3] px-3.5 py-1.5 min-h-[36px] text-sm text-white shadow-sm transition hover:brightness-110"
               >
                 <span className="text-sm">$</span>
                 Pricing
@@ -586,7 +609,7 @@ export default function Home() {
               <Link
                 href="/pricing"
                 aria-label="Pricing"
-                className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#0056D6] bg-white text-[#0056D6] text-xs shadow-sm hover:bg-[#eef3ff]"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#1A3DE3] bg-white text-[#1A3DE3] text-xs shadow-sm hover:bg-[#EEF2FF]"
               >
                 $
               </Link>
@@ -601,26 +624,26 @@ export default function Home() {
                 </div>
                 <Link
                   href="/dashboard"
-                  className="inline-flex items-center rounded-full bg-[#12326B] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:brightness-110"
-                >
-                  Dashboard
-                </Link>
-                <button
-                  type="button"
-                  onClick={handleSignOut}
-                  disabled={isSigningOut}
-                  className={`inline-flex items-center rounded-full bg-[#12326B] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:brightness-110 ${
-                    isSigningOut ? "opacity-60 cursor-not-allowed" : ""
-                  }`}
-                >
-                  {isSigningOut ? "Signing out…" : "Sign out"}
-                </button>
+              className="inline-flex items-center rounded-full bg-[#0F1F3F] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:brightness-110"
+            >
+              Dashboard
+            </Link>
+            <button
+              type="button"
+              onClick={handleSignOut}
+              disabled={isSigningOut}
+              className={`inline-flex items-center rounded-full bg-[#0F1F3F] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:brightness-110 ${
+                isSigningOut ? "opacity-60 cursor-not-allowed" : ""
+              }`}
+            >
+              {isSigningOut ? "Signing out…" : "Sign out"}
+            </button>
               </div>
             ) : (
               <div className="flex items-center gap-2 rounded-full border border-gray-200 bg-white/90 px-2 py-1 shadow-sm">
                 <Link
                   href="/signin"
-                  className="inline-flex items-center rounded-full bg-[#0056D6] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:brightness-110"
+                  className="inline-flex items-center rounded-full bg-gradient-to-r from-[#0F1F3F] to-[#1A3DE3] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:brightness-110"
                 >
                   {isCheckingSession ? "Checking…" : "Sign in"}
                 </Link>
@@ -638,66 +661,69 @@ export default function Home() {
 
       {/* Main content */}
       <div className="flex-1 flex items-center">
-        <div className="mx-auto max-w-5xl w-full px-4 sm:px-6 py-10 sm:py-16">
-          <div className="grid gap-6 lg:grid-cols-[1.2fr,1fr] items-start md:items-center relative">
+        <div className="mx-auto max-w-6xl w-full px-4 sm:px-6 py-12 sm:py-16">
+          <div className="grid gap-8 lg:grid-cols-[1.1fr,0.9fr] items-start md:items-center relative">
             {/* Left side */}
             <section className="relative">
-              <span className="pointer-events-none absolute -top-8 -left-6 h-48 w-48 rounded-full bg-[#3FA9FF]/30 blur-3xl" />
-              <span className="pointer-events-none absolute top-1/4 -right-10 h-40 w-40 rounded-full bg-[#F79CFF]/20 blur-3xl" />
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-gray-900 mb-4">
+              <span className="pointer-events-none absolute -top-10 -left-16 h-56 w-56 rounded-full bg-gradient-to-br from-[#f0f2f7] to-transparent blur-3xl" />
+              <span className="pointer-events-none absolute top-1/4 -right-14 h-48 w-48 rounded-full bg-gradient-to-br from-[#e8ecf5] to-transparent blur-3xl" />
+              <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-3 py-1 text-[11px] font-semibold text-slate-700 shadow-sm mb-3">
+                <span className="h-2 w-2 rounded-full bg-[#D4A15A]" aria-hidden="true" />
+                Built for busy attorneys
+              </div>
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-slate-900 mb-4 leading-tight">
                 The automatic exhibit builder for lawyers.
-                <span className="block text-[#0056D6]">
+                <span className="block text-[#0F1F3F]">
                   Turn messy screenshots into court-ready PDFs.
                 </span>
               </h1>
-              <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white/80 px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm">
-                <span className="h-2 w-2 rounded-full bg-[#0056D6]" aria-hidden="true" />
+              <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/90 px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm">
+                <span className="h-2 w-2 rounded-full bg-[#0F1F3F]" aria-hidden="true" />
                 Still in beta testing — feedback welcomed.
               </p>
-              <p className="text-sm sm:text-base text-gray-600 max-w-xl mb-6">
+              <p className="text-sm sm:text-base text-slate-600 max-w-2xl mb-6">
                 Drag, drop, and let CaseReady auto-sort, auto-rotate, Bates stamp, and merge a clean exhibit packet in minutes.
               </p>
-          <div className="flex flex-wrap gap-3 mb-6 max-sm:flex-col max-sm:w-full max-sm:items-stretch">
-            <button
-              type="button"
-              onClick={() => {
-                if (isAuthenticated) {
-                  router.push("/builder");
-                } else {
-                  router.push("/signin?redirectedFrom=/builder");
-                }
-              }}
-              className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-4 py-2 min-h-[40px] text-xs sm:px-5 sm:py-2.5 sm:min-h-[44px] sm:text-sm font-semibold text-white shadow-sm hover:brightness-110"
-            >
-              Try Exhibit Builder Free
-            </button>
-            <button
-              type="button"
-              onClick={() =>
-                document
-                  .getElementById("how-it-works")
-                  ?.scrollIntoView({ behavior: "smooth" })
-              }
-              className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full border border-gray-200 bg-white/80 px-4 py-2 min-h-[40px] text-xs sm:px-5 sm:py-2.5 sm:min-h-[44px] sm:text-sm font-semibold text-gray-700 hover:bg-gray-50"
-            >
-              Watch workflow
-            </button>
-          </div>
+              <div className="flex flex-wrap gap-3 mb-6 max-sm:flex-col max-sm:w-full max-sm:items-stretch">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (isAuthenticated) {
+                      router.push("/builder");
+                    } else {
+                      router.push("/signin?redirectedFrom=/builder");
+                    }
+                  }}
+                  className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg bg-[#0F1F3F] px-5 py-2.5 min-h-[44px] text-sm font-semibold text-white shadow-md transition-all duration-150 hover:-translate-y-0.5 hover:shadow-lg hover:bg-[#152749]"
+                >
+                  Try Exhibit Builder Free
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    document
+                      .getElementById("how-it-works")
+                      ?.scrollIntoView({ behavior: "smooth" })
+                  }
+                  className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-5 py-2.5 min-h-[44px] text-sm font-semibold text-[#0F1F3F] shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:bg-slate-50"
+                >
+                  Watch workflow
+                </button>
+              </div>
 
           <div className="hidden xl:block absolute right-2 top-36 w-[260px]">
-            <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white/90 shadow-sm">
-              <div className="absolute inset-0 bg-gradient-to-br from-[#EEF3FF] via-white to-[#F7F8FD] opacity-70" />
-              <div className="relative p-3">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm font-semibold text-gray-800">See it in action</p>
-                  <span className="rounded-full bg-blue-50 px-2.5 py-0.5 text-[10px] font-semibold text-[#0F2F8F] border border-blue-100">
+            <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md">
+              <div className="relative p-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-semibold text-slate-800">See it in action</p>
+                  <span className="rounded-full border border-slate-200 px-2.5 py-0.5 text-[10px] font-semibold text-slate-700 bg-white">
                     Live flow
                   </span>
                 </div>
                 <button
                   type="button"
                   onClick={scrollToHowItWorksGif}
-                  className="rounded-xl overflow-hidden border border-gray-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0056D6]"
+                  className="block rounded-xl overflow-hidden border border-slate-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0F1F3F]/40"
                 >
                   <video
                     src="/case1.mp4"
@@ -712,9 +738,9 @@ export default function Home() {
               </div>
             </div>
           </div>
-              <div className="h-px w-20 bg-gradient-to-r from-transparent via-[#0056D6]/50 to-transparent mb-3" />
+              <div className="h-px w-20 bg-gradient-to-r from-transparent via-[#1A3DE3]/50 to-transparent mb-3" />
 
-              <div className="surface-card rounded-xl border border-blue-100 bg-white/70 px-4 py-3 text-xs text-gray-600 mb-4">
+              <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-xs text-slate-600 shadow-sm mb-4">
                 {isAuthenticated ? (
                   hasUnlimitedExports ? (
                     <>
@@ -753,11 +779,11 @@ export default function Home() {
               {/* Upload card */}
               <div
                 id="drop-zone"
-                className="surface-card rounded-2xl border border-gray-200 bg-white shadow-sm p-5 sm:p-6"
+                className="rounded-2xl border border-slate-200 bg-white/90 shadow-sm p-5 sm:p-6 backdrop-blur"
                 style={{ scrollMarginTop: dropZoneScrollMargin }}
               >
                 <div
-                  className="border-2 border-dashed border-gray-200 rounded-xl p-6 sm:p-8 text-center shadow-inner"
+                  className="border-2 border-dashed border-slate-200 rounded-xl p-6 sm:p-8 text-center shadow-inner bg-gradient-to-b from-white to-[#F8FAFC]"
                   style={{
                     backgroundImage:
                       "url('/ChatGPT Image Nov 17, 2025, 09_42_05 PM copy.svg')",
@@ -769,7 +795,7 @@ export default function Home() {
                   onDragOver={(event) => event.preventDefault()}
                   onDrop={handleDropZone}
                 >
-                  <div className="inline-flex flex-col gap-1 rounded-xl bg-white/85 px-4 py-3 text-gray-800 shadow-sm backdrop-blur">
+                  <div className="inline-flex flex-col gap-1 rounded-xl bg-white/85 px-4 py-3 text-slate-800 shadow-sm backdrop-blur">
                     <p className="text-sm font-semibold">
                       Drag & drop evidence files here
                     </p>
@@ -792,7 +818,7 @@ export default function Home() {
                   <button
                     type="button"
                     onClick={handleSelectFiles}
-                    className="inline-flex w-full sm:w-auto justify-center items-center rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-5 py-2.5 min-h-[44px] text-sm font-semibold text-white shadow-sm hover:brightness-110 transition"
+                    className="inline-flex w-full sm:w-auto justify-center items-center rounded-full bg-gradient-to-r from-[#0F1F3F] to-[#1A3DE3] px-5 py-2.5 min-h-[44px] text-sm font-semibold text-white shadow-[0_12px_32px_rgba(15,31,63,0.25)] hover:brightness-110 transition"
                   >
                     Select files
                   </button>
@@ -910,8 +936,8 @@ export default function Home() {
                                         labelLocked: true,
                                       })
                                     }
-                                    className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm focus:border-[#0056D6] focus:outline-none"
-                                  />
+                                  className="w-full rounded-xl border border-slate-200 bg-gray-50 px-3 py-1.5 text-sm focus:border-[#1A3DE3] focus:outline-none"
+                                />
                                 </td>
                                 <td className="px-3 py-3 align-top text-gray-600">
                                   <p className="truncate text-sm">
@@ -927,8 +953,8 @@ export default function Home() {
                                         assumedDate: event.target.value,
                                       })
                                     }
-                                    className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm focus:border-[#0056D6] focus:outline-none"
-                                  />
+                                  className="w-full rounded-xl border border-slate-200 bg-gray-50 px-3 py-1.5 text-sm focus:border-[#1A3DE3] focus:outline-none"
+                                />
                                 </td>
                                 <td className="px-3 py-3 align-top">
                                   <input
@@ -940,8 +966,8 @@ export default function Home() {
                                       })
                                     }
                                     placeholder="Optional notes"
-                                    className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm focus:border-[#0056D6] focus:outline-none"
-                                  />
+                                  className="w-full rounded-xl border border-slate-200 bg-gray-50 px-3 py-1.5 text-sm focus:border-[#1A3DE3] focus:outline-none"
+                                />
                                 </td>
                                 <td className="px-3 py-3 align-top">
                                   <input
@@ -953,8 +979,8 @@ export default function Home() {
                                         pages: event.target.value,
                                       })
                                     }
-                                    className="w-20 rounded-xl border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm focus:border-[#0056D6] focus:outline-none"
-                                  />
+                                  className="w-20 rounded-xl border border-slate-200 bg-gray-50 px-3 py-1.5 text-sm focus:border-[#1A3DE3] focus:outline-none"
+                                />
                                 </td>
                                 <td className="px-3 py-3 align-top text-right">
                                   <button
@@ -975,12 +1001,12 @@ export default function Home() {
 
                   {isSubmitting && (
                     <div className="mt-4">
-                      <div className="h-2 w-full rounded-full bg-gray-200 overflow-hidden">
-                        <div
-                          className="h-full rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] transition-all duration-200"
-                          style={{ width: `${loadingProgress}%` }}
-                        />
-                      </div>
+                    <div className="h-2 w-full rounded-full bg-gray-200 overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-[#0F1F3F] to-[#1A3DE3] transition-all duration-200"
+                        style={{ width: `${loadingProgress}%` }}
+                      />
+                    </div>
                       <p className="text-[11px] text-gray-500 mt-1 uppercase tracking-wide">
                         Rendering your exhibit…
                       </p>
@@ -1027,13 +1053,13 @@ export default function Home() {
                   )}
 
                   {downloadUrl && (
-                    <a
-                      href={downloadUrl}
-                      download="caseready-exhibit.pdf"
-                      className="mt-3 inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:brightness-110 transition"
-                    >
-                      Download Exhibit PDF
-                    </a>
+                  <a
+                    href={downloadUrl}
+                    download="caseready-exhibit.pdf"
+                    className="mt-3 inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#0F1F3F] to-[#1A3DE3] px-5 py-2 text-sm font-semibold text-white shadow-[0_12px_32px_rgba(15,31,63,0.25)] hover:brightness-110 transition"
+                  >
+                    Download Exhibit PDF
+                  </a>
                   )}
 
                   <p className="mt-4 inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white/95 px-4 py-2 text-[11px] font-medium text-gray-700 shadow-sm">
@@ -1061,15 +1087,15 @@ export default function Home() {
 
             {/* Right side */}
             <aside className="space-y-4">
-              <div className="surface-card rounded-2xl border border-blue-100 bg-gradient-to-br from-white to-[#E8F0FF]/80 p-5 shadow-sm text-sm text-gray-700 backdrop-blur">
-                <h2 className="font-semibold text-gray-900 mb-2">
+              <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-[#EEF2FF]/80 p-5 shadow-sm text-sm text-slate-700 backdrop-blur">
+                <h2 className="font-semibold text-slate-900 mb-2">
                   Built for busy attorneys.
                 </h2>
                 <p className="mb-2">
                   CaseReady was designed for solos and small firms drowning in
                   screenshots and PDFs. Save paralegal hours on every matter.
                 </p>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-slate-500">
                   Coming soon: redactions, exhibit presets by jurisdiction, and
                   client upload links.
                 </p>
@@ -1086,7 +1112,7 @@ export default function Home() {
       >
         <div className="mx-auto max-w-5xl w-full px-4 sm:px-6 py-12 sm:py-16 space-y-10">
           <div className="text-center max-w-2xl mx-auto">
-            <p className="text-xs uppercase tracking-[0.2em] text-[#0056D6] font-semibold">
+            <p className="text-xs uppercase tracking-[0.2em] text-[#1A3DE3] font-semibold">
               How it works
             </p>
             <h2 className="text-2xl sm:text-3xl font-semibold text-gray-900 mt-2">
@@ -1102,10 +1128,10 @@ export default function Home() {
             {HERO_METRICS.map((metric) => (
               <div
                 key={metric.label}
-                className="inline-flex items-center gap-2 rounded-md border border-blue-100 bg-white/90 px-3 py-1.5 text-[11px] font-semibold text-gray-700 shadow-sm"
+                className="inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white/90 px-3 py-1.5 text-[11px] font-semibold text-slate-700 shadow-sm"
               >
-                <span className="text-sm text-[#0056D6]">{metric.value}</span>
-                <span className="text-[11px] text-gray-600">{metric.label}</span>
+                <span className="text-sm text-[#1A3DE3]">{metric.value}</span>
+                <span className="text-[11px] text-slate-600">{metric.label}</span>
               </div>
             ))}
           </div>
@@ -1129,15 +1155,15 @@ export default function Home() {
                 ].map((step, index) => (
                   <div
                     key={step.title}
-                    className="relative overflow-hidden rounded-2xl border border-blue-100 bg-white/90 p-6 flex flex-col gap-3 shadow-sm"
+                    className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 flex flex-col gap-3 shadow-sm hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(15,23,42,0.08)] transition"
                   >
-                    <span className="h-10 w-10 rounded-2xl bg-gradient-to-br from-[#3FA9FF] to-[#0056D6] text-white font-semibold text-lg flex items-center justify-center shadow-sm">
+                    <span className="h-10 w-10 rounded-full bg-[#0F1F3F] text-white font-semibold text-lg flex items-center justify-center shadow-sm">
                       {index + 1}
                     </span>
-                    <h3 className="text-lg font-semibold text-gray-900">
+                    <h3 className="text-lg font-semibold text-slate-900">
                       {step.title}
                     </h3>
-                    <p className="text-sm text-gray-600">{step.body}</p>
+                    <p className="text-sm text-slate-600">{step.body}</p>
                   </div>
                 ))}
               </div>
@@ -1145,12 +1171,12 @@ export default function Home() {
 
             <div
               id="how-it-works-gif"
-              className="relative overflow-hidden rounded-3xl border border-gray-200 bg-white/90 shadow-sm"
+              className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white/90 shadow-[0_20px_50px_rgba(15,23,42,0.16)]"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-[#EEF3FF] via-white to-[#F7F8FD] opacity-70" />
               <div className="relative p-4 sm:p-5">
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm font-semibold text-gray-800">Full flow preview</p>
+                  <p className="text-sm font-semibold text-slate-800">Full flow preview</p>
                   <span className="rounded-full bg-blue-50 px-3 py-1 text-[11px] font-semibold text-[#0F2F8F] border border-blue-100">
                     See steps 1–3
                   </span>
@@ -1171,15 +1197,15 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="rounded-3xl border border-blue-100 bg-white/90 px-6 py-6 sm:py-8 shadow-sm">
+          <div className="rounded-2xl border border-slate-200 bg-white/90 px-6 py-6 sm:py-8 shadow-sm">
             <div className="text-center max-w-2xl mx-auto mb-6">
-              <p className="text-xs uppercase tracking-[0.3em] text-[#0056D6] font-semibold">
+              <p className="text-xs uppercase tracking-[0.3em] text-[#1A3DE3] font-semibold">
                 Feature roadmap
               </p>
-              <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 mt-1">
+              <h3 className="text-xl sm:text-2xl font-semibold text-slate-900 mt-1">
                 Core automations now, deeper workflows rolling out weekly.
               </h3>
-              <p className="text-sm text-gray-600 mt-2">
+              <p className="text-sm text-slate-600 mt-2">
                 Some capabilities are live today, while others are in active beta build. Early users see them first.
               </p>
             </div>
@@ -1187,27 +1213,27 @@ export default function Home() {
               {FEATURE_SETS.map((set) => (
                 <div
                   key={set.title}
-                  className="rounded-2xl border border-gray-100 bg-white/80 p-4 sm:p-5 text-sm text-gray-600 backdrop-blur"
+                  className="rounded-2xl border border-slate-200 bg-white/90 p-4 sm:p-5 text-sm text-slate-600 backdrop-blur shadow-sm"
                 >
                   <div className="mb-3 flex items-center gap-2">
                     <span
                       className={`inline-flex h-8 w-8 items-center justify-center rounded-full ${
                         set.icon === "check"
                           ? "bg-green-100 text-green-700"
-                          : "bg-amber-100 text-amber-700"
+                          : "bg-indigo-100 text-indigo-700"
                       } text-xs font-semibold uppercase tracking-wide`}
                     >
                       {set.icon === "check" ? "Live" : "Beta"}
                     </span>
                     <div>
-                      <p className="text-gray-900 font-semibold">{set.title}</p>
-                      <p className="text-[12px] text-gray-500">{set.subtitle}</p>
+                      <p className="text-slate-900 font-semibold">{set.title}</p>
+                      <p className="text-[12px] text-slate-500">{set.subtitle}</p>
                     </div>
                   </div>
                   <ul className="space-y-2">
                     {set.items.map((item) => (
                       <li key={item} className="flex items-start gap-2">
-                        <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[#0056D6]" />
+                        <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[#0F1F3F]" />
                         <span>{item}</span>
                       </li>
                     ))}
@@ -1219,7 +1245,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="bg-[#0056D6] text-white">
+      <section className="bg-[#0F1F3F] text-white">
         <div className="mx-auto max-w-5xl w-full px-4 sm:px-6 py-10 sm:py-12 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-xs uppercase tracking-[0.35em] text-blue-100 font-semibold">
@@ -1235,30 +1261,30 @@ export default function Home() {
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 text-sm font-medium">
-            <div className="rounded-2xl bg-white/10 px-4 py-3">
+            <div className="rounded-2xl bg-white/10 px-4 py-3 border border-white/10">
               <p className="text-xs uppercase tracking-wide text-blue-100">
                 Free
               </p>
               <p className="text-xl font-semibold">$0</p>
               <p className="text-xs text-blue-100">2 exports included</p>
             </div>
-            <div className="rounded-2xl bg-white text-[#0056D6] px-4 py-3">
-              <p className="text-xs uppercase tracking-wide text-[#0056D6]/70">
+            <div className="rounded-2xl bg-white text-[#0F1F3F] px-4 py-3 border border-white/30">
+              <p className="text-xs uppercase tracking-wide text-[#0F1F3F]/70">
                 Solo launch
               </p>
               <p className="text-xl font-semibold">$29</p>
-              <p className="text-xs text-[#0056D6]/70">First 50 solos</p>
+              <p className="text-xs text-[#0F1F3F]/70">First 50 solos</p>
             </div>
-            <div className="rounded-2xl bg-white text-[#0056D6] px-4 py-3">
-              <p className="text-xs uppercase tracking-wide text-[#0056D6]/70">
+            <div className="rounded-2xl bg-white text-[#0F1F3F] px-4 py-3 border border-white/30">
+              <p className="text-xs uppercase tracking-wide text-[#0F1F3F]/70">
                 Firm plan
               </p>
               <p className="text-xl font-semibold">$79</p>
-              <p className="text-xs text-[#0056D6]/70">Unlimited matters</p>
+              <p className="text-xs text-[#0F1F3F]/70">Unlimited matters</p>
             </div>
             <Link
               href="/pricing"
-              className="inline-flex items-center justify-center rounded-full bg-white text-[#0056D6] px-5 py-2.5 font-semibold hover:bg-blue-50 transition"
+              className="inline-flex items-center justify-center rounded-full bg-white text-[#0F1F3F] px-5 py-2.5 font-semibold hover:bg-blue-50 transition border border-white/40"
             >
               View plans
             </Link>
@@ -1287,18 +1313,18 @@ export default function Home() {
 
       {matterPromptOpen && (
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-md rounded-3xl border border-blue-100 bg-white p-6 shadow-xl">
-            <h3 className="text-lg font-semibold text-gray-900">
+          <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white/95 p-6 shadow-xl backdrop-blur">
+            <h3 className="text-lg font-semibold text-slate-900">
               Name this matter
             </h3>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-slate-600 mt-1">
               Enter a matter name before generating your exhibit packet.
             </p>
             <input
               value={matterInput}
               onChange={(e) => setMatterInput(e.target.value)}
               placeholder="e.g., Acme v. Smith – Hearing Prep"
-              className="mt-3 w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 focus:border-[#0056D6] focus:outline-none"
+              className="mt-3 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-gray-800 focus:border-[#1A3DE3] focus:outline-none"
             />
             <div className="mt-4 flex justify-end gap-2 text-sm">
               <button
@@ -1314,7 +1340,7 @@ export default function Home() {
               <button
                 type="button"
                 onClick={confirmMatterAndGenerate}
-                className="rounded-full bg-[#0056D6] px-4 py-2 font-semibold text-white shadow-sm hover:brightness-110"
+                className="rounded-full bg-gradient-to-r from-[#0F1F3F] to-[#1A3DE3] px-4 py-2 font-semibold text-white shadow-sm hover:brightness-110"
               >
                 Continue
               </button>
