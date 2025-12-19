@@ -4,19 +4,24 @@ import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import Stripe from "stripe";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabaseConfig";
 
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-if (!stripeSecretKey) {
-  throw new Error("Missing STRIPE_SECRET_KEY");
-}
-
-const stripe = new Stripe(stripeSecretKey, {
-  apiVersion: "2024-06-20",
-});
-
 const isRecurringPrice = (price: Stripe.Price) => Boolean(price.recurring);
+
+const getStripe = () => {
+  const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+  if (!stripeSecretKey) return null;
+  return new Stripe(stripeSecretKey, { apiVersion: "2024-06-20" });
+};
 
 export async function POST(req: Request) {
   try {
+    const stripe = getStripe();
+    if (!stripe) {
+      return NextResponse.json(
+        { error: "Stripe not configured" },
+        { status: 500 }
+      );
+    }
+
     const { priceId } = await req.json();
     if (!priceId || typeof priceId !== "string") {
       return NextResponse.json({ error: "priceId is required" }, { status: 400 });
