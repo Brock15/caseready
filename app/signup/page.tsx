@@ -155,7 +155,7 @@ export default function SignupPage() {
               className={`w-full rounded-full px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition ${
                 isSubmitting
                   ? "bg-gray-300 cursor-not-allowed"
-                  : "bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] hover:brightness-110"
+                  : "bg-gradient-to-r bg-[#0056D6] hover:brightness-110"
               }`}
             >
               {isSubmitting ? "Creating your account..." : "Create account"}

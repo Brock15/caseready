@@ -205,12 +205,12 @@ export default function PricingPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#F5F2ED] text-[#111827] flex flex-col">
+    <main className="min-h-screen bg-[#F5F2ED] text-[#1A1614] flex flex-col">
       {/* Top nav */}
-      <header className="w-full border-b border-black/5 bg-white/80 backdrop-blur-sm">
+      <header className="w-full border-b border-[#E5E0D8] bg-white/80 backdrop-blur-sm">
         <div className="mx-auto max-w-6xl flex items-center justify-between py-4 px-4 sm:px-6">
           <Link href="/" className="flex items-center gap-3">
-            <div className="h-12 w-12 rounded-2xl bg-white shadow-md flex items-center justify-center border border-gray-100">
+            <div className="h-12 w-12 rounded-2xl bg-white shadow-sm flex items-center justify-center border border-[#F0EBE5]">
               <NextImage
                 src="/logo.svg"
                 alt="CaseReady logo"
@@ -221,50 +221,47 @@ export default function PricingPage() {
               />
             </div>
             <div className="flex flex-col leading-tight">
-              <span className="font-semibold tracking-tight text-lg">
+              <span className="font-semibold tracking-tight text-lg text-[#0F1419]">
                 CaseReady
               </span>
-              <span className="text-xs text-gray-500 hidden sm:block">
+              <span className="text-xs text-[#6B6560] hidden sm:block">
                 Evidence made effortless.
               </span>
             </div>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-3 text-xs font-semibold text-gray-700">
+          <nav className="hidden md:flex items-center gap-3 text-xs font-semibold text-[#1A1614]">
             <Link
               href="/how-it-works"
-              className="rounded-full border border-gray-200 bg-white/80 px-3 py-1 shadow-sm hover:border-[#0056D6] hover:text-[#0056D6] transition"
+              className="rounded-full border border-[#E5E0D8] bg-white px-3 py-1 hover:border-[#0056D6] hover:text-[#0056D6] transition"
             >
               How it works
             </Link>
             <Link
               href="/features#roadmap"
-              className="rounded-full border border-gray-200 bg-white/80 px-3 py-1 shadow-sm hover:border-[#0056D6] hover:text-[#0056D6] transition"
+              className="rounded-full border border-[#E5E0D8] bg-white px-3 py-1 hover:border-[#0056D6] hover:text-[#0056D6] transition"
             >
               Roadmap
             </Link>
             <Link
               href="/pricing"
-              className="rounded-full border border-transparent bg-[#0056D6] px-3 py-1 text-white shadow-sm hover:brightness-110 transition"
+              className="rounded-full border border-transparent bg-[#0056D6] px-3 py-1 text-white hover:bg-[#0056D6]-hover transition"
             >
               Pricing
             </Link>
             <Link
               href="/security"
-              className="rounded-full border border-gray-200 bg-white/80 px-3 py-1 shadow-sm hover:border-[#0056D6] hover:text-[#0056D6] transition"
+              className="rounded-full border border-[#E5E0D8] bg-white px-3 py-1 hover:border-[#0056D6] hover:text-[#0056D6] transition"
             >
               Security
             </Link>
           </nav>
 
           {userEmail ? (
-            <div className="flex items-center gap-3 rounded-full border border-gray-200 bg-white/90 px-3 py-1 shadow-sm">
-              <span className="text-xs font-semibold text-gray-700">
-                {userEmail}
-              </span>
+            <div className="flex items-center gap-2">
               <Link
                 href="/dashboard"
-                className="inline-flex items-center rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50"
+                className="inline-flex items-center rounded-full bg-[#0056D6] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0056D6]-hover transition"
               >
                 Dashboard
               </Link>
@@ -272,7 +269,7 @@ export default function PricingPage() {
                 type="button"
                 onClick={handleSignOut}
                 disabled={isSigningOut}
-                className={`inline-flex items-center rounded-full bg-[#0056D6] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:brightness-110 ${
+                className={`inline-flex items-center rounded-full border border-[#E5E0D8] bg-white px-4 py-2 text-sm font-medium text-[#1A1614] hover:bg-[#F5F2ED] transition ${
                   isSigningOut ? "opacity-60 cursor-not-allowed" : ""
                 }`}
               >
@@ -280,16 +277,16 @@ export default function PricingPage() {
               </button>
             </div>
           ) : (
-            <div className="flex items-center gap-2 rounded-full border border-gray-200 bg-white/90 px-2 py-1 shadow-sm">
+            <div className="flex items-center gap-2">
               <Link
                 href="/signin"
-                className="inline-flex items-center rounded-full bg-[#0056D6] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:brightness-110"
+                className="inline-flex items-center rounded-full border border-[#E5E0D8] bg-white px-4 py-2 text-sm font-medium text-[#1A1614] hover:bg-[#F5F2ED] transition"
               >
                 {isCheckingSession ? "Checking…" : "Sign in"}
               </Link>
               <Link
                 href="/signup"
-                className="inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-100"
+                className="inline-flex items-center rounded-full bg-[#0056D6] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0056D6]-hover transition"
               >
                 Sign up
               </Link>
@@ -321,7 +318,7 @@ export default function PricingPage() {
           </div>
 
           {/* Founding offer banner */}
-          <div className="rounded-3xl border border-dashed border-[#3FA9FF]/60 bg-[#F1F7FF] px-4 py-5 sm:px-6 sm:py-6 text-xs sm:text-sm text-gray-800 text-center shadow-sm">
+          <div className="rounded-3xl border border-dashed border-[#0056D6]/60 bg-[#F1F7FF] px-4 py-5 sm:px-6 sm:py-6 text-xs sm:text-sm text-gray-800 text-center shadow-sm">
             <span className="inline-flex items-center justify-center rounded-full bg-[#0056D6] text-white text-[10px] font-semibold px-2 py-0.5 mr-2">
               Founding offer
             </span>
@@ -344,7 +341,7 @@ export default function PricingPage() {
                     plan.highlighted
                       ? isLifetime
                         ? "border-[#D4AF37] ring-2 ring-[#D4AF37]/25 bg-white/98"
-                        : "border-[#0056D6] ring-2 ring-[#3FA9FF]/30 bg-white/95"
+                        : "border-[#0056D6] ring-2 ring-[#0056D6]/30 bg-white/95"
                       : "border-gray-200 bg-white/95"
                   }`}
                 >
@@ -449,7 +446,11 @@ export default function PricingPage() {
                       </Link>
                     )}
                     {plan.note && (
-                      <p className={`text-[11px] text-center ${isLifetime ? "text-[#E5D9A4]/90" : "text-gray-500"}`}>
+                      <p
+                        className={`text-[11px] text-center font-semibold ${
+                          isLifetime ? "text-[#0B0F1F]" : "text-gray-700"
+                        }`}
+                      >
                         {plan.note}
                       </p>
                     )}

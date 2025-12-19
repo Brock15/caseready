@@ -151,7 +151,7 @@ export default function RedactPage() {
           <div className="mt-5 flex justify-center gap-3">
             <Link
               href="/dashboard"
-              className="inline-flex items-center rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:brightness-110"
+              className="inline-flex items-center rounded-full bg-gradient-to-r bg-[#0056D6] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:brightness-110"
             >
               Go to Exhibit Builder
             </Link>
@@ -210,7 +210,7 @@ export default function RedactPage() {
             </p>
             <p className="text-xs text-slate-500 mt-1">Single PDF up to ~20MB</p>
             <div className="mt-4">
-              <label className="inline-flex cursor-pointer items-center rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow hover:brightness-110">
+              <label className="inline-flex cursor-pointer items-center rounded-full bg-[#0056D6] px-4 py-2 text-sm font-semibold text-white shadow hover:brightness-110">
                 Choose PDF
                 <input
                   type="file"
@@ -287,7 +287,7 @@ export default function RedactPage() {
               className={`inline-flex items-center justify-center rounded-full px-5 py-2.5 text-sm font-semibold text-white shadow ${
                 !file || isLoading
                   ? "bg-slate-400 cursor-not-allowed"
-                  : "bg-blue-600 hover:brightness-110"
+                  : "bg-[#0056D6] hover:brightness-110"
               }`}
             >
               {isLoading ? "Redacting…" : "Redact PDF"}

@@ -38,7 +38,7 @@ export default function ClientPortalPreview() {
             </Link>
             <Link
               href="/coming-soon"
-              className="inline-flex items-center rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-4 py-2 text-xs font-semibold text-white shadow-sm hover:brightness-110"
+              className="inline-flex items-center rounded-full bg-gradient-to-r bg-[#0056D6] px-4 py-2 text-xs font-semibold text-white shadow-sm hover:brightness-110"
             >
               Join beta list
             </Link>

@@ -16,7 +16,7 @@ export default function CancelPage() {
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link
             href="/pricing"
-            className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:brightness-110"
+            className="inline-flex items-center justify-center rounded-full bg-gradient-to-r bg-[#0056D6] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:brightness-110"
           >
             Retry checkout
           </Link>

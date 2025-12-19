@@ -1215,7 +1215,7 @@ export default function ExhibitBuilderPage() {
                   <button
                     type="button"
                     onClick={handleSelectFiles}
-                    className="inline-flex w-full sm:w-auto justify-center items-center rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-5 py-2.5 min-h-[44px] text-sm font-semibold text-white shadow-sm hover:brightness-110 transition"
+                    className="inline-flex w-full sm:w-auto justify-center items-center rounded-full bg-gradient-to-r bg-[#0056D6] px-5 py-2.5 min-h-[44px] text-sm font-semibold text-white shadow-sm hover:brightness-110 transition"
                   >
                     Select files
                   </button>
@@ -1410,7 +1410,7 @@ export default function ExhibitBuilderPage() {
                   <div className="mt-4">
                     <div className="h-2 w-full rounded-full bg-gray-200 overflow-hidden">
                       <div
-                        className="h-full rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] transition-all duration-200"
+                        className="h-full rounded-full bg-gradient-to-r bg-[#0056D6] transition-all duration-200"
                         style={{ width: `${loadingProgress}%` }}
                       />
                     </div>
@@ -1463,7 +1463,7 @@ export default function ExhibitBuilderPage() {
                   <a
                     href={downloadUrl}
                     download="caseready-exhibit.pdf"
-                    className="mt-3 inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:brightness-110 transition"
+                    className="mt-3 inline-flex items-center justify-center rounded-full bg-gradient-to-r bg-[#0056D6] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:brightness-110 transition"
                   >
                     Download Exhibit PDF
                   </a>

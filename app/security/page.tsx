@@ -100,10 +100,10 @@ export default function SecurityPage() {
           </p>
           <div className="mt-4 flex flex-wrap gap-3">
             <Link
-              href="/pricing"
+              href="mailto:hello@caseready.io?subject=Security%20review%20request"
               className="inline-flex items-center rounded-full bg-[#0056D6] px-4 py-2 text-xs font-semibold text-white shadow-sm hover:brightness-110"
             >
-              Talk to us
+              Email us
             </Link>
             <Link
               href="/features#roadmap"

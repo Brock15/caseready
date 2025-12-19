@@ -78,7 +78,7 @@ export default function HowItWorksPage() {
                 key={step.title}
                 className="relative overflow-hidden rounded-2xl border border-blue-100 bg-white/90 p-4 shadow-sm"
               >
-                <span className="inline-flex h-8 w-8 items-center justify-center rounded-2xl bg-gradient-to-br from-[#3FA9FF] to-[#0056D6] text-white font-semibold text-base shadow-sm">
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-2xl bg-gradient-to-br bg-[#0056D6] text-white font-semibold text-base shadow-sm">
                   {idx + 1}
                 </span>
                 <h3 className="mt-3 text-base font-semibold text-[#0F172A]">{step.title}</h3>

@@ -147,10 +147,10 @@ export default function FeaturesPage() {
               Read security
             </Link>
             <Link
-              href="/coming-soon"
+              href="/pricing"
               className="inline-flex items-center rounded-full bg-[#0056D6] px-4 py-2 text-xs font-semibold text-white shadow-sm hover:brightness-110"
             >
-              Join beta list
+              Upgrade
             </Link>
           </div>
         </section>
