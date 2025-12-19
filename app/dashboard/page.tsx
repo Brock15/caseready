@@ -23,28 +23,28 @@ const quickActions: QuickAction[] = [
     title: "Timeline Builder",
     description: "Build courtroom timelines from events and filings.",
     badge: "Beta",
-    href: "/coming-soon",
+    href: "/timeline",
   },
   {
     id: "redact",
     title: "Stealth Redaction",
     description: "Batch remove sensitive info from PDFs.",
     badge: "Beta",
-    href: "/coming-soon",
+    href: "/redact",
   },
   {
     id: "chat",
     title: "Evidence Workspace",
     description: "Summaries, notes, and tasking on matters.",
     badge: "Preview",
-    href: "/coming-soon",
+    href: "/workspace",
   },
   {
     id: "portal",
     title: "Client Portal",
     description: "Collect uploads with secure client links.",
     badge: "Coming Soon",
-    href: "/coming-soon",
+    href: "/portal",
   },
 ];
 
@@ -482,7 +482,7 @@ const hasPremium =
                   </p>
                   <button
                     type="button"
-                    onClick={() => labsToggles[action.id] && router.push(`/coming-soon?feature=${action.id}`)}
+                    onClick={() => labsToggles[action.id] && router.push(action.href || "/coming-soon")}
                     disabled={!labsToggles[action.id]}
                     className={`mt-3 inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold transition ${
                       labsToggles[action.id]

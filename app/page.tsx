@@ -593,7 +593,7 @@ export default function Home() {
               </Link>
               <Link
                 href="/pricing"
-                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-gradient-to-r from-[#0F1F3F] to-[#1A3DE3] px-3.5 py-1.5 min-h-[36px] text-sm text-white shadow-sm transition hover:brightness-110"
+                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-3.5 py-1.5 min-h-[36px] text-sm text-white shadow-sm transition hover:brightness-110"
               >
                 <span className="text-sm">$</span>
                 Pricing
@@ -620,26 +620,26 @@ export default function Home() {
                 </div>
                 <Link
                   href="/dashboard"
-              className="inline-flex items-center rounded-full bg-[#0F1F3F] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:brightness-110"
-            >
-              Dashboard
-            </Link>
-            <button
-              type="button"
-              onClick={handleSignOut}
-              disabled={isSigningOut}
-              className={`inline-flex items-center rounded-full bg-[#0F1F3F] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:brightness-110 ${
-                isSigningOut ? "opacity-60 cursor-not-allowed" : ""
-              }`}
-            >
-              {isSigningOut ? "Signing out…" : "Sign out"}
-            </button>
+                  className="inline-flex items-center rounded-full bg-[#0056D6] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:brightness-110"
+                >
+                  Dashboard
+                </Link>
+                <button
+                  type="button"
+                  onClick={handleSignOut}
+                  disabled={isSigningOut}
+                  className={`inline-flex items-center rounded-full bg-[#0056D6] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:brightness-110 ${
+                    isSigningOut ? "opacity-60 cursor-not-allowed" : ""
+                  }`}
+                >
+                  {isSigningOut ? "Signing out…" : "Sign out"}
+                </button>
               </div>
             ) : (
               <div className="flex items-center gap-2 rounded-full border border-gray-200 bg-white/90 px-2 py-1 shadow-sm">
                 <Link
                   href="/signin"
-                  className="inline-flex items-center rounded-full bg-gradient-to-r from-[#0F1F3F] to-[#1A3DE3] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:brightness-110"
+                  className="inline-flex items-center rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:brightness-110"
                 >
                   {isCheckingSession ? "Checking…" : "Sign in"}
                 </Link>
@@ -661,20 +661,18 @@ export default function Home() {
           <div className="grid gap-8 lg:grid-cols-[1.1fr,0.9fr] items-start md:items-center relative">
             {/* Left side */}
             <section className="relative">
-              <span className="pointer-events-none absolute -top-10 -left-16 h-56 w-56 rounded-full bg-gradient-to-br from-[#f0f2f7] to-transparent blur-3xl" />
-              <span className="pointer-events-none absolute top-1/4 -right-14 h-48 w-48 rounded-full bg-gradient-to-br from-[#e8ecf5] to-transparent blur-3xl" />
-              <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-3 py-1 text-[11px] font-semibold text-slate-700 shadow-sm mb-3">
-                <span className="h-2 w-2 rounded-full bg-[#D4A15A]" aria-hidden="true" />
-                Built for busy attorneys
+              <div className="mb-3 relative">
+                <span className="pointer-events-none absolute -top-4 -left-6 h-44 w-44 rounded-full bg-[#3FA9FF]/18 blur-3xl" aria-hidden="true" />
+                <span className="pointer-events-none absolute -bottom-2 right-2 h-32 w-32 rounded-full bg-[#0056D6]/14 blur-3xl" aria-hidden="true" />
               </div>
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-slate-900 mb-4 leading-tight">
                 The automatic exhibit builder for lawyers.
-                <span className="block text-[#0F1F3F]">
+                <span className="block text-[#0056D6]">
                   Turn messy screenshots into court-ready PDFs.
                 </span>
               </h1>
               <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/90 px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm">
-                <span className="h-2 w-2 rounded-full bg-[#0F1F3F]" aria-hidden="true" />
+                <span className="h-2 w-2 rounded-full bg-[#0056D6]" aria-hidden="true" />
                 Still in beta testing — feedback welcomed.
               </p>
               <p className="text-sm sm:text-base text-slate-600 max-w-2xl mb-6">
@@ -690,7 +688,7 @@ export default function Home() {
                       router.push("/signin?redirectedFrom=/builder");
                     }
                   }}
-                  className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg bg-[#0F1F3F] px-5 py-2.5 min-h-[44px] text-sm font-semibold text-white shadow-md transition-all duration-150 hover:-translate-y-0.5 hover:shadow-lg hover:bg-[#152749]"
+                  className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-6 py-3 min-h-[44px] text-sm font-semibold text-white shadow-sm transition hover:brightness-110"
                 >
                   Try Exhibit Builder Free
                 </button>
@@ -701,7 +699,7 @@ export default function Home() {
                       .getElementById("how-it-works")
                       ?.scrollIntoView({ behavior: "smooth" })
                   }
-                  className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-5 py-2.5 min-h-[44px] text-sm font-semibold text-[#0F1F3F] shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:bg-slate-50"
+                  className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-6 py-3 min-h-[44px] text-sm font-semibold text-[#0056D6] shadow-sm transition hover:bg-slate-50"
                 >
                   Watch workflow
                 </button>
@@ -719,7 +717,7 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={scrollToHowItWorksGif}
-                  className="block rounded-xl overflow-hidden border border-slate-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0F1F3F]/40"
+                  className="block rounded-xl overflow-hidden border border-slate-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0056D6]/40"
                 >
                   <video
                     src="/case1.mp4"
@@ -814,7 +812,7 @@ export default function Home() {
                   <button
                     type="button"
                     onClick={handleSelectFiles}
-                    className="inline-flex w-full sm:w-auto justify-center items-center rounded-full bg-gradient-to-r from-[#0F1F3F] to-[#1A3DE3] px-5 py-2.5 min-h-[44px] text-sm font-semibold text-white shadow-[0_12px_32px_rgba(15,31,63,0.25)] hover:brightness-110 transition"
+                    className="inline-flex w-full sm:w-auto justify-center items-center rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-5 py-2.5 min-h-[44px] text-sm font-semibold text-white transition hover:brightness-110"
                   >
                     Select files
                   </button>
@@ -999,7 +997,7 @@ export default function Home() {
                     <div className="mt-4">
                     <div className="h-2 w-full rounded-full bg-gray-200 overflow-hidden">
                       <div
-                        className="h-full rounded-full bg-gradient-to-r from-[#0F1F3F] to-[#1A3DE3] transition-all duration-200"
+                        className="h-full rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] transition-all duration-200"
                         style={{ width: `${loadingProgress}%` }}
                       />
                     </div>
@@ -1052,7 +1050,7 @@ export default function Home() {
                   <a
                     href={downloadUrl}
                     download="caseready-exhibit.pdf"
-                    className="mt-3 inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#0F1F3F] to-[#1A3DE3] px-5 py-2 text-sm font-semibold text-white shadow-[0_12px_32px_rgba(15,31,63,0.25)] hover:brightness-110 transition"
+                    className="mt-3 inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-5 py-2 text-sm font-semibold text-white shadow-[0_12px_32px_rgba(0,86,214,0.25)] hover:brightness-110 transition"
                   >
                     Download Exhibit PDF
                   </a>
@@ -1153,7 +1151,7 @@ export default function Home() {
                     key={step.title}
                     className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 flex flex-col gap-3 shadow-sm hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(15,23,42,0.08)] transition"
                   >
-                    <span className="h-10 w-10 rounded-full bg-[#0F1F3F] text-white font-semibold text-lg flex items-center justify-center shadow-sm">
+                    <span className="h-10 w-10 rounded-full bg-[#0056D6] text-white font-semibold text-lg flex items-center justify-center shadow-sm">
                       {index + 1}
                     </span>
                     <h3 className="text-lg font-semibold text-slate-900">
@@ -1243,7 +1241,7 @@ export default function Home() {
                   <ul className="space-y-2">
                     {set.items.map((item) => (
                       <li key={item} className="flex items-start gap-2">
-                        <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[#0F1F3F]" />
+                        <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[#0056D6]" />
                         <span>{item}</span>
                       </li>
                     ))}
@@ -1251,53 +1249,6 @@ export default function Home() {
                 </div>
               ))}
             </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-[#0F1F3F] text-white">
-        <div className="mx-auto max-w-5xl w-full px-4 sm:px-6 py-10 sm:py-12 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-xs uppercase tracking-[0.35em] text-blue-100 font-semibold">
-              Pricing
-            </p>
-            <h3 className="text-2xl font-semibold mt-2">
-              Founding offer seats are limited.
-            </h3>
-            <p className="text-sm text-blue-100 mt-2 max-w-xl">
-              Start free with two exports. When CaseReady becomes essential,
-              solo attorneys lock lifetime pricing at $29/mo and firms step into
-              the $79/mo plan.
-            </p>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-3 text-sm font-medium">
-            <div className="rounded-2xl bg-white/10 px-4 py-3 border border-white/10">
-              <p className="text-xs uppercase tracking-wide text-blue-100">
-                Free
-              </p>
-              <p className="text-xl font-semibold">$0</p>
-              <p className="text-xs text-blue-100">2 exports included</p>
-            </div>
-            <div className="rounded-2xl bg-white text-[#0F1F3F] px-4 py-3 border border-white/30">
-              <p className="text-xs uppercase tracking-wide text-[#0F1F3F]/70">
-                Solo launch
-              </p>
-              <p className="text-xl font-semibold">$29</p>
-              <p className="text-xs text-[#0F1F3F]/70">First 50 solos</p>
-            </div>
-            <div className="rounded-2xl bg-white text-[#0F1F3F] px-4 py-3 border border-white/30">
-              <p className="text-xs uppercase tracking-wide text-[#0F1F3F]/70">
-                Firm plan
-              </p>
-              <p className="text-xl font-semibold">$79</p>
-              <p className="text-xs text-[#0F1F3F]/70">Unlimited matters</p>
-            </div>
-            <Link
-              href="/pricing"
-              className="inline-flex items-center justify-center rounded-full bg-white text-[#0F1F3F] px-5 py-2.5 font-semibold hover:bg-blue-50 transition border border-white/40"
-            >
-              View plans
-            </Link>
           </div>
         </div>
       </section>
@@ -1383,7 +1334,7 @@ export default function Home() {
               <button
                 type="button"
                 onClick={confirmMatterAndGenerate}
-                className="rounded-full bg-gradient-to-r from-[#0F1F3F] to-[#1A3DE3] px-4 py-2 font-semibold text-white shadow-sm hover:brightness-110"
+                className="rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-4 py-2 font-semibold text-white shadow-sm hover:brightness-110"
               >
                 Continue
               </button>
