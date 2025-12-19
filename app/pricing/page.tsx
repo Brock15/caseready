@@ -43,7 +43,7 @@ const plansByTier = [
     ],
     cta: {
       label: "Start monthly",
-      href: "mailto:hello@caseready.io?subject=Solo%20plan%20signup",
+      priceId: "price_monthly_29", // replace with your Stripe monthly price id
     },
     highlighted: false,
     note: "Monthly, cancel anytime.",
@@ -66,7 +66,7 @@ const plansByTier = [
     ],
     cta: {
       label: "Lock lifetime offer",
-      href: "mailto:hello@caseready.io?subject=Founding%20Lifetime%20Offer",
+      priceId: "price_lifetime_199", // replace with your Stripe lifetime price id
     },
     highlighted: true,
     note: "Limited to the first 50 buyers. One-time payment, lifetime access.",
@@ -117,6 +117,7 @@ export default function PricingPage() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [isCheckingSession, setIsCheckingSession] = useState(true);
   const [isSigningOut, setIsSigningOut] = useState(false);
+  const [checkoutLoading, setCheckoutLoading] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     let active = true;
@@ -154,6 +155,36 @@ export default function PricingPage() {
       router.replace("/signin");
     } finally {
       setIsSigningOut(false);
+    }
+  };
+
+  const startCheckout = async (priceId?: string) => {
+    if (!priceId) {
+      router.push("/pricing");
+      return;
+    }
+    setCheckoutLoading((prev) => ({ ...prev, [priceId]: true }));
+    try {
+      const res = await fetch("/api/stripe/create-checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ priceId }),
+      });
+      if (!res.ok) {
+        alert("Please sign in to continue.");
+        return;
+      }
+      const data = await res.json();
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        alert("Could not start checkout. Please try again.");
+      }
+    } catch (err) {
+      console.error("Checkout error", err);
+      alert("Something went wrong starting checkout.");
+    } finally {
+      setCheckoutLoading((prev) => ({ ...prev, [priceId]: false }));
     }
   };
 
@@ -372,18 +403,35 @@ export default function PricingPage() {
                   </ul>
 
                   <div className="mt-auto space-y-2">
-                    <Link
-                      href={plan.cta.href}
-                      className={`inline-flex justify-center items-center w-full rounded-full px-4 py-2.5 text-sm font-semibold transition ${
-                        isLifetime
-                          ? "bg-[#D4AF37] text-[#0B0F1F] shadow-lg shadow-[#D4AF37]/30 hover:-translate-y-0.5"
-                          : plan.highlighted
-                          ? "bg-[#0056D6] text-white shadow-lg shadow-[#0056D6]/40 hover:-translate-y-0.5"
-                          : "border border-gray-200 text-gray-700 hover:bg-gray-50"
-                      }`}
-                    >
-                      {plan.cta.label}
-                    </Link>
+                    {"priceId" in plan.cta && plan.cta.priceId ? (
+                      <button
+                        type="button"
+                        onClick={() => startCheckout((plan.cta as any).priceId)}
+                        disabled={checkoutLoading[(plan.cta as any).priceId]}
+                        className={`inline-flex justify-center items-center w-full rounded-full px-4 py-2.5 text-sm font-semibold transition ${
+                          isLifetime
+                            ? "bg-[#D4AF37] text-[#0B0F1F] shadow-lg shadow-[#D4AF37]/30 hover:-translate-y-0.5"
+                            : plan.highlighted
+                            ? "bg-[#0056D6] text-white shadow-lg shadow-[#0056D6]/40 hover:-translate-y-0.5"
+                            : "border border-gray-200 text-gray-700 hover:bg-gray-50"
+                        } ${checkoutLoading[(plan.cta as any).priceId] ? "opacity-60 cursor-not-allowed" : ""}`}
+                      >
+                        {checkoutLoading[(plan.cta as any).priceId] ? "Redirecting…" : plan.cta.label}
+                      </button>
+                    ) : (
+                      <Link
+                        href={plan.cta.href}
+                        className={`inline-flex justify-center items-center w-full rounded-full px-4 py-2.5 text-sm font-semibold transition ${
+                          isLifetime
+                            ? "bg-[#D4AF37] text-[#0B0F1F] shadow-lg shadow-[#D4AF37]/30 hover:-translate-y-0.5"
+                            : plan.highlighted
+                            ? "bg-[#0056D6] text-white shadow-lg shadow-[#0056D6]/40 hover:-translate-y-0.5"
+                            : "border border-gray-200 text-gray-700 hover:bg-gray-50"
+                        }`}
+                      >
+                        {plan.cta.label}
+                      </Link>
+                    )}
                     {plan.note && (
                       <p className={`text-[11px] text-center ${isLifetime ? "text-[#E5D9A4]/90" : "text-gray-500"}`}>
                         {plan.note}

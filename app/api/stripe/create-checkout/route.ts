@@ -12,6 +12,11 @@ const getStripe = () => {
   return new Stripe(stripeSecretKey, { apiVersion: "2024-06-20" });
 };
 
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  process.env.SITE_URL ||
+  "http://localhost:3000";
+
 export async function POST(req: Request) {
   try {
     const stripe = getStripe();
@@ -71,14 +76,17 @@ export async function POST(req: Request) {
       mode,
       customer: customerId,
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: "https://caseready.io/success?session_id={CHECKOUT_SESSION_ID}",
-      cancel_url: "https://caseready.io/pricing",
+      success_url: `${SITE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${SITE_URL}/cancel`,
       allow_promotion_codes: true,
     };
 
     const checkoutSession = await stripe.checkout.sessions.create(sessionParams);
 
-    return NextResponse.json({ url: checkoutSession.url }, { status: 200 });
+    return NextResponse.json(
+      { url: checkoutSession.url, sessionId: checkoutSession.id },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Stripe checkout session error", error);
     return NextResponse.json(
