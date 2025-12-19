@@ -420,7 +420,7 @@ export default function PricingPage() {
                       </button>
                     ) : (
                       <Link
-                        href={plan.cta.href}
+                        href={plan.cta.href || "/pricing"}
                         className={`inline-flex justify-center items-center w-full rounded-full px-4 py-2.5 text-sm font-semibold transition ${
                           isLifetime
                             ? "bg-[#D4AF37] text-[#0B0F1F] shadow-lg shadow-[#D4AF37]/30 hover:-translate-y-0.5"

@@ -699,7 +699,7 @@ export default function Home() {
                       .getElementById("how-it-works")
                       ?.scrollIntoView({ behavior: "smooth" })
                   }
-                  className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-6 py-3 min-h-[44px] text-sm font-semibold text-[#0056D6] shadow-sm transition hover:bg-slate-50"
+                  className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-6 py-3 min-h-[44px] text-sm font-semibold text-black shadow-sm transition hover:bg-slate-50"
                 >
                   Watch workflow
                 </button>
