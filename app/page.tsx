@@ -163,6 +163,7 @@ export default function Home() {
   const [globalFocusMode, setGlobalFocusMode] = useState(false);
   const tableRef = useRef<HTMLDivElement | null>(null);
   const [redirectingToBuilder, setRedirectingToBuilder] = useState(false);
+  const [showLifetimeBanner, setShowLifetimeBanner] = useState(true);
 
   const scrollToHowItWorksGif = () => {
     document
@@ -558,20 +559,15 @@ export default function Home() {
           >
             {/* Desktop buttons */}
             <div className="hidden lg:flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() =>
-                  document
-                    .getElementById("how-it-works")
-                    ?.scrollIntoView({ behavior: "smooth" })
-                }
+              <Link
+                href="/how-it-works"
                 className="inline-flex items-center justify-center gap-1 rounded-full border border-white/30 bg-white/80 px-3 py-1.5 min-h-[36px] text-sm text-gray-700 shadow-sm transition hover:shadow-md hover:bg-white"
               >
                 <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#E4EEFF] text-[#0056D6] text-xs font-bold leading-none">
                   i
                 </span>
                 How it works
-              </button>
+              </Link>
               <Link
                 href="/pricing"
                 className="inline-flex items-center justify-center gap-1.5 rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-3.5 py-1.5 min-h-[36px] text-sm text-white shadow-sm transition hover:brightness-110"
@@ -586,9 +582,9 @@ export default function Home() {
               <Link
                 href="/pricing"
                 aria-label="Pricing"
-                className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#0056D6] bg-white text-[#0056D6] text-xs shadow-sm hover:bg-[#eef3ff]"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#E7FAFF] via-white to-[#E4E7FF] text-[#0B3F91] text-sm font-semibold shadow-[0_10px_24px_rgba(0,86,214,0.2)] border border-[#CFE4FF] hover:shadow-[0_14px_28px_rgba(0,86,214,0.26)] hover:-translate-y-0.5 transition"
               >
-                $
+                💸
               </Link>
             </div>
 
@@ -601,7 +597,7 @@ export default function Home() {
                 </div>
                 <Link
                   href="/dashboard"
-                  className="inline-flex items-center rounded-full bg-[#12326B] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:brightness-110"
+                  className="inline-flex items-center rounded-full bg-[#0056D6] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:brightness-110"
                 >
                   Dashboard
                 </Link>
@@ -609,7 +605,7 @@ export default function Home() {
                   type="button"
                   onClick={handleSignOut}
                   disabled={isSigningOut}
-                  className={`inline-flex items-center rounded-full bg-[#12326B] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:brightness-110 ${
+                  className={`inline-flex items-center rounded-full bg-[#0056D6] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:brightness-110 ${
                     isSigningOut ? "opacity-60 cursor-not-allowed" : ""
                   }`}
                 >
@@ -1141,6 +1137,20 @@ export default function Home() {
                   </div>
                 ))}
               </div>
+              <div className="flex flex-wrap items-center gap-3">
+                <Link
+                  href="/how-it-works"
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#3FA9FF] to-[#0056D6] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:brightness-110"
+                >
+                  See more
+                </Link>
+                <Link
+                  href="/pricing"
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-blue-100 bg-white px-4 py-2 text-sm font-semibold text-[#0056D6] hover:border-[#0056D6] hover:text-[#0F2F8F]"
+                >
+                  Pricing
+                </Link>
+              </div>
             </div>
 
             <div
@@ -1219,53 +1229,6 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="bg-[#0056D6] text-white">
-        <div className="mx-auto max-w-5xl w-full px-4 sm:px-6 py-10 sm:py-12 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-xs uppercase tracking-[0.35em] text-blue-100 font-semibold">
-              Pricing
-            </p>
-            <h3 className="text-2xl font-semibold mt-2">
-              Founding offer seats are limited.
-            </h3>
-            <p className="text-sm text-blue-100 mt-2 max-w-xl">
-              Start free with two exports. When CaseReady becomes essential,
-              solo attorneys lock lifetime pricing at $29/mo and firms step into
-              the $79/mo plan.
-            </p>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-3 text-sm font-medium">
-            <div className="rounded-2xl bg-white/10 px-4 py-3">
-              <p className="text-xs uppercase tracking-wide text-blue-100">
-                Free
-              </p>
-              <p className="text-xl font-semibold">$0</p>
-              <p className="text-xs text-blue-100">2 exports included</p>
-            </div>
-            <div className="rounded-2xl bg-white text-[#0056D6] px-4 py-3">
-              <p className="text-xs uppercase tracking-wide text-[#0056D6]/70">
-                Solo launch
-              </p>
-              <p className="text-xl font-semibold">$29</p>
-              <p className="text-xs text-[#0056D6]/70">First 50 solos</p>
-            </div>
-            <div className="rounded-2xl bg-white text-[#0056D6] px-4 py-3">
-              <p className="text-xs uppercase tracking-wide text-[#0056D6]/70">
-                Firm plan
-              </p>
-              <p className="text-xl font-semibold">$79</p>
-              <p className="text-xs text-[#0056D6]/70">Unlimited matters</p>
-            </div>
-            <Link
-              href="/pricing"
-              className="inline-flex items-center justify-center rounded-full bg-white text-[#0056D6] px-5 py-2.5 font-semibold hover:bg-blue-50 transition"
-            >
-              View plans
-            </Link>
-          </div>
-        </div>
-      </section>
-
       <footer className="border-t border-black/5 bg-white/60">
         <div className="mx-auto max-w-5xl flex items-center justify-between py-3 px-4 sm:px-6 text-[11px] text-gray-500">
           <span>© {new Date().getFullYear()} CaseReady.io</span>
@@ -1285,6 +1248,39 @@ export default function Home() {
         </div>
       </footer>
 
+      {showLifetimeBanner && (
+        <div className="fixed bottom-4 inset-x-4 md:inset-x-auto md:left-8 md:right-8 z-30">
+          <div className="rounded-xl border border-[#D4AF37]/60 bg-white px-5 py-4 shadow-[0_18px_38px_rgba(212,175,55,0.25)] grid gap-3 sm:grid-cols-[1fr,auto] items-center text-sm text-[#0F172A] ring-2 ring-[#D4AF37]/15">
+            <div className="flex flex-col items-center gap-2 sm:items-start">
+              <span className="inline-flex items-center justify-center h-10 px-4 rounded-lg bg-gradient-to-br from-[#F7E9B5] to-[#D4AF37] text-[#0B0F1F] text-xs font-semibold shadow">
+                First 50
+              </span>
+              <div className="text-center sm:text-left">
+                <p className="font-semibold text-[#0F172A]">Founding Lifetime • $199 one-time</p>
+                <p className="text-xs text-[#4B5563]">
+                  Unlimited exhibit packets forever. Locks pricing for the first 50 attorneys.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 justify-center sm:justify-end">
+              <Link
+                href="/pricing#founders"
+                className="inline-flex items-center rounded-full bg-[#0056D6] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:brightness-110"
+              >
+                View offer
+              </Link>
+              <button
+                type="button"
+                onClick={() => setShowLifetimeBanner(false)}
+                className="text-gray-400 hover:text-gray-600 text-lg leading-none px-2"
+                aria-label="Close lifetime banner"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {matterPromptOpen && (
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 px-4">
           <div className="w-full max-w-md rounded-3xl border border-blue-100 bg-white p-6 shadow-xl">

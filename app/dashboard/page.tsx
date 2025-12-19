@@ -90,6 +90,7 @@ export default function DashboardClient({
   const [showPlans, setShowPlans] = useState(false);
   const [speedMode, setSpeedMode] = useState(false);
   const [focusMode, setFocusMode] = useState(false);
+  const [labsToggles, setLabsToggles] = useState<Record<string, boolean>>({});
   const [loadingMatters, setLoadingMatters] = useState(false);
   const plan = String(session?.user?.user_metadata?.plan ?? "").toLowerCase();
 const hasPremium =
@@ -110,6 +111,17 @@ const hasPremium =
       const savedSpeed = localStorage.getItem("caseready:speedMode");
       if (savedSpeed === "on") {
         setSpeedMode(true);
+      }
+      const savedLabs = localStorage.getItem("caseready:labsToggles");
+      if (savedLabs) {
+        try {
+          const parsed = JSON.parse(savedLabs);
+          if (parsed && typeof parsed === "object") {
+            setLabsToggles(parsed);
+          }
+        } catch {
+          // ignore parse errors
+        }
       }
     }
 
@@ -140,6 +152,11 @@ const hasPremium =
     if (typeof window === "undefined") return;
     localStorage.setItem("caseready:speedMode", speedMode ? "on" : "off");
   }, [speedMode]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    localStorage.setItem("caseready:labsToggles", JSON.stringify(labsToggles));
+  }, [labsToggles]);
 
   useEffect(() => {
     const loadMatters = async () => {
@@ -420,23 +437,62 @@ const hasPremium =
             </div>
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
               {quickActions.map((action) => (
-                <button
+                <div
                   key={action.id}
-                  type="button"
-                  onClick={() => router.push("/coming-soon")}
                   className="group relative flex flex-col items-start rounded-2xl border border-gray-200 bg-gray-50 p-4 text-left transition hover:border-[#0056D6]/40"
-                  disabled
                 >
-                  <span className="rounded-full bg-gray-200 text-gray-700 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
-                    {action.badge}
-                  </span>
-                  <p className="mt-2 text-base font-semibold text-gray-900 group-disabled:opacity-90">
+                  <div className="flex items-center justify-between w-full">
+                    <span className="rounded-full bg-gray-200 text-gray-700 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
+                      {action.badge}
+                    </span>
+                    <label className="inline-flex items-center gap-2 text-[11px] font-semibold text-gray-600">
+                      <span>Enable</span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setLabsToggles((prev) => ({
+                            ...prev,
+                            [action.id]: !prev[action.id],
+                          }))
+                        }
+                        className={`relative inline-flex h-5 w-10 items-center rounded-full transition ${
+                          labsToggles[action.id]
+                            ? "bg-[#0056D6]"
+                            : "bg-gray-300"
+                        }`}
+                        aria-label={`Toggle ${action.title}`}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition ${
+                            labsToggles[action.id] ? "translate-x-5" : "translate-x-1"
+                          }`}
+                        />
+                      </button>
+                    </label>
+                  </div>
+                  <p
+                    className={`mt-2 text-base font-semibold ${
+                      labsToggles[action.id] ? "text-gray-900" : "text-gray-500"
+                    }`}
+                  >
                     {action.title}
                   </p>
-                  <p className="mt-1 text-sm text-gray-600 group-disabled:opacity-80">
+                  <p className={`mt-1 text-sm ${labsToggles[action.id] ? "text-gray-700" : "text-gray-500/80"}`}>
                     {action.description}
                   </p>
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => labsToggles[action.id] && router.push(`/coming-soon?feature=${action.id}`)}
+                    disabled={!labsToggles[action.id]}
+                    className={`mt-3 inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold transition ${
+                      labsToggles[action.id]
+                        ? "bg-[#0056D6] text-white shadow-sm hover:brightness-110"
+                        : "bg-gray-200 text-gray-600 cursor-not-allowed"
+                    }`}
+                  >
+                    {labsToggles[action.id] ? "Open beta tool" : "Enable to open"}
+                  </button>
+                </div>
               ))}
             </div>
           </section>

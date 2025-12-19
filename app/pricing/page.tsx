@@ -30,7 +30,7 @@ const plansByTier = [
     price: "$29",
     duration: "per month",
     originalPrice: "$39",
-    badge: "Founding Attorney – first 50",
+    badge: "Monthly",
     audience: "Solo practitioners who live in their inbox & scanner.",
     description:
       "Unlimited, judge-ready exhibit packets with Bates numbers and labels. Built to replace late-night PDF surgery.",
@@ -42,11 +42,34 @@ const plansByTier = [
       "Higher-priority processing queue",
     ],
     cta: {
-      label: "Join early access",
-      href: "mailto:hello@caseready.io?subject=Founding%20Attorney%20Solo%20Plan",
+      label: "Start monthly",
+      href: "mailto:hello@caseready.io?subject=Solo%20plan%20signup",
+    },
+    highlighted: false,
+    note: "Monthly, cancel anytime.",
+  },
+  {
+    name: "Founding Lifetime",
+    price: "$199",
+    duration: "one-time, first 50 only",
+    originalPrice: "$299",
+    badge: "Founding Attorney – first 50",
+    audience: "Solo practitioners who live in their inbox & scanner.",
+    description:
+      "Lifetime access to unlimited, judge-ready exhibit packets with Bates numbers and labels. Built to replace late-night PDF surgery.",
+    perks: [
+      "Unlimited exhibit PDFs forever",
+      "Unlimited files per packet",
+      "Exhibit labels (Ex. A, Ex. B…) and page stamping",
+      "Bates numbering (e.g. CR-0001, 0002…)",
+      "Higher-priority processing queue",
+    ],
+    cta: {
+      label: "Lock lifetime offer",
+      href: "mailto:hello@caseready.io?subject=Founding%20Lifetime%20Offer",
     },
     highlighted: true,
-    note: "Founder pricing is locked in for life for the first 50 attorneys.",
+    note: "Limited to the first 50 buyers. One-time payment, lifetime access.",
   },
   {
     name: "Firm",
@@ -160,17 +183,29 @@ export default function PricingPage() {
             </div>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-6 text-xs font-medium text-gray-600">
-            <Link href="/" className="hover:text-gray-900">
+          <nav className="hidden md:flex items-center gap-3 text-xs font-semibold text-gray-700">
+            <Link
+              href="/how-it-works"
+              className="rounded-full border border-gray-200 bg-white/80 px-3 py-1 shadow-sm hover:border-[#0056D6] hover:text-[#0056D6] transition"
+            >
               How it works
             </Link>
-            <Link href="/" className="hover:text-gray-900">
-              Features
+            <Link
+              href="/features#roadmap"
+              className="rounded-full border border-gray-200 bg-white/80 px-3 py-1 shadow-sm hover:border-[#0056D6] hover:text-[#0056D6] transition"
+            >
+              Roadmap
             </Link>
-            <Link href="/pricing" className="text-gray-900">
+            <Link
+              href="/pricing"
+              className="rounded-full border border-transparent bg-[#0056D6] px-3 py-1 text-white shadow-sm hover:brightness-110 transition"
+            >
               Pricing
             </Link>
-            <Link href="/" className="hover:text-gray-900">
+            <Link
+              href="/security"
+              className="rounded-full border border-gray-200 bg-white/80 px-3 py-1 shadow-sm hover:border-[#0056D6] hover:text-[#0056D6] transition"
+            >
               Security
             </Link>
           </nav>
@@ -243,90 +278,121 @@ export default function PricingPage() {
             <span className="inline-flex items-center justify-center rounded-full bg-[#0056D6] text-white text-[10px] font-semibold px-2 py-0.5 mr-2">
               Founding offer
             </span>
-            First 50 attorneys to subscribe to the Solo plan lock in{" "}
-            <span className="font-semibold">$29/mo</span> for life (normally{" "}
-            <span className="line-through decoration-red-500/70">$39/mo</span>).
-            No hidden fees, no contracts.
+            First 50 attorneys can lock a{" "}
+            <span className="font-semibold">$199 lifetime</span> license (normally{" "}
+            <span className="line-through decoration-red-500/70">$299</span>). Or choose{" "}
+            <span className="font-semibold">$29/mo</span> if you prefer monthly.
+            One-time = lifetime access.
           </div>
 
           {/* Main plans */}
-          <div className="grid gap-6 md:grid-cols-3">
-            {plansByTier.map((plan) => (
-              <div
-                key={plan.name}
-                className={`rounded-3xl border p-6 sm:p-7 shadow-md bg-white/95 flex flex-col gap-5 transition hover:-translate-y-1 hover:shadow-lg ${
-                  plan.highlighted
-                    ? "border-[#0056D6] ring-2 ring-[#3FA9FF]/30 bg-white"
-                    : "border-gray-200"
-                }`}
-              >
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between gap-2">
-                    <div>
-                      <p className="text-xs uppercase tracking-wide text-gray-500">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {plansByTier.map((plan) => {
+              const isLifetime = plan.name === "Founding Lifetime";
+              return (
+                <div
+                  key={plan.name}
+                  id={plan.highlighted ? "founders" : undefined}
+                  className={`rounded-3xl border p-6 sm:p-7 shadow-md flex flex-col gap-5 transition hover:-translate-y-1 hover:shadow-lg ${
+                    isLifetime
+                      ? "bg-gradient-to-br from-[#0B0F1F] via-[#111827] to-[#1E293B] text-white border-[#D4AF37] ring-2 ring-[#D4AF37]/30"
+                      : plan.highlighted
+                      ? "border-[#0056D6] ring-2 ring-[#3FA9FF]/30 bg-white/95"
+                      : "border-gray-200 bg-white/95"
+                  }`}
+                >
+                  <div className="space-y-3">
+                    <div className="flex flex-col items-center text-center gap-1">
+                      <p
+                        className={`text-xs uppercase tracking-wide ${
+                          isLifetime ? "text-[#F7E9B5]" : "text-gray-500"
+                        }`}
+                      >
                         {plan.name}
                       </p>
-                      <p className="text-[11px] text-gray-400">
+                      {plan.badge && (
+                        <span
+                          className={`inline-flex items-center justify-center rounded-full px-3 py-1 text-[10px] font-semibold ${
+                            isLifetime ? "bg-[#D4AF37] text-[#0B0F1F]" : "bg-[#0056D6] text-white"
+                          }`}
+                        >
+                          {plan.badge}
+                        </span>
+                      )}
+                      <p className={`text-[11px] ${isLifetime ? "text-[#E5D9A4]" : "text-gray-400"}`}>
                         {plan.audience}
                       </p>
                     </div>
-                    {plan.badge && (
-                      <span className="inline-flex items-center rounded-full bg-[#0056D6] text-white text-[10px] font-semibold px-2 py-0.5 text-right">
-                        {plan.badge}
-                      </span>
-                    )}
-                  </div>
 
-                  <div className="flex items-baseline gap-2">
-                    <p className="text-3xl sm:text-4xl font-semibold text-gray-900">
-                      {plan.price}
+                    <div className="flex items-baseline justify-center gap-2">
+                      <p
+                        className={`text-3xl sm:text-4xl font-semibold ${
+                          isLifetime ? "text-white" : "text-gray-900"
+                        }`}
+                      >
+                        {plan.price}
+                      </p>
+                      <span
+                        className={`text-xs sm:text-sm font-normal ${
+                          isLifetime ? "text-[#E5D9A4]" : "text-gray-500"
+                        }`}
+                      >
+                        {plan.duration}
+                      </span>
+                      {"originalPrice" in plan && plan.originalPrice && (
+                        <span
+                          className={`text-[11px] line-through ml-auto ${
+                            isLifetime ? "text-[#E5D9A4]/80" : "text-gray-400"
+                          }`}
+                        >
+                          {plan.originalPrice}
+                        </span>
+                      )}
+                    </div>
+
+                    <p className={`text-xs sm:text-sm text-center ${isLifetime ? "text-[#E5D9A4]/90" : "text-gray-600"}`}>
+                      {plan.description}
                     </p>
-                    <span className="text-xs sm:text-sm font-normal text-gray-500">
-                      {plan.duration}
-                    </span>
-                    {"originalPrice" in plan && plan.originalPrice && (
-                      <span className="text-[11px] text-gray-400 line-through ml-auto">
-                        {plan.originalPrice}
-                      </span>
-                    )}
                   </div>
 
-                  <p className="text-xs sm:text-sm text-gray-600">
-                    {plan.description}
-                  </p>
-                </div>
+                  <ul className={`space-y-2 text-xs sm:text-sm ${isLifetime ? "text-[#E5D9A4]" : "text-gray-700"}`}>
+                    {plan.perks.map((perk) => (
+                      <li
+                        key={perk}
+                        className={`flex items-start gap-2 ${isLifetime ? "text-[#E5D9A4]" : "text-gray-600"}`}
+                      >
+                        <span
+                          className={`mt-1 h-1.5 w-1.5 rounded-full ${
+                            isLifetime ? "bg-[#D4AF37]" : "bg-[#0056D6]"
+                          }`}
+                        />
+                        <span>{perk}</span>
+                      </li>
+                    ))}
+                  </ul>
 
-                <ul className="space-y-2 text-xs sm:text-sm text-gray-700">
-                  {plan.perks.map((perk) => (
-                    <li
-                      key={perk}
-                      className="flex items-start gap-2 text-gray-600"
+                  <div className="mt-auto space-y-2">
+                    <Link
+                      href={plan.cta.href}
+                      className={`inline-flex justify-center items-center w-full rounded-full px-4 py-2.5 text-sm font-semibold transition ${
+                        isLifetime
+                          ? "bg-[#D4AF37] text-[#0B0F1F] shadow-lg shadow-[#D4AF37]/30 hover:-translate-y-0.5"
+                          : plan.highlighted
+                          ? "bg-[#0056D6] text-white shadow-lg shadow-[#0056D6]/40 hover:-translate-y-0.5"
+                          : "border border-gray-200 text-gray-700 hover:bg-gray-50"
+                      }`}
                     >
-                      <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[#0056D6]" />
-                      <span>{perk}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <div className="mt-auto space-y-2">
-                  <Link
-                    href={plan.cta.href}
-                    className={`inline-flex justify-center items-center w-full rounded-full px-4 py-2.5 text-sm font-semibold transition ${
-                      plan.highlighted
-                        ? "bg-[#0056D6] text-white shadow-lg shadow-[#0056D6]/40 hover:-translate-y-0.5"
-                        : "border border-gray-200 text-gray-700 hover:bg-gray-50"
-                    }`}
-                  >
-                    {plan.cta.label}
-                  </Link>
-                  {plan.note && (
-                    <p className="text-[11px] text-gray-500 text-center">
-                      {plan.note}
-                    </p>
-                  )}
+                      {plan.cta.label}
+                    </Link>
+                    {plan.note && (
+                      <p className={`text-[11px] text-center ${isLifetime ? "text-[#E5D9A4]/90" : "text-gray-500"}`}>
+                        {plan.note}
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Enterprise section */}
