@@ -10,7 +10,7 @@ if (!stripeSecretKey) {
 }
 
 const stripe = new Stripe(stripeSecretKey, {
-  apiVersion: "2023-10-16",
+  apiVersion: "2024-06-20",
 });
 
 const isRecurringPrice = (price: Stripe.Price) => Boolean(price.recurring);
