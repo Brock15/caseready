@@ -43,7 +43,7 @@ const plansByTier = [
     ],
     cta: {
       label: "Start monthly",
-      priceId: "price_monthly_29", // replace with your Stripe monthly price id
+      priceId: "price_1SfvgEAVvDE7fh9qEOJgP2kU",
     },
     highlighted: false,
     note: "Monthly, cancel anytime.",
@@ -66,7 +66,7 @@ const plansByTier = [
     ],
     cta: {
       label: "Lock lifetime offer",
-      priceId: "price_lifetime_199", // replace with your Stripe lifetime price id
+      priceId: "price_1SfvgmAVvDE7fh9qHhgdH1YB",
     },
     highlighted: true,
     note: "Limited to the first 50 buyers. One-time payment, lifetime access.",
@@ -88,7 +88,7 @@ const plansByTier = [
     ],
     cta: {
       label: "Reserve founding rate",
-      href: "mailto:hello@caseready.io?subject=Firm%20plan%20inquiry",
+      priceId: "price_1SfvgWAVvDE7fh9qi8A0blg4",
     },
     highlighted: false,
     note: "Ideal for 2–10 person teams running active dockets.",
@@ -165,18 +165,34 @@ export default function PricingPage() {
     }
     setCheckoutLoading((prev) => ({ ...prev, [priceId]: true }));
     try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
       const res = await fetch("/api/stripe/create-checkout", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ priceId }),
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ priceId, accessToken: token }),
+        credentials: "include",
       });
       if (!res.ok) {
-        alert("Please sign in to continue.");
+        let message = "Could not start checkout. Please try again.";
+        try {
+          const data = await res.json();
+          if (data?.error) message = data.error;
+        } catch {
+          // ignore parse error
+        }
+        if (res.status === 401) {
+          message = "Please sign in to continue.";
+        }
+        alert(message);
         return;
       }
-      const data = await res.json();
-      if (data?.url) {
-        window.location.href = data.url;
+      const checkout = await res.json();
+      if (checkout?.url) {
+        window.location.href = checkout.url;
       } else {
         alert("Could not start checkout. Please try again.");
       }

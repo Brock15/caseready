@@ -1,6 +1,8 @@
+export const runtime = "nodejs";
+
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
+import { Buffer } from "buffer";
+import { createClient } from "@supabase/supabase-js";
 import Stripe from "stripe";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabaseConfig";
 
@@ -12,10 +14,54 @@ const getStripe = () => {
   return new Stripe(stripeSecretKey, { apiVersion: "2024-06-20" });
 };
 
-const SITE_URL =
+const getUserFromToken = async (token: string) => {
+  const client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    global: { headers: { Authorization: `Bearer ${token}` } },
+  });
+  const { data, error } = await client.auth.getUser();
+  if (error || !data?.user) return null;
+  return data.user;
+};
+
+const decodeJwt = (token?: string | null) => {
+  if (!token) return null;
+  try {
+    const payload = token.split(".")[1];
+    if (!payload) return null;
+    const decoded = JSON.parse(
+      Buffer.from(payload, "base64").toString("utf-8")
+    );
+    return decoded as { sub?: string; email?: string };
+  } catch {
+    return null;
+  }
+};
+
+const getTokenFromCookies = (req: Request) => {
+  const cookieHeader = req.headers.get("cookie") || "";
+  const authCookie = cookieHeader
+    .split(";")
+    .map((c) => c.trim())
+    .find((c) => c.startsWith("sb-") && c.includes("auth-token"));
+  if (!authCookie) return null;
+  try {
+    const tokenValue = decodeURIComponent(authCookie.split("=")[1] || "");
+    const parsed = JSON.parse(tokenValue);
+    return (
+      parsed?.access_token || parsed?.currentSession?.access_token || null
+    );
+  } catch {
+    return null;
+  }
+};
+
+const siteUrlRaw =
   process.env.NEXT_PUBLIC_SITE_URL ||
-  process.env.SITE_URL ||
-  "http://localhost:3000";
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "");
+if (!siteUrlRaw) {
+  throw new Error("Missing NEXT_PUBLIC_SITE_URL / VERCEL_URL");
+}
+const siteUrl = siteUrlRaw.replace(/\/$/, "");
 
 export async function POST(req: Request) {
   try {
@@ -27,33 +73,33 @@ export async function POST(req: Request) {
       );
     }
 
-    const { priceId } = await req.json();
+    const { priceId, accessToken: bodyAccessToken } = await req.json();
     if (!priceId || typeof priceId !== "string") {
       return NextResponse.json({ error: "priceId is required" }, { status: 400 });
     }
 
-    const cookieStore = await cookies();
-    const supabase = createRouteHandlerClient(
-      {
-        cookies: (() => cookieStore) as unknown as () => ReturnType<typeof cookies>,
-      },
-      {
-        supabaseUrl: SUPABASE_URL,
-        supabaseKey: SUPABASE_ANON_KEY,
-      }
-    );
+    const authHeader = req.headers.get("authorization") || "";
+    const bearerToken = authHeader.startsWith("Bearer ")
+      ? authHeader.replace("Bearer ", "").trim()
+      : null;
+    const cookieToken = getTokenFromCookies(req);
+    const token =
+      (bodyAccessToken as string | undefined) || bearerToken || cookieToken;
 
-    const {
-      data: { session },
-      error: sessionError,
-    } = await supabase.auth.getSession();
-    if (sessionError || !session?.user) {
+    let user = token ? await getUserFromToken(token) : null;
+    if (!user && token) {
+      const decoded = decodeJwt(token);
+      if (decoded?.sub) {
+        user = { id: decoded.sub, email: decoded.email } as any;
+      }
+    }
+
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = session.user;
     const email = user.email || undefined;
-    const existingCustomerId = user.user_metadata?.stripeCustomerId as string | undefined;
+    const existingCustomerId = (user as any).user_metadata?.stripeCustomerId as string | undefined;
 
     let customerId = existingCustomerId;
     if (!customerId) {
@@ -62,8 +108,13 @@ export async function POST(req: Request) {
         metadata: { supabaseUserId: user.id },
       });
       customerId = customer.id;
-      await supabase.auth.updateUser({
-        data: { stripeCustomerId: customerId },
+      // Best-effort: do not block checkout on metadata failure
+      await getUserFromToken(token || "").then(async (u) => {
+        if (!u) return;
+        const client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+          global: { headers: { Authorization: `Bearer ${token}` } },
+        });
+        await client.auth.updateUser({ data: { stripeCustomerId: customerId } }).catch(() => {});
       });
     }
 
@@ -76,8 +127,9 @@ export async function POST(req: Request) {
       mode,
       customer: customerId,
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${SITE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${SITE_URL}/cancel`,
+      payment_method_types: ["card"],
+      success_url: `${siteUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${siteUrl}/pricing`,
       allow_promotion_codes: true,
     };
 
@@ -89,8 +141,10 @@ export async function POST(req: Request) {
     );
   } catch (error) {
     console.error("Stripe checkout session error", error);
+    const message =
+      error instanceof Error ? error.message : "Failed to create checkout session";
     return NextResponse.json(
-      { error: "Failed to create checkout session" },
+      { error: message },
       { status: 500 }
     );
   }
