@@ -340,11 +340,11 @@ export default function PricingPage() {
                 <div
                   key={plan.name}
                   id={plan.highlighted ? "founders" : undefined}
-                  className={`rounded-3xl border p-6 sm:p-7 shadow-md flex flex-col gap-5 transition hover:-translate-y-1 hover:shadow-lg ${
-                    isLifetime
-                      ? "bg-gradient-to-br from-[#0B0F1F] via-[#111827] to-[#1E293B] text-white border-[#D4AF37] ring-2 ring-[#D4AF37]/30"
-                      : plan.highlighted
-                      ? "border-[#0056D6] ring-2 ring-[#3FA9FF]/30 bg-white/95"
+                  className={`relative rounded-3xl border p-6 sm:p-7 shadow-md flex flex-col gap-5 transition hover:-translate-y-1 hover:shadow-lg overflow-hidden ${
+                    plan.highlighted
+                      ? isLifetime
+                        ? "border-[#D4AF37] ring-2 ring-[#D4AF37]/25 bg-white/98"
+                        : "border-[#0056D6] ring-2 ring-[#3FA9FF]/30 bg-white/95"
                       : "border-gray-200 bg-white/95"
                   }`}
                 >
@@ -352,7 +352,7 @@ export default function PricingPage() {
                     <div className="flex flex-col items-center text-center gap-1">
                       <p
                         className={`text-xs uppercase tracking-wide ${
-                          isLifetime ? "text-[#F7E9B5]" : "text-gray-500"
+                          isLifetime ? "text-gray-900 font-semibold" : "text-gray-500"
                         }`}
                       >
                         {plan.name}
@@ -366,7 +366,7 @@ export default function PricingPage() {
                           {plan.badge}
                         </span>
                       )}
-                      <p className={`text-[11px] ${isLifetime ? "text-[#E5D9A4]" : "text-gray-400"}`}>
+                      <p className={`text-[11px] ${isLifetime ? "text-black" : "text-gray-400"}`}>
                         {plan.audience}
                       </p>
                     </div>
@@ -381,7 +381,7 @@ export default function PricingPage() {
                       </p>
                       <span
                         className={`text-xs sm:text-sm font-normal ${
-                          isLifetime ? "text-[#E5D9A4]" : "text-gray-500"
+                          isLifetime ? "text-gray-500" : "text-gray-500"
                         }`}
                       >
                         {plan.duration}
@@ -389,7 +389,7 @@ export default function PricingPage() {
                       {"originalPrice" in plan && plan.originalPrice && (
                         <span
                           className={`text-[11px] line-through ml-auto ${
-                            isLifetime ? "text-[#E5D9A4]/80" : "text-gray-400"
+                            isLifetime ? "text-gray-400" : "text-gray-400"
                           }`}
                         >
                           {plan.originalPrice}
@@ -397,16 +397,16 @@ export default function PricingPage() {
                       )}
                     </div>
 
-                    <p className={`text-xs sm:text-sm text-center ${isLifetime ? "text-[#E5D9A4]/90" : "text-gray-600"}`}>
+                    <p className={`text-xs sm:text-sm text-center ${isLifetime ? "text-black" : "text-gray-600"}`}>
                       {plan.description}
                     </p>
                   </div>
 
-                  <ul className={`space-y-2 text-xs sm:text-sm ${isLifetime ? "text-[#E5D9A4]" : "text-gray-700"}`}>
+                  <ul className={`space-y-2 text-xs sm:text-sm ${isLifetime ? "text-black" : "text-gray-700"}`}>
                     {plan.perks.map((perk) => (
                       <li
                         key={perk}
-                        className={`flex items-start gap-2 ${isLifetime ? "text-[#E5D9A4]" : "text-gray-600"}`}
+                        className={`flex items-start gap-2 ${isLifetime ? "text-black" : "text-gray-600"}`}
                       >
                         <span
                           className={`mt-1 h-1.5 w-1.5 rounded-full ${
@@ -426,7 +426,7 @@ export default function PricingPage() {
                         disabled={checkoutLoading[(plan.cta as any).priceId]}
                         className={`inline-flex justify-center items-center w-full rounded-full px-4 py-2.5 text-sm font-semibold transition ${
                           isLifetime
-                            ? "bg-[#D4AF37] text-[#0B0F1F] shadow-lg shadow-[#D4AF37]/30 hover:-translate-y-0.5"
+                            ? "bg-gradient-to-r from-[#F7DE95] via-[#EBC867] to-[#D8B240] text-[#0F172A] shadow-lg shadow-[#D4AF37]/30 hover:-translate-y-0.5"
                             : plan.highlighted
                             ? "bg-[#0056D6] text-white shadow-lg shadow-[#0056D6]/40 hover:-translate-y-0.5"
                             : "border border-gray-200 text-gray-700 hover:bg-gray-50"

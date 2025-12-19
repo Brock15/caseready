@@ -576,7 +576,7 @@ export default function Home() {
           </div>
 
           <div
-            className={`flex flex-wrap items-center gap-2 justify-end max-sm:w-full max-sm:justify-center max-sm:gap-2 text-[11px] font-semibold ${
+            className={`flex flex-wrap items-center gap-2 justify-end max-sm:flex-1 max-sm:justify-end max-sm:items-start max-sm:gap-1 max-sm:pt-1 text-[11px] font-semibold ${
               globalFocusMode ? "text-gray-200" : "text-gray-600"
             }`}
           >
@@ -601,13 +601,12 @@ export default function Home() {
             </div>
 
             {/* Mobile/medium compact actions */}
-            <div className="flex items-center gap-2 lg:hidden">
+            <div className="flex items-center gap-2 lg:hidden max-sm:w-full max-sm:justify-end max-sm:pt-1">
               <Link
                 href="/pricing"
-                aria-label="Pricing"
-              className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#1A3DE3] bg-white text-[#1A3DE3] text-xs shadow-sm hover:bg-[#EEF2FF]"
+                className="inline-flex items-center gap-1.5 rounded-full bg-[#0F1F3F] text-white px-3 py-1.5 text-[11px] font-semibold shadow-sm hover:brightness-110 transition"
               >
-                💸
+                <span>Pricing</span>
               </Link>
             </div>
 

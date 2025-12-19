@@ -135,7 +135,7 @@ export default function RedactPage() {
     }
   };
 
-  const DISABLED = true;
+  const DISABLED = false;
 
   if (DISABLED) {
     return (

@@ -15,7 +15,7 @@ type QuickAction = {
   href?: string;
 };
 
-const COMING_SOON_FEATURES = new Set(["timeline", "redact", "chat", "portal"]);
+const COMING_SOON_FEATURES = new Set(["chat", "portal"]);
 
 const quickActions: QuickAction[] = [
   {
@@ -30,7 +30,7 @@ const quickActions: QuickAction[] = [
     title: "Stealth Redaction",
     description: "Batch remove sensitive info from PDFs.",
     badge: "Beta",
-    href: "/redact",
+    href: "/stealth",
   },
   {
     id: "chat",
@@ -304,7 +304,7 @@ const hasPremium =
             {quickActions.map((item) => (
               <Link
                 key={item.id}
-                href="/coming-soon"
+                href={item.href || "/coming-soon"}
                 className={`flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-sm font-medium ${
                   focusMode
                     ? "text-gray-400 hover:bg-[#1E293B] hover:text-white"
@@ -482,7 +482,10 @@ const hasPremium =
                   </p>
                   <button
                     type="button"
-                    onClick={() => labsToggles[action.id] && router.push(action.href || "/coming-soon")}
+                    onClick={() => {
+                      if (!labsToggles[action.id]) return;
+                      router.push(action.href || "/coming-soon");
+                    }}
                     disabled={!labsToggles[action.id]}
                     className={`mt-3 inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold transition ${
                       labsToggles[action.id]
@@ -746,10 +749,41 @@ const hasPremium =
                   View plans
                 </Link>
               </div>
+              <div
+                id="account"
+                className={`rounded-3xl border p-5 text-sm shadow-sm ${
+                  focusMode ? "border-slate-800 bg-[#0F172A] text-gray-100" : "border-gray-200 bg-white/90 text-gray-700"
+                }`}
+              >
+                <p className="text-sm font-semibold">Account</p>
+                <p className={`text-xs mt-1 ${focusMode ? "text-gray-400" : "text-gray-500"}`}>
+                  {session?.user?.email || "Signed in user"}
+                </p>
+                <p className="text-sm mt-2">
+                  Current plan:{" "}
+                  <span className="font-semibold">
+                    {plan ? plan.charAt(0).toUpperCase() + plan.slice(1) : "Free"}
+                  </span>
+                </p>
+                <div className="mt-3 space-y-2 text-xs">
+                  <button
+                    type="button"
+                    disabled
+                    className="inline-flex items-center rounded-full bg-gray-200 text-gray-700 px-3 py-1 font-semibold cursor-not-allowed"
+                    title="Add Stripe customer portal to enable cancellation"
+                  >
+                    Cancel subscription
+                  </button>
+                  <p className={`${focusMode ? "text-gray-400" : "text-gray-500"}`}>
+                    To enable self-serve cancellation, add a Stripe customer portal route and link it here.
+                  </p>
+                </div>
+              </div>
             </div>
           </section>
         </div>
       </main>
+
       {showPlans && (
         <div
           className={`fixed inset-0 z-40 flex items-center justify-center px-4 ${
