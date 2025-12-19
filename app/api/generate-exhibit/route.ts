@@ -466,7 +466,7 @@ const drawCoverPage = (
 };
 
 const toJpegBuffer = async (input: Buffer): Promise<Buffer> => {
-  // Cap size and convert to JPEG for consistent embedding while stripping EXIF orientation
+  // Cap size and convert to JPEG for consistent embedding while preserving pixel orientation
   try {
     return await sharp(input)
       .resize({
@@ -500,7 +500,7 @@ const loadPdfOrImageAsPages = async (
 
   let workingBuffer: Buffer = Buffer.from(fileBuffer);
 
-  // Do not rotate automatically; treat images as already upright and strip EXIF by re-encoding to JPEG.
+  // Do not rotate automatically; images are assumed visually upright. Always re-encode to JPEG to strip EXIF orientation.
   const embeddedBuffer = await toJpegBuffer(workingBuffer);
   const embedded = await targetDoc.embedJpg(embeddedBuffer);
 
