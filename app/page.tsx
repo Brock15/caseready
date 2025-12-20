@@ -119,7 +119,7 @@ export default function Home() {
       router.push("/builder");
       return;
     }
-    fileInputRef.current?.click();
+    router.push("/signup?redirectedFrom=/builder");
   };
 
   const handleMiniVideoClick = () => {
@@ -127,6 +127,10 @@ export default function Home() {
   };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (!isAuthenticated) {
+      router.push("/signup?redirectedFrom=/builder");
+      return;
+    }
     const files = Array.from(e.target.files || []);
     if (files.length > 0) {
       setFilesSelected(files.length);
@@ -139,6 +143,10 @@ export default function Home() {
 
   const handleDrop = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+    if (!isAuthenticated) {
+      router.push("/signup?redirectedFrom=/builder");
+      return;
+    }
     const files = Array.from(e.dataTransfer?.files || []);
     if (files.length > 0) {
       setFilesSelected(files.length);
@@ -181,22 +189,22 @@ export default function Home() {
           <div className="flex items-center gap-3">
             <Link
               href="/how-it-works"
-              className="hidden md:inline-flex items-center rounded-full border border-[#E5E0D8] bg-white px-4 py-2 text-sm font-medium text-[#1A1614] hover:border-[var(--color-brand-royal)] hover:text-[var(--color-brand-royal)] transition"
+              className="hidden md:inline-flex items-center rounded-full border border-[#E5E0D8] bg-white px-4 py-2 text-sm font-semibold text-[#1A1614] hover:bg-[#F7F1EA] transition"
             >
-              How it works
+              <span className="mr-1" aria-hidden="true">ⓘ</span> How it works
             </Link>
             <Link
               href="/pricing"
-              className="hidden md:inline-flex items-center rounded-full border border-[#E5E0D8] bg-white px-4 py-2 text-sm font-medium text-[#1A1614] hover:border-[var(--color-brand-royal)] hover:text-[var(--color-brand-royal)] transition"
+              className="hidden md:inline-flex items-center rounded-full bg-[var(--color-brand-royal)] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:shadow-md hover:bg-[var(--color-brand-royal-hover)] transition"
             >
-              Pricing
+              <span className="mr-1" aria-hidden="true">$</span> Pricing
             </Link>
 
             {isAuthenticated ? (
-              <div className="flex items-center gap-2">
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-[#E5E0D8] bg-white/90 px-1.5 py-1 shadow-sm">
                 <Link
                   href="/dashboard"
-                  className="inline-flex items-center rounded-full bg-[var(--color-brand-royal)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--color-brand-royal-hover)] transition"
+                  className="inline-flex items-center rounded-full bg-[var(--color-brand-royal)] px-3.5 py-1.5 text-sm font-semibold text-white hover:bg-[var(--color-brand-royal-hover)] transition"
                 >
                   Dashboard
                 </Link>
@@ -204,7 +212,7 @@ export default function Home() {
                   type="button"
                   onClick={handleSignOut}
                   disabled={isSigningOut}
-                  className="inline-flex items-center rounded-full border border-[#E5E0D8] bg-white px-4 py-2 text-sm font-medium text-[#1A1614] hover:bg-[#F7F1EA] transition disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="inline-flex items-center rounded-full border border-[#E5E0D8] bg-white px-3.5 py-1.5 text-sm font-medium text-[#1A1614] hover:bg-[#F7F1EA] transition disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {isSigningOut ? "Signing out…" : "Sign out"}
                 </button>
@@ -213,7 +221,7 @@ export default function Home() {
               <div className="flex items-center gap-2">
                 <Link
                   href="/signin"
-                  className="inline-flex items-center rounded-full border border-[#E5E0D8] bg-white px-4 py-2 text-sm font-medium text-[#1A1614] hover:bg-[#F7F1EA] transition"
+                  className="inline-flex items-center rounded-full bg-[var(--color-brand-royal)] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[var(--color-brand-royal-hover)] transition"
                 >
                   {isCheckingSession ? "Checking…" : "Sign in"}
                 </Link>
@@ -233,12 +241,7 @@ export default function Home() {
       <section className="flex-1 flex items-center">
         <div className="mx-auto max-w-5xl w-full px-4 sm:px-6 py-12 sm:py-16">
           <div className="grid grid-cols-1 lg:grid-cols-2 items-start gap-12">
-            <div className="flex-1 max-w-3xl text-center lg:text-left space-y-8">
-            {/* Beta badge */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#E5E0D8] bg-white px-4 py-2 text-sm font-medium text-[#1A1614]">
-              <span className="h-2 w-2 rounded-full bg-[var(--color-brand-royal)]" />
-              Beta — feedback welcomed
-            </div>
+            <div className="flex-1 max-w-3xl text-left space-y-6">
 
             {/* Headline */}
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-[#0F1419] leading-tight">
@@ -246,22 +249,22 @@ export default function Home() {
             </h1>
 
             {/* Subheadline */}
-            <p className="text-lg sm:text-xl text-[#1A1614] max-w-2xl mx-auto">
+            <p className="text-lg sm:text-xl text-[#1A1614] max-w-2xl lg:max-w-xl">
               Turn messy screenshots into court-ready PDFs. Drag, drop, and let CaseReady auto-sort, auto-rotate, Bates stamp, and merge in minutes.
             </p>
 
             {/* CTA buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center">
+            <div className="flex flex-col sm:flex-row gap-3 justify-start items-center">
               <button
                 type="button"
                 onClick={() => {
                   if (isAuthenticated) {
                     router.push("/builder");
                   } else {
-                    router.push("/signin?redirectedFrom=/builder");
+                    router.push("/signup?redirectedFrom=/builder");
                   }
                 }}
-                className="inline-flex items-center justify-center rounded-full bg-[var(--color-brand-royal)] px-10 py-4 text-lg font-semibold text-white hover:bg-[var(--color-brand-royal-hover)] transition shadow-sm"
+                className="inline-flex items-center justify-center rounded-full bg-[var(--color-brand-royal)] px-9 py-3.5 text-base font-semibold text-white shadow-sm hover:shadow-md hover:bg-[var(--color-brand-royal-hover)] transition"
               >
                 Try Exhibit Builder Free
               </button>
@@ -272,14 +275,14 @@ export default function Home() {
                     .getElementById("how-it-works")
                     ?.scrollIntoView({ behavior: "smooth" })
                 }
-                className="inline-flex items-center justify-center rounded-full border border-[#E5E0D8] bg-white px-10 py-4 text-lg font-semibold text-[#0F1419] hover:bg-[#F7F1EA] transition"
+                className="inline-flex items-center justify-center rounded-full border border-[#E5E0D8] bg-white px-9 py-3 text-base font-semibold text-[#1A1614] hover:bg-[#F7F1EA] transition"
               >
                 Watch workflow →
               </button>
             </div>
 
             {/* Trust badge */}
-            <div className="flex items-center justify-center gap-2 text-sm text-[#6B6560]">
+            <div className="flex items-center justify-start gap-2 text-sm text-[#6B6560]">
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
@@ -297,7 +300,7 @@ export default function Home() {
             </div>
 
             {/* Usage info */}
-            <div className="rounded-2xl border border-[#E5E0D8] bg-white px-6 py-4 text-sm text-[#1A1614] max-w-xl mx-auto">
+            <div className="rounded-2xl border border-[#E5E0D8] bg-white px-6 py-4 text-sm text-[#1A1614] max-w-xl">
               {isAuthenticated ? (
                 hasUnlimitedExports ? (
                   <>
@@ -330,14 +333,17 @@ export default function Home() {
               )}
             </div>
           </div>
-            <div className="w-full max-w-md justify-self-center lg:justify-self-end self-start lg:pt-10">
+            <div className="hidden lg:block w-full max-w-md justify-self-center lg:justify-self-end self-start lg:pt-10">
               <button
                 type="button"
                 onClick={handleMiniVideoClick}
                 className="w-full text-left rounded-2xl border border-[#E5E0D8] bg-white shadow-sm overflow-hidden hover:shadow-md transition"
               >
                 <div className="flex items-center justify-between px-4 py-3 border-b border-[#F0EBE5]">
-                  <span className="text-sm font-semibold text-[#0F1419]">1-min demo</span>
+                  <div>
+                    <span className="text-sm font-semibold text-[#0F1419] block">1-min demo</span>
+                    <span className="text-[11px] text-[#6B6560]">Preview of the builder flow</span>
+                  </div>
                   <span className="text-xs text-[#6B6560]">Auto-play muted</span>
                 </div>
                 <video
@@ -358,8 +364,8 @@ export default function Home() {
       {/* Drag-and-drop proof element */}
       <section className="py-12 border-t border-[#F0EBE5] relative z-10">
         <div className="mx-auto max-w-3xl px-4 sm:px-6">
-          <div className="-mt-12 rounded-3xl border border-[#E5E0D8] bg-white/95 p-8 shadow-xl shadow-black/10 ring-1 ring-black/5 backdrop-blur-sm float-card">
-            <div className="text-center mb-6">
+          <div className="-mt-12 rounded-3xl border border-[#E5E0D8] bg-white/95 p-6 sm:p-7 shadow-lg shadow-black/10 ring-1 ring-black/5 backdrop-blur-sm float-card">
+            <div className="text-center mb-4">
               <p className="text-sm font-semibold text-[#0F1419] mb-1">
                 Try it now
               </p>
@@ -371,7 +377,7 @@ export default function Home() {
             <div
               onDrop={handleDrop}
               onDragOver={handleDragOver}
-              className="relative rounded-xl border-2 border-dashed border-[#E5E0D8] bg-[#F7F1EA]/30 p-12 text-center cursor-pointer hover:border-text-disabled transition"
+              className="relative rounded-xl border-2 border-dashed border-[#E5E0D8] bg-[#F7F1EA]/40 p-8 sm:p-9 text-center cursor-pointer transition hover:border-[#D8D2C8] hover:shadow-md"
               onClick={handleFileSelect}
             >
               <input
@@ -441,7 +447,7 @@ export default function Home() {
           </div>
 
           {/* Metrics */}
-          <div className="flex flex-wrap gap-4 justify-center mb-12">
+          <div className="flex flex-wrap gap-6 justify-center mb-12">
             {HERO_METRICS.map((metric) => (
               <div
                 key={metric.label}
@@ -463,23 +469,38 @@ export default function Home() {
               {
                 title: "Upload evidence",
                 body: "Drag up to 100 screenshots, PDFs, or photos at once. Everything stays encrypted in transit.",
+                icon: (
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                  </svg>
+                ),
               },
               {
                 title: "Let CaseReady format",
                 body: "We merge PDFs, resize images, add page numbers, and keep your files in order automatically.",
+                icon: (
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                ),
               },
               {
                 title: "Download & file",
                 body: "Get a single exhibit-ready PDF that drops straight into your judge's preferred format.",
+                icon: (
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                ),
               },
-            ].map((step, index) => (
+            ].map((step) => (
               <div
                 key={step.title}
                 className="rounded-2xl border border-[#E5E0D8] bg-white p-8 flex flex-col gap-4 hover:border-[var(--color-brand-royal)] transition"
               >
-                <span className="h-12 w-12 rounded-full bg-[var(--color-brand-royal)] text-white font-semibold text-xl flex items-center justify-center">
-                  {index + 1}
-                </span>
+                <div className="h-12 w-12 rounded-xl bg-[var(--color-brand-royal)] text-white flex items-center justify-center">
+                  {step.icon}
+                </div>
                 <h3 className="text-xl font-semibold text-[#0F1419]">
                   {step.title}
                 </h3>

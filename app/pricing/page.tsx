@@ -66,7 +66,7 @@ const plansByTier = [
     ],
     cta: {
       label: "Lock lifetime offer",
-      priceId: "price_1SfvgmAVvDE7fh9qHhgdH1YB",
+      priceId: "price_1SgBd6AVvDE7fh9qhxkSYOyX",
     },
     highlighted: true,
     note: "Limited to the first 50 buyers. One-time payment, lifetime access.",
@@ -87,7 +87,7 @@ const plansByTier = [
       "Priority email support",
     ],
     cta: {
-      label: "Reserve founding rate",
+      label: "Start firm plan",
       priceId: "price_1SfvgWAVvDE7fh9qi8A0blg4",
     },
     highlighted: false,
@@ -233,25 +233,25 @@ export default function PricingPage() {
           <nav className="hidden md:flex items-center gap-3 text-xs font-semibold text-[#1A1614]">
             <Link
               href="/how-it-works"
-              className="rounded-full border border-[#E5E0D8] bg-white px-3 py-1 hover:border-[#0056D6] hover:text-[#0056D6] transition"
+              className="rounded-full border border-[#E5E0D8] bg-white px-3 py-1 hover:border-[var(--color-brand-royal)] hover:text-[var(--color-brand-royal)] transition"
             >
               How it works
             </Link>
             <Link
               href="/features#roadmap"
-              className="rounded-full border border-[#E5E0D8] bg-white px-3 py-1 hover:border-[#0056D6] hover:text-[#0056D6] transition"
+              className="rounded-full border border-[#E5E0D8] bg-white px-3 py-1 hover:border-[var(--color-brand-royal)] hover:text-[var(--color-brand-royal)] transition"
             >
               Roadmap
             </Link>
             <Link
               href="/pricing"
-              className="rounded-full border border-transparent bg-[#0056D6] px-3 py-1 text-white hover:bg-[#0056D6]-hover transition"
+              className="rounded-full border border-transparent bg-[var(--color-brand-royal)] px-3 py-1 text-white hover:bg-[var(--color-brand-royal-hover)] transition"
             >
               Pricing
             </Link>
             <Link
               href="/security"
-              className="rounded-full border border-[#E5E0D8] bg-white px-3 py-1 hover:border-[#0056D6] hover:text-[#0056D6] transition"
+              className="rounded-full border border-[#E5E0D8] bg-white px-3 py-1 hover:border-[var(--color-brand-royal)] hover:text-[var(--color-brand-royal)] transition"
             >
               Security
             </Link>
@@ -261,7 +261,7 @@ export default function PricingPage() {
             <div className="flex items-center gap-2">
               <Link
                 href="/dashboard"
-                className="inline-flex items-center rounded-full bg-[#0056D6] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0056D6]-hover transition"
+                className="inline-flex items-center rounded-full bg-[var(--color-brand-royal)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--color-brand-royal-hover)] transition"
               >
                 Dashboard
               </Link>
@@ -286,7 +286,7 @@ export default function PricingPage() {
               </Link>
               <Link
                 href="/signup"
-                className="inline-flex items-center rounded-full bg-[#0056D6] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0056D6]-hover transition"
+                className="inline-flex items-center rounded-full bg-[var(--color-brand-royal)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--color-brand-royal-hover)] transition"
               >
                 Sign up
               </Link>
@@ -297,10 +297,10 @@ export default function PricingPage() {
 
       {/* Pricing content */}
       <section className="flex-1">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 sm:py-20 space-y-12">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-16 sm:py-20 space-y-12">
           {/* Hero copy */}
           <div className="text-center max-w-4xl mx-auto space-y-5 bg-gradient-to-r from-[#eaf2ff] via-white to-[#f7f2ff] rounded-3xl border border-white/60 shadow-sm px-6 py-10">
-            <p className="text-xs uppercase tracking-[0.2em] text-[#0056D6] font-semibold">
+            <p className="text-xs uppercase tracking-[0.2em] text-[var(--color-brand-royal)] font-semibold">
               Pricing
             </p>
             <h1 className="text-3xl sm:text-4xl font-semibold text-gray-900">
@@ -318,8 +318,8 @@ export default function PricingPage() {
           </div>
 
           {/* Founding offer banner */}
-          <div className="rounded-3xl border border-dashed border-[#0056D6]/60 bg-[#F1F7FF] px-4 py-5 sm:px-6 sm:py-6 text-xs sm:text-sm text-gray-800 text-center shadow-sm">
-            <span className="inline-flex items-center justify-center rounded-full bg-[#0056D6] text-white text-[10px] font-semibold px-2 py-0.5 mr-2">
+          <div className="rounded-3xl border border-dashed border-[var(--color-brand-royal)]/60 bg-[#F1F7FF] px-4 py-5 sm:px-6 sm:py-6 text-xs sm:text-sm text-gray-800 text-center shadow-sm">
+            <span className="inline-flex items-center justify-center rounded-full bg-[var(--color-brand-royal)] text-white text-[10px] font-semibold px-2 py-0.5 mr-2">
               Founding offer
             </span>
             First 50 attorneys can lock a{" "}
@@ -357,7 +357,7 @@ export default function PricingPage() {
                       {plan.badge && (
                         <span
                           className={`inline-flex items-center justify-center rounded-full px-3 py-1 text-[10px] font-semibold ${
-                            isLifetime ? "bg-[#D4AF37] text-[#0B0F1F]" : "bg-[#0056D6] text-white"
+                            isLifetime ? "bg-[#D4AF37] text-[#0B0F1F]" : "bg-[var(--color-brand-royal)] text-white"
                           }`}
                         >
                           {plan.badge}
@@ -407,7 +407,7 @@ export default function PricingPage() {
                       >
                         <span
                           className={`mt-1 h-1.5 w-1.5 rounded-full ${
-                            isLifetime ? "bg-[#D4AF37]" : "bg-[#0056D6]"
+                            isLifetime ? "bg-[#D4AF37]" : "bg-[var(--color-brand-royal)]"
                           }`}
                         />
                         <span>{perk}</span>
@@ -425,7 +425,7 @@ export default function PricingPage() {
                           isLifetime
                             ? "bg-gradient-to-r from-[#F7DE95] via-[#EBC867] to-[#D8B240] text-[#0F172A] shadow-lg shadow-[#D4AF37]/30 hover:-translate-y-0.5"
                             : plan.highlighted
-                            ? "bg-[#0056D6] text-white shadow-lg shadow-[#0056D6]/40 hover:-translate-y-0.5"
+                            ? "bg-[var(--color-brand-royal)] text-white shadow-lg shadow-[var(--color-brand-royal)]/40 hover:-translate-y-0.5"
                             : "border border-gray-200 text-gray-700 hover:bg-gray-50"
                         } ${checkoutLoading[(plan.cta as any).priceId] ? "opacity-60 cursor-not-allowed" : ""}`}
                       >
@@ -438,7 +438,7 @@ export default function PricingPage() {
                           isLifetime
                             ? "bg-[#D4AF37] text-[#0B0F1F] shadow-lg shadow-[#D4AF37]/30 hover:-translate-y-0.5"
                             : plan.highlighted
-                            ? "bg-[#0056D6] text-white shadow-lg shadow-[#0056D6]/40 hover:-translate-y-0.5"
+                            ? "bg-[var(--color-brand-royal)] text-white shadow-lg shadow-[var(--color-brand-royal)]/40 hover:-translate-y-0.5"
                             : "border border-gray-200 text-gray-700 hover:bg-gray-50"
                         }`}
                       >

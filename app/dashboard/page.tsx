@@ -237,7 +237,7 @@ export default function DashboardClient({
       </header>
 
       {/* Main content */}
-      <main className="mx-auto max-w-6xl px-4 sm:px-6 py-8 space-y-8">
+      <main className="mx-auto max-w-6xl px-4 sm:px-6 py-12 space-y-8">
         {/* Welcome */}
         <div>
           <h1 className="text-3xl font-semibold text-[#0F1419]">
@@ -251,7 +251,7 @@ export default function DashboardClient({
         </div>
 
         {/* Primary action - Create Exhibit Packet */}
-        <section className="rounded-3xl border border-[#E5E0D8] bg-white p-8 shadow-sm hover:shadow-md transition">
+        <section className="rounded-3xl border border-[#E5E0D8] bg-white p-8 shadow-sm hover:shadow-lg transition">
           <div className="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-3">
@@ -275,7 +275,7 @@ export default function DashboardClient({
             <button
               type="button"
               onClick={() => router.push("/builder")}
-              className="inline-flex items-center gap-2 rounded-full bg-[var(--color-brand-royal)] px-8 py-4 text-base font-semibold text-white hover:bg-[var(--color-brand-royal-hover)] transition shadow-sm"
+              className="inline-flex items-center gap-2 rounded-full bg-[var(--color-brand-royal)] px-8 py-3 text-base font-semibold text-white hover:bg-[var(--color-brand-royal-hover)] transition shadow-sm"
             >
               Open Exhibit Builder
             </button>
@@ -474,7 +474,7 @@ export default function DashboardClient({
         </section>
 
         {/* CaseReady Labs */}
-        <section className="rounded-3xl border border-[#E5E0D8] bg-white p-6">
+        <section className="rounded-3xl border border-[#E5E0D8] bg-white p-8 hover:shadow-md transition">
           <button
             type="button"
             onClick={() => setShowLabsExpanded(!showLabsExpanded)}
@@ -519,7 +519,7 @@ export default function DashboardClient({
         </section>
 
         {/* Account info */}
-        <section className="rounded-3xl border border-[#E5E0D8] bg-white p-6">
+        <section className="rounded-3xl border border-[#E5E0D8] bg-white p-8">
           <h3 className="text-lg font-semibold text-[#0F1419] mb-4">Account</h3>
           <div className="space-y-3 text-sm">
             <div className="flex items-center justify-between">

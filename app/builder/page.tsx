@@ -238,11 +238,27 @@ export default function ExhibitBuilderPage() {
     }
   };
 
+  const requireMatterName = () => {
+    if (matterName.trim()) {
+      setError(null);
+      return true;
+    }
+    setError("Enter a matter name before adding files.");
+    matterNameRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    matterNameRef.current?.focus({ preventScroll: true });
+    return false;
+  };
+
   const handleSelectFiles = () => {
+    if (!requireMatterName()) return;
     fileInputRef.current?.click();
   };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (!requireMatterName()) {
+      e.target.value = "";
+      return;
+    }
     const incoming = Array.from(e.target.files || []);
     addFiles(incoming);
     e.target.value = "";
@@ -504,6 +520,7 @@ export default function ExhibitBuilderPage() {
 
   const handleDropZone = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
+    if (!requireMatterName()) return;
     const droppedFiles = Array.from(event.dataTransfer?.files || []);
     addFiles(droppedFiles);
   };
