@@ -610,17 +610,11 @@ export default function ExhibitBuilderPage() {
   ];
 
   return (
-    <main
-      className="relative min-h-screen flex flex-col overflow-hidden text-[#111827]"
-      style={{
-        backgroundImage:
-          "radial-gradient(130% 130% at 50% 0%, #fdfbff 0%, #f4f7ff 45%, #faf6f0 100%)",
-      }}
-    >
-      <header className="w-full border-b backdrop-blur-sm bg-white/70 border-black/5">
+    <main className="relative min-h-screen flex flex-col overflow-hidden bg-[#F5F2ED]">
+      <header className="w-full border-b border-[#E5E0D8] bg-white/80 backdrop-blur-sm">
         <div className="mx-auto max-w-5xl flex items-center justify-between py-4 px-4 sm:px-6">
           <div className="flex items-center gap-3">
-            <div className="h-12 w-12 rounded-2xl bg-white shadow-md flex items-center justify-center border border-gray-100">
+            <div className="h-12 w-12 rounded-2xl bg-white shadow-sm flex items-center justify-center border border-[#F0EBE5]">
               <NextImage
                 src="/logo.svg"
                 alt="CaseReady logo"
@@ -631,24 +625,24 @@ export default function ExhibitBuilderPage() {
               />
             </div>
             <div className="flex flex-col leading-tight">
-              <span className="font-semibold tracking-tight text-lg">
+              <span className="font-semibold tracking-tight text-lg text-[#0F1419]">
                 CaseReady Exhibit Builder
               </span>
-              <span className="text-xs text-gray-500 hidden sm:block">
+              <span className="text-xs text-[#6B6560] hidden sm:block">
                 Upload → auto-sort → Bates stamp → export.
               </span>
             </div>
           </div>
           {isAuthenticated ? (
-            <div className="flex items-center gap-3 rounded-full border border-gray-200 bg-white/90 px-3 py-1 shadow-sm">
+            <div className="flex items-center gap-3 rounded-full border border-[#E5E0D8] bg-white/90 px-3 py-1 shadow-sm">
               <div className="hidden sm:flex flex-col text-right leading-tight">
-                <span className="text-xs font-semibold text-gray-700">
+                <span className="text-xs font-semibold text-[#6B6560]">
                   {userEmail || "Account"}
                 </span>
               </div>
               <Link
                 href="/dashboard"
-                className="inline-flex items-center rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50"
+                className="inline-flex items-center rounded-full border border-[#E5E0D8] bg-white px-3 py-1.5 text-xs font-semibold text-[#1A1614] hover:bg-[#F5F2ED]"
               >
                 Dashboard
               </Link>
@@ -656,7 +650,7 @@ export default function ExhibitBuilderPage() {
                 type="button"
                 onClick={handleSignOut}
                 disabled={isSigningOut}
-                className={`inline-flex items-center rounded-full bg-[#0056D6] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:brightness-110 ${
+                className={`inline-flex items-center rounded-full bg-[var(--color-brand-royal)] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-[var(--color-brand-royal-hover)] ${
                   isSigningOut ? "opacity-60 cursor-not-allowed" : ""
                 }`}
               >
@@ -664,16 +658,16 @@ export default function ExhibitBuilderPage() {
               </button>
             </div>
           ) : (
-            <div className="flex items-center gap-2 rounded-full border border-gray-200 bg-white/90 px-2 py-1 shadow-sm">
+            <div className="flex items-center gap-2 rounded-full border border-[#E5E0D8] bg-white/90 px-2 py-1 shadow-sm">
               <Link
                 href="/signin?redirectedFrom=/builder"
-                className="inline-flex items-center rounded-full bg-[#0056D6] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:brightness-110"
+                className="inline-flex items-center rounded-full bg-[var(--color-brand-royal)] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-[var(--color-brand-royal-hover)]"
               >
                 {isCheckingSession ? "Checking…" : "Sign in"}
               </Link>
               <Link
                 href="/signup"
-                className="inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-100"
+                className="inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold text-[#6B6560] hover:bg-[#F5F2ED]"
               >
                 Early access
               </Link>
@@ -684,18 +678,18 @@ export default function ExhibitBuilderPage() {
 
       <div className="flex-1 flex items-start">
         <div className="mx-auto max-w-5xl w-full px-4 sm:px-6 py-8 space-y-6">
-          <div className="rounded-3xl border border-gray-200 bg-white/90 p-6 shadow-sm">
+          <div className="rounded-3xl border border-[#E5E0D8] bg-white p-6 shadow-sm">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-[#0056D6]">Exhibit Builder</p>
-                <h1 className="text-2xl font-semibold text-gray-900">Upload & assemble your packet</h1>
-                <p className="text-sm text-gray-600">
+                <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-brand-royal)]">Exhibit Builder</p>
+                <h1 className="text-2xl font-semibold text-[#0F1419]">Upload & assemble your packet</h1>
+                <p className="text-sm text-[#6B6560]">
                   Drag files below, reorder, and generate a judge-ready PDF with Bates stamps and exhibit labels.
                 </p>
               </div>
             </div>
             <div className="mt-3 flex flex-col sm:flex-row sm:items-center sm:gap-4">
-              <label className="w-full sm:w-1/2 text-sm font-semibold text-gray-800">
+              <label className="w-full sm:w-1/2 text-sm font-semibold text-[#0F1419]">
                 Matter name
                 <input
                   ref={matterNameRef}
@@ -705,8 +699,8 @@ export default function ExhibitBuilderPage() {
                     if (error) setError(null);
                   }}
                   placeholder="e.g., Acme v. Smith – Hearing Prep"
-                  className={`mt-1 w-full rounded-xl border bg-white px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none ${
-                    error ? "border-red-400" : "border-gray-200"
+                  className={`mt-1 w-full rounded-xl border bg-white px-3 py-2 text-sm text-[#0F1419] focus:border-[var(--color-brand-royal)] focus:outline-none ${
+                    error ? "border-red-400" : "border-[#E5E0D8]"
                   }`}
                 />
                 {error && (
@@ -715,28 +709,28 @@ export default function ExhibitBuilderPage() {
                   </p>
                 )}
               </label>
-              <div className="hidden sm:block text-xs text-gray-500">
+              <div className="hidden sm:block text-xs text-[#6B6560]">
                 Name your packet before generating. You can rename it later in the matter detail page.
               </div>
             </div>
 
-            <div className="mt-5 rounded-2xl border border-gray-200 bg-white/90 p-4 sm:p-5 shadow-sm">
+            <div className="mt-5 rounded-2xl border border-[#E5E0D8] bg-white/90 p-4 sm:p-5 shadow-sm">
               <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-[#0056D6]">
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-[var(--color-brand-royal)]">
                     Formatting
                   </p>
-                  <h3 className="text-lg font-semibold text-gray-900">
+                  <h3 className="text-lg font-semibold text-[#0F1419]">
                     Pick a preset
                   </h3>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-[#6B6560]">
                     Quick is free. Court Formal unlocks on Solo. Firm Branded unlocks on Firm.
                   </p>
                 </div>
                 <span
                   className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-semibold ${
                     userPlan === "free"
-                      ? "bg-gray-100 text-gray-700"
+                      ? "bg-[#F5F2ED] text-[#6B6560]"
                       : "bg-green-100 text-green-800"
                   }`}
                 >
@@ -757,16 +751,16 @@ export default function ExhibitBuilderPage() {
                       title={locked ? "Upgrade to unlock" : undefined}
                       className={`relative text-left rounded-xl border p-3 sm:p-4 transition ${
                         active
-                          ? "border-[#0056D6] bg-[#EEF3FF] shadow-sm"
-                          : "border-gray-200 bg-white hover:border-[#0056D6]/40"
+                          ? "border-[var(--color-brand-royal)] bg-[#EEF3FF] shadow-sm"
+                          : "border-[#E5E0D8] bg-white hover:border-[var(--color-brand-royal)]/40"
                       } ${locked ? "cursor-not-allowed opacity-60" : ""}`}
                     >
                       <div className="flex items-center justify-between gap-2">
-                        <span className="text-sm font-semibold text-gray-900">
+                        <span className="text-sm font-semibold text-[#0F1419]">
                           {choice.title}
                         </span>
                         {locked ? (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-1 text-[11px] font-semibold text-gray-600">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-[#F5F2ED] px-2 py-1 text-[11px] font-semibold text-[#6B6560]">
                             <svg
                               aria-hidden="true"
                               viewBox="0 0 24 24"
@@ -781,14 +775,14 @@ export default function ExhibitBuilderPage() {
                             Locked
                           </span>
                         ) : active ? (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-[#0056D6]/10 px-2 py-1 text-[11px] font-semibold text-[#0056D6]">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-brand-royal)]/10 px-2 py-1 text-[11px] font-semibold text-[var(--color-brand-royal)]">
                             Selected
                           </span>
                         ) : null}
                       </div>
-                      <p className="mt-1 text-xs text-gray-600">{choice.description}</p>
+                      <p className="mt-1 text-xs text-[#6B6560]">{choice.description}</p>
                       {locked && (
-                        <p className="mt-2 inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-1 text-[11px] font-semibold text-gray-600">
+                        <p className="mt-2 inline-flex items-center gap-1 rounded-full bg-[#F5F2ED] px-2 py-1 text-[11px] font-semibold text-[#6B6560]">
                           Upgrade to unlock
                         </p>
                       )}
@@ -803,7 +797,7 @@ export default function ExhibitBuilderPage() {
                     <button
                       type="button"
                       onClick={() => setShowAdvanced((prev) => !prev)}
-                      className="inline-flex items-center gap-2 text-sm font-semibold text-gray-800"
+                      className="inline-flex items-center gap-2 text-sm font-semibold text-[#0F1419]"
                     >
                       <span>{showAdvanced ? "Hide" : "Advanced formatting"}</span>
                       <svg
@@ -820,7 +814,7 @@ export default function ExhibitBuilderPage() {
                       </svg>
                     </button>
                     {formatPreset === "quick" && (
-                      <p className="text-[11px] text-gray-500">
+                      <p className="text-[11px] text-[#6B6560]">
                         Quick Packet: cover/index off, branding on, top-right stickers.
                       </p>
                     )}
@@ -829,58 +823,58 @@ export default function ExhibitBuilderPage() {
                   {showAdvanced && (
                     <div className="mt-3 space-y-3">
                       {formatPreset === "quick" && (
-                        <p className="rounded-xl border border-dashed border-gray-200 bg-gray-50 px-3 py-3 text-xs font-medium text-gray-600">
+                        <p className="rounded-xl border border-dashed border-[#E5E0D8] bg-[#F5F2ED]/50 px-3 py-3 text-xs font-medium text-[#6B6560]">
                           Quick Packet is intentionally minimal. Upgrade to Solo or Firm to unlock formal layouts and branding controls.
                         </p>
                       )}
 
                       {formatPreset === "formal" && (
                         <div className="grid gap-3 md:grid-cols-2">
-                          <label className="flex items-start gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800">
+                          <label className="flex items-start gap-2 rounded-xl border border-[#E5E0D8] bg-[#F5F2ED]/50 px-3 py-2 text-sm text-[#0F1419]">
                             <input
                               type="checkbox"
                               checked={Boolean(formatOptions.include_cover)}
                               onChange={() => toggleFormatOption("include_cover")}
-                              className="mt-1 h-4 w-4 rounded border-gray-300 text-[#0056D6] focus:ring-[#0056D6]"
+                              className="mt-1 h-4 w-4 rounded border-[#E5E0D8] text-[var(--color-brand-royal)] focus:ring-[var(--color-brand-royal)]"
                             />
                             <div className="space-y-0.5">
                               <p className="font-semibold">Cover page</p>
-                              <p className="text-xs text-gray-600">
+                              <p className="text-xs text-[#6B6560]">
                                 Adds a professional cover with case title, court, and Bates range.
                               </p>
                             </div>
                           </label>
-                          <label className="flex items-start gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800">
+                          <label className="flex items-start gap-2 rounded-xl border border-[#E5E0D8] bg-[#F5F2ED]/50 px-3 py-2 text-sm text-[#0F1419]">
                             <input
                               type="checkbox"
                               checked={Boolean(formatOptions.include_index)}
                               onChange={() => toggleFormatOption("include_index")}
-                              className="mt-1 h-4 w-4 rounded border-gray-300 text-[#0056D6] focus:ring-[#0056D6]"
+                              className="mt-1 h-4 w-4 rounded border-[#E5E0D8] text-[var(--color-brand-royal)] focus:ring-[var(--color-brand-royal)]"
                             />
                             <div className="space-y-0.5">
                               <p className="font-semibold">Table of Contents</p>
-                              <p className="text-xs text-gray-600">
+                              <p className="text-xs text-[#6B6560]">
                                 Adds page ranges for each exhibit.
                               </p>
                             </div>
                           </label>
-                          <label className="flex items-start gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800">
+                          <label className="flex items-start gap-2 rounded-xl border border-[#E5E0D8] bg-[#F5F2ED]/50 px-3 py-2 text-sm text-[#0F1419]">
                             <input
                               type="checkbox"
                               checked={Boolean(formatOptions.show_caseready_branding)}
                               onChange={() => toggleFormatOption("show_caseready_branding")}
-                              className="mt-1 h-4 w-4 rounded border-gray-300 text-[#0056D6] focus:ring-[#0056D6]"
+                              className="mt-1 h-4 w-4 rounded border-[#E5E0D8] text-[var(--color-brand-royal)] focus:ring-[var(--color-brand-royal)]"
                             />
                             <div className="space-y-0.5">
                               <p className="font-semibold">CaseReady footer</p>
-                              <p className="text-xs text-gray-600">
+                              <p className="text-xs text-[#6B6560]">
                                 Toggle the “Prepared with CaseReady” footer on/off.
                               </p>
                             </div>
                           </label>
-                          <div className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-3 text-sm text-gray-800">
+                          <div className="rounded-xl border border-[#E5E0D8] bg-[#F5F2ED]/50 px-3 py-3 text-sm text-[#0F1419]">
                             <p className="font-semibold">Sticker position</p>
-                            <p className="text-xs text-gray-600">Default top-right; adjust if needed.</p>
+                            <p className="text-xs text-[#6B6560]">Default top-right; adjust if needed.</p>
                             <div className="mt-3 flex flex-wrap gap-2">
                               {(["top-right", "bottom-right", "left-vertical"] as const).map((pos) => {
                                 const active = formatOptions.sticker_position === pos;
@@ -891,8 +885,8 @@ export default function ExhibitBuilderPage() {
                                     onClick={() => setStickerPosition(pos)}
                                     className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
                                       active
-                                        ? "border-[#0056D6] bg-white text-[#0056D6]"
-                                        : "border-gray-200 bg-white text-gray-700 hover:border-[#0056D6]/40"
+                                        ? "border-[var(--color-brand-royal)] bg-white text-[var(--color-brand-royal)]"
+                                        : "border-[#E5E0D8] bg-white text-[#6B6560] hover:border-[var(--color-brand-royal)]/40"
                                     }`}
                                   >
                                     {pos === "top-right"
@@ -905,7 +899,7 @@ export default function ExhibitBuilderPage() {
                               })}
                             </div>
                           </div>
-                          <div className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-3 text-sm text-gray-800">
+                          <div className="rounded-xl border border-[#E5E0D8] bg-[#F5F2ED]/50 px-3 py-3 text-sm text-[#0F1419]">
                             <p className="font-semibold">Case details (optional)</p>
                             <div className="mt-2 space-y-2">
                               <input
@@ -918,7 +912,7 @@ export default function ExhibitBuilderPage() {
                                   }))
                                 }
                                 placeholder="Case title"
-                                className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:border-[#0056D6] focus:outline-none"
+                                className="w-full rounded-lg border border-[#E5E0D8] bg-white px-3 py-2 text-sm focus:border-[var(--color-brand-royal)] focus:outline-none"
                               />
                               <input
                                 type="text"
@@ -930,7 +924,7 @@ export default function ExhibitBuilderPage() {
                                   }))
                                 }
                                 placeholder="Court name"
-                                className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:border-[#0056D6] focus:outline-none"
+                                className="w-full rounded-lg border border-[#E5E0D8] bg-white px-3 py-2 text-sm focus:border-[var(--color-brand-royal)] focus:outline-none"
                               />
                               <textarea
                                 value={formatOptions.contact_block_text || ""}
@@ -942,7 +936,7 @@ export default function ExhibitBuilderPage() {
                                   }))
                                 }
                                 placeholder="Attorney contact block (optional)"
-                                className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:border-[#0056D6] focus:outline-none"
+                                className="w-full rounded-lg border border-[#E5E0D8] bg-white px-3 py-2 text-sm focus:border-[var(--color-brand-royal)] focus:outline-none"
                                 rows={2}
                               />
                             </div>
@@ -953,81 +947,81 @@ export default function ExhibitBuilderPage() {
                       {formatPreset === "firm_branded" && (
                         <div className="space-y-3">
                           <div className="grid gap-3 md:grid-cols-2">
-                            <label className="flex items-start gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800">
+                            <label className="flex items-start gap-2 rounded-xl border border-[#E5E0D8] bg-[#F5F2ED]/50 px-3 py-2 text-sm text-[#0F1419]">
                               <input
                                 type="checkbox"
                                 checked={Boolean(formatOptions.include_cover)}
                                 onChange={() => toggleFormatOption("include_cover")}
-                                className="mt-1 h-4 w-4 rounded border-gray-300 text-[#0056D6] focus:ring-[#0056D6]"
+                                className="mt-1 h-4 w-4 rounded border-[#E5E0D8] text-[var(--color-brand-royal)] focus:ring-[var(--color-brand-royal)]"
                               />
                               <div className="space-y-0.5">
                                 <p className="font-semibold">Cover page</p>
-                                <p className="text-xs text-gray-600">
+                                <p className="text-xs text-[#6B6560]">
                                   Professional cover with court + case details.
                                 </p>
                               </div>
                             </label>
-                            <label className="flex items-start gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800">
+                            <label className="flex items-start gap-2 rounded-xl border border-[#E5E0D8] bg-[#F5F2ED]/50 px-3 py-2 text-sm text-[#0F1419]">
                               <input
                                 type="checkbox"
                                 checked={Boolean(formatOptions.include_index)}
                                 onChange={() => toggleFormatOption("include_index")}
-                                className="mt-1 h-4 w-4 rounded border-gray-300 text-[#0056D6] focus:ring-[#0056D6]"
+                                className="mt-1 h-4 w-4 rounded border-[#E5E0D8] text-[var(--color-brand-royal)] focus:ring-[var(--color-brand-royal)]"
                               />
                               <div className="space-y-0.5">
                                 <p className="font-semibold">Table of Contents</p>
-                                <p className="text-xs text-gray-600">
+                                <p className="text-xs text-[#6B6560]">
                                   Adds page ranges for each exhibit.
                                 </p>
                               </div>
                             </label>
-                            <label className="flex items-start gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800">
+                            <label className="flex items-start gap-2 rounded-xl border border-[#E5E0D8] bg-[#F5F2ED]/50 px-3 py-2 text-sm text-[#0F1419]">
                               <input
                                 type="checkbox"
                                 checked={Boolean(formatOptions.show_caseready_branding)}
                                 onChange={() => toggleFormatOption("show_caseready_branding")}
-                                className="mt-1 h-4 w-4 rounded border-gray-300 text-[#0056D6] focus:ring-[#0056D6]"
+                                className="mt-1 h-4 w-4 rounded border-[#E5E0D8] text-[var(--color-brand-royal)] focus:ring-[var(--color-brand-royal)]"
                               />
                               <div className="space-y-0.5">
                                 <p className="font-semibold">CaseReady footer</p>
-                                <p className="text-xs text-gray-600">
+                                <p className="text-xs text-[#6B6560]">
                                   Hide for white-label, or keep for co-branding.
                                 </p>
                               </div>
                             </label>
-                            <label className="flex items-start gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800">
+                            <label className="flex items-start gap-2 rounded-xl border border-[#E5E0D8] bg-[#F5F2ED]/50 px-3 py-2 text-sm text-[#0F1419]">
                               <input
                                 type="checkbox"
                                 checked={Boolean(formatOptions.color_coded_stickers)}
                                 onChange={() => toggleFormatOption("color_coded_stickers")}
-                                className="mt-1 h-4 w-4 rounded border-gray-300 text-[#0056D6] focus:ring-[#0056D6]"
+                                className="mt-1 h-4 w-4 rounded border-[#E5E0D8] text-[var(--color-brand-royal)] focus:ring-[var(--color-brand-royal)]"
                               />
                               <div className="space-y-0.5">
                                 <p className="font-semibold">Color-coded stickers</p>
-                                <p className="text-xs text-gray-600">
+                                <p className="text-xs text-[#6B6560]">
                                   Adds subtle color by exhibit label.
                                 </p>
                               </div>
                             </label>
-                            <label className="flex items-start gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800">
+                            <label className="flex items-start gap-2 rounded-xl border border-[#E5E0D8] bg-[#F5F2ED]/50 px-3 py-2 text-sm text-[#0F1419]">
                               <input
                                 type="checkbox"
                                 checked={Boolean(formatOptions.slip_sheets)}
                                 onChange={() => toggleFormatOption("slip_sheets")}
-                                className="mt-1 h-4 w-4 rounded border-gray-300 text-[#0056D6] focus:ring-[#0056D6]"
+                                className="mt-1 h-4 w-4 rounded border-[#E5E0D8] text-[var(--color-brand-royal)] focus:ring-[var(--color-brand-royal)]"
                               />
                               <div className="space-y-0.5">
                                 <p className="font-semibold">Slip sheets</p>
-                                <p className="text-xs text-gray-600">
+                                <p className="text-xs text-[#6B6560]">
                                   Inserts firm-branded separators before each exhibit.
                                 </p>
                               </div>
                             </label>
                           </div>
 
-                          <div className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-3 text-sm text-gray-800">
+                          <div className="rounded-xl border border-[#E5E0D8] bg-[#F5F2ED]/50 px-3 py-3 text-sm text-[#0F1419]">
                             <p className="font-semibold">Sticker position</p>
-                            <p className="text-xs text-gray-600">
+                            <p className="text-xs text-[#6B6560]">
                               Choose from top-right, bottom-right, or left-vertical.
                             </p>
                             <div className="mt-3 flex flex-wrap gap-2">
@@ -1040,8 +1034,8 @@ export default function ExhibitBuilderPage() {
                                     onClick={() => setStickerPosition(pos)}
                                     className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
                                       active
-                                        ? "border-[#0056D6] bg-white text-[#0056D6]"
-                                        : "border-gray-200 bg-white text-gray-700 hover:border-[#0056D6]/40"
+                                        ? "border-[var(--color-brand-royal)] bg-white text-[var(--color-brand-royal)]"
+                                        : "border-[#E5E0D8] bg-white text-[#6B6560] hover:border-[var(--color-brand-royal)]/40"
                                     }`}
                                   >
                                     {pos === "top-right"
@@ -1056,7 +1050,7 @@ export default function ExhibitBuilderPage() {
                           </div>
 
                           <div className="grid gap-3 md:grid-cols-2">
-                            <div className="rounded-xl border border-gray-200 bg-white px-3 py-3 text-sm text-gray-800">
+                            <div className="rounded-xl border border-[#E5E0D8] bg-white px-3 py-3 text-sm text-[#0F1419]">
                               <p className="font-semibold">Cover template</p>
                               <div className="mt-2 flex flex-wrap gap-2">
                                 {(["classic", "modern", "black-bar"] as const).map((template) => {
@@ -1073,8 +1067,8 @@ export default function ExhibitBuilderPage() {
                                       }
                                       className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
                                         active
-                                          ? "border-[#0056D6] bg-[#EEF3FF] text-[#0056D6]"
-                                          : "border-gray-200 bg-gray-50 text-gray-700 hover:border-[#0056D6]/40"
+                                          ? "border-[var(--color-brand-royal)] bg-[#EEF3FF] text-[var(--color-brand-royal)]"
+                                          : "border-[#E5E0D8] bg-[#F5F2ED]/50 text-[#6B6560] hover:border-[var(--color-brand-royal)]/40"
                                       }`}
                                     >
                                       {template === "classic"
@@ -1097,7 +1091,7 @@ export default function ExhibitBuilderPage() {
                                     }))
                                   }
                                   placeholder="Case title"
-                                  className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:border-[#0056D6] focus:outline-none"
+                                  className="w-full rounded-lg border border-[#E5E0D8] bg-white px-3 py-2 text-sm focus:border-[var(--color-brand-royal)] focus:outline-none"
                                 />
                                 <input
                                   type="text"
@@ -1109,11 +1103,11 @@ export default function ExhibitBuilderPage() {
                                     }))
                                   }
                                   placeholder="Court name"
-                                  className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:border-[#0056D6] focus:outline-none"
+                                  className="w-full rounded-lg border border-[#E5E0D8] bg-white px-3 py-2 text-sm focus:border-[var(--color-brand-royal)] focus:outline-none"
                                 />
                               </div>
                             </div>
-                            <div className="rounded-xl border border-gray-200 bg-white px-3 py-3 text-sm text-gray-800">
+                            <div className="rounded-xl border border-[#E5E0D8] bg-white px-3 py-3 text-sm text-[#0F1419]">
                               <p className="font-semibold">Branding & extras</p>
                               <div className="mt-2 space-y-2">
                                 <textarea
@@ -1127,7 +1121,7 @@ export default function ExhibitBuilderPage() {
                                   }
                                   placeholder="Attorney contact block (optional)"
                                   rows={2}
-                                  className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:border-[#0056D6] focus:outline-none"
+                                  className="w-full rounded-lg border border-[#E5E0D8] bg-white px-3 py-2 text-sm focus:border-[var(--color-brand-royal)] focus:outline-none"
                                 />
                                 <input
                                   type="text"
@@ -1139,7 +1133,7 @@ export default function ExhibitBuilderPage() {
                                     }))
                                   }
                                   placeholder="Custom footer line (address/phone/email)"
-                                  className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:border-[#0056D6] focus:outline-none"
+                                  className="w-full rounded-lg border border-[#E5E0D8] bg-white px-3 py-2 text-sm focus:border-[var(--color-brand-royal)] focus:outline-none"
                                 />
                                 <input
                                   type="text"
@@ -1151,7 +1145,7 @@ export default function ExhibitBuilderPage() {
                                     }))
                                   }
                                   placeholder="Firm logo URL (optional)"
-                                  className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:border-[#0056D6] focus:outline-none"
+                                  className="w-full rounded-lg border border-[#E5E0D8] bg-white px-3 py-2 text-sm focus:border-[var(--color-brand-royal)] focus:outline-none"
                                 />
                                 <input
                                   type="text"
@@ -1163,7 +1157,7 @@ export default function ExhibitBuilderPage() {
                                     }))
                                   }
                                   placeholder='Watermark text (e.g., "CONFIDENTIAL")'
-                                  className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:border-[#0056D6] focus:outline-none"
+                                  className="w-full rounded-lg border border-[#E5E0D8] bg-white px-3 py-2 text-sm focus:border-[var(--color-brand-royal)] focus:outline-none"
                                 />
                               </div>
                             </div>
@@ -1174,7 +1168,7 @@ export default function ExhibitBuilderPage() {
                   )}
                 </div>
               ) : (
-                <p className="mt-3 inline-flex items-center gap-2 rounded-xl bg-gray-50 px-3 py-2 text-[11px] font-semibold text-gray-600">
+                <p className="mt-3 inline-flex items-center gap-2 rounded-xl bg-[#F5F2ED]/50 px-3 py-2 text-[11px] font-semibold text-[#6B6560]">
                   <svg
                     aria-hidden="true"
                     viewBox="0 0 24 24"
@@ -1194,10 +1188,10 @@ export default function ExhibitBuilderPage() {
             {/* Upload card */}
             <div
               id="drop-zone"
-              className="surface-card mt-6 rounded-2xl border border-gray-200 bg-white shadow-sm p-5 sm:p-6"
+              className="surface-card mt-6 rounded-2xl border border-[#E5E0D8] bg-white shadow-sm p-5 sm:p-6"
             >
               <div
-                className="border-2 border-dashed border-gray-200 rounded-xl p-6 sm:p-8 text-center shadow-inner"
+                className="border-2 border-dashed border-[#E5E0D8] rounded-xl p-6 sm:p-8 text-center shadow-inner"
                 style={{
                   backgroundImage:
                     "url('/ChatGPT Image Nov 17, 2025, 09_42_05 PM copy.svg')",
@@ -1209,11 +1203,11 @@ export default function ExhibitBuilderPage() {
                 onDragOver={(event) => event.preventDefault()}
                 onDrop={handleDropZone}
               >
-                <div className="inline-flex flex-col gap-1 rounded-xl bg-white/85 px-4 py-3 text-gray-800 shadow-sm backdrop-blur">
+                <div className="inline-flex flex-col gap-1 rounded-xl bg-white/85 px-4 py-3 text-[#0F1419] shadow-sm backdrop-blur">
                   <p className="text-sm font-semibold">
                     Drag & drop evidence files here
                   </p>
-                  <p className="text-xs text-gray-600">
+                  <p className="text-xs text-[#6B6560]">
                     Screenshots, PDFs, emails, photos — up to 100 pages.
                   </p>
                 </div>
@@ -1232,7 +1226,7 @@ export default function ExhibitBuilderPage() {
                   <button
                     type="button"
                     onClick={handleSelectFiles}
-                    className="inline-flex w-full sm:w-auto justify-center items-center rounded-full bg-gradient-to-r bg-[#0056D6] px-5 py-2.5 min-h-[44px] text-sm font-semibold text-white shadow-sm hover:brightness-110 transition"
+                    className="inline-flex w-full sm:w-auto justify-center items-center rounded-full bg-gradient-to-r bg-[var(--color-brand-royal)] px-5 py-2.5 min-h-[44px] text-sm font-semibold text-white shadow-sm hover:brightness-110 transition"
                   >
                     Select files
                   </button>
@@ -1251,8 +1245,8 @@ export default function ExhibitBuilderPage() {
                       (!isAuthenticated ||
                         exportsLeft > 0 ||
                         hasUnlimitedExports)
-                        ? "border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
-                        : "border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed"
+                        ? "border-[#E5E0D8] bg-white text-[#6B6560] hover:bg-[#F5F2ED]/50"
+                        : "border-[#E5E0D8] bg-[#F5F2ED] text-gray-400 cursor-not-allowed"
                     }`}
                   >
                     {isSubmitting
@@ -1268,12 +1262,12 @@ export default function ExhibitBuilderPage() {
                 {files.length > 0 && (
                     <div className="mt-6 space-y-3">
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs">
-                        <label className="flex flex-col text-left font-semibold text-gray-700">
+                        <label className="flex flex-col text-left font-semibold text-[#6B6560]">
                           Ordering
                           <select
                           value={orderingMode}
                           onChange={handleOrderingChange}
-                          className="mt-1 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-[13px] text-gray-700 focus:outline-none"
+                          className="mt-1 rounded-full border border-[#E5E0D8] bg-white px-3 py-1.5 text-[13px] text-[#6B6560] focus:outline-none"
                         >
                           <option value="upload">Upload order</option>
                           <option value="timestamp">File timestamp</option>
@@ -1282,7 +1276,7 @@ export default function ExhibitBuilderPage() {
                           </option>
                           </select>
                         </label>
-                        <p className="text-[11px] text-gray-700">
+                        <p className="text-[11px] text-[#6B6560]">
                           {orderingMode === "upload"
                             ? "Drag rows to reorder exhibits manually."
                             : orderingMode === "timestamp"
@@ -1292,10 +1286,10 @@ export default function ExhibitBuilderPage() {
                       </div>
                     <div
                       ref={tableRef}
-                      className="surface-card overflow-x-auto rounded-2xl border border-gray-200 bg-white"
+                      className="surface-card overflow-x-auto rounded-2xl border border-[#E5E0D8] bg-white"
                     >
-                      <table className="min-w-full text-left text-xs text-gray-700">
-                        <thead className="text-[11px] uppercase tracking-wide text-gray-500">
+                      <table className="min-w-full text-left text-xs text-[#6B6560]">
+                        <thead className="text-[11px] uppercase tracking-wide text-[#6B6560]">
                           <tr>
                             <th className="px-3 py-2 font-semibold">Order</th>
                             <th className="px-3 py-2 font-semibold">
@@ -1307,7 +1301,7 @@ export default function ExhibitBuilderPage() {
                                 <button
                                   type="button"
                                   onClick={scrollToDetails}
-                                  className="inline-flex items-center rounded-full border border-gray-200 bg-white px-2 py-0.5 text-[11px] font-semibold text-gray-600 hover:border-[#0056D6]/50"
+                                  className="inline-flex items-center rounded-full border border-[#E5E0D8] bg-white px-2 py-0.5 text-[11px] font-semibold text-[#6B6560] hover:border-[var(--color-brand-royal)]/50"
                                   title="Scroll to description and delete"
                                 >
                                   →
@@ -1343,7 +1337,7 @@ export default function ExhibitBuilderPage() {
                                   : "bg-white"
                               }`}
                             >
-                              <td className="px-3 py-3 align-top text-gray-500 font-semibold">
+                              <td className="px-3 py-3 align-top text-[#6B6560] font-semibold">
                                 {orderingMode === "upload" && (
                                   <span className="mr-2 cursor-grab select-none text-gray-300">
                                     ⋮⋮
@@ -1360,10 +1354,10 @@ export default function ExhibitBuilderPage() {
                                       labelLocked: true,
                                     })
                                   }
-                                  className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm focus:border-[#0056D6] focus:outline-none"
+                                  className="w-full rounded-xl border border-[#E5E0D8] bg-[#F5F2ED]/50 px-3 py-1.5 text-sm focus:border-[var(--color-brand-royal)] focus:outline-none"
                                 />
                               </td>
-                              <td className="px-3 py-3 align-top text-gray-600">
+                              <td className="px-3 py-3 align-top text-[#6B6560]">
                                 <p className="truncate text-sm">
                                   {item.file.name}
                                 </p>
@@ -1377,7 +1371,7 @@ export default function ExhibitBuilderPage() {
                                       assumedDate: event.target.value,
                                     })
                                   }
-                                  className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm focus:border-[#0056D6] focus:outline-none"
+                                  className="w-full rounded-xl border border-[#E5E0D8] bg-[#F5F2ED]/50 px-3 py-1.5 text-sm focus:border-[var(--color-brand-royal)] focus:outline-none"
                                 />
                               </td>
                               <td className="px-3 py-3 align-top">
@@ -1390,7 +1384,7 @@ export default function ExhibitBuilderPage() {
                                     })
                                   }
                                   placeholder="Optional notes"
-                                  className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm focus:border-[#0056D6] focus:outline-none"
+                                  className="w-full rounded-xl border border-[#E5E0D8] bg-[#F5F2ED]/50 px-3 py-1.5 text-sm focus:border-[var(--color-brand-royal)] focus:outline-none"
                                 />
                               </td>
                               <td className="px-3 py-3 align-top">
@@ -1403,14 +1397,14 @@ export default function ExhibitBuilderPage() {
                                       pages: event.target.value,
                                     })
                                   }
-                                  className="w-20 rounded-xl border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm focus:border-[#0056D6] focus:outline-none"
+                                  className="w-20 rounded-xl border border-[#E5E0D8] bg-[#F5F2ED]/50 px-3 py-1.5 text-sm focus:border-[var(--color-brand-royal)] focus:outline-none"
                                 />
                               </td>
                               <td className="px-3 py-3 align-top text-right">
                                 <button
                                   type="button"
                                   onClick={() => handleRemoveFile(item.id)}
-                                  className="inline-flex items-center rounded-full border border-gray-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-gray-700 hover:border-red-200 hover:text-red-700"
+                                  className="inline-flex items-center rounded-full border border-[#E5E0D8] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#6B6560] hover:border-red-200 hover:text-red-700"
                                 >
                                   Delete
                                 </button>
@@ -1427,11 +1421,11 @@ export default function ExhibitBuilderPage() {
                   <div className="mt-4">
                     <div className="h-2 w-full rounded-full bg-gray-200 overflow-hidden">
                       <div
-                        className="h-full rounded-full bg-gradient-to-r bg-[#0056D6] transition-all duration-200"
+                        className="h-full rounded-full bg-gradient-to-r bg-[var(--color-brand-royal)] transition-all duration-200"
                         style={{ width: `${loadingProgress}%` }}
                       />
                     </div>
-                    <p className="text-[11px] text-gray-500 mt-1 uppercase tracking-wide">
+                    <p className="text-[11px] text-[#6B6560] mt-1 uppercase tracking-wide">
                       Rendering your exhibit…
                     </p>
                   </div>
@@ -1440,13 +1434,13 @@ export default function ExhibitBuilderPage() {
                 {/* File summary */}
                 {files.length === 0 ? (
                   <div className="mt-4 flex min-h-[88px] items-center justify-center">
-                    <p className="inline-flex items-center justify-center rounded-full border border-gray-200 bg-white/90 px-4 py-1.5 text-center text-[12px] font-semibold text-gray-600 shadow-sm">
+                    <p className="inline-flex items-center justify-center rounded-full border border-[#E5E0D8] bg-white/90 px-4 py-1.5 text-center text-[12px] font-semibold text-[#6B6560] shadow-sm">
                       No files selected yet
                     </p>
                   </div>
                 ) : (
-                  <div className="mt-4 text-left text-xs text-gray-700">
-                    <p className="mb-1 font-medium text-gray-900">
+                  <div className="mt-4 text-left text-xs text-[#6B6560]">
+                    <p className="mb-1 font-medium text-[#0F1419]">
                       {files.length} file
                       {files.length > 1 ? "s" : ""} selected ·{" "}
                       {totalSizeMB.toFixed(2)} MB total
@@ -1457,10 +1451,10 @@ export default function ExhibitBuilderPage() {
                           key={id}
                           className="flex justify-between gap-2 border-b border-gray-100 pb-1 last:border-b-0"
                         >
-                          <span className="truncate text-gray-800">
+                          <span className="truncate text-[#0F1419]">
                             {label} — {file.name}
                           </span>
-                          <span className="whitespace-nowrap text-gray-600">
+                          <span className="whitespace-nowrap text-[#6B6560]">
                             {(file.size / 1024).toFixed(0)} KB
                           </span>
                         </li>
@@ -1471,7 +1465,7 @@ export default function ExhibitBuilderPage() {
 
                 {/* Server response */}
                 {serverMessage && (
-                  <p className="mt-3 text-[11px] text-gray-700">
+                  <p className="mt-3 text-[11px] text-[#6B6560]">
                     {serverMessage}
                   </p>
                 )}
@@ -1480,14 +1474,14 @@ export default function ExhibitBuilderPage() {
                   <a
                     href={downloadUrl}
                     download="caseready-exhibit.pdf"
-                    className="mt-3 inline-flex items-center justify-center rounded-full bg-gradient-to-r bg-[#0056D6] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:brightness-110 transition"
+                    className="mt-3 inline-flex items-center justify-center rounded-full bg-gradient-to-r bg-[var(--color-brand-royal)] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:brightness-110 transition"
                   >
                     Download Exhibit PDF
                   </a>
                 )}
 
-                <p className="mt-4 inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white/95 px-4 py-2 text-[11px] font-medium text-gray-700 shadow-sm">
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full border border-gray-300 bg-gray-50">
+                <p className="mt-4 inline-flex items-center justify-center gap-2 rounded-2xl border border-[#E5E0D8] bg-white/95 px-4 py-2 text-[11px] font-medium text-[#6B6560] shadow-sm">
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full border border-[#E5E0D8] bg-[#F5F2ED]/50">
                     <svg
                       viewBox="0 0 24 24"
                       fill="none"
@@ -1495,7 +1489,7 @@ export default function ExhibitBuilderPage() {
                       strokeWidth="1.6"
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      className="h-3.5 w-3.5 text-gray-700"
+                      className="h-3.5 w-3.5 text-[#6B6560]"
                       aria-hidden="true"
                     >
                       <rect x="5" y="11" width="14" height="9" rx="2" />

@@ -188,16 +188,28 @@ export default function Home() {
 
           <div className="flex items-center gap-3">
             <Link
-              href="/how-it-works"
+              href="/features"
               className="hidden md:inline-flex items-center rounded-full border border-[#E5E0D8] bg-white px-4 py-2 text-sm font-semibold text-[#1A1614] hover:bg-[#F7F1EA] transition"
             >
-              <span className="mr-1" aria-hidden="true">ⓘ</span> How it works
+              Features
             </Link>
             <Link
               href="/pricing"
-              className="hidden md:inline-flex items-center rounded-full bg-[var(--color-brand-royal)] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:shadow-md hover:bg-[var(--color-brand-royal-hover)] transition"
+              className="hidden md:inline-flex items-center rounded-full border border-[#E5E0D8] bg-white px-4 py-2 text-sm font-semibold text-[#1A1614] hover:bg-[#F7F1EA] transition"
             >
-              <span className="mr-1" aria-hidden="true">$</span> Pricing
+              Pricing
+            </Link>
+            <Link
+              href="/security"
+              className="hidden lg:inline-flex items-center rounded-full border border-[#E5E0D8] bg-white px-4 py-2 text-sm font-semibold text-[#1A1614] hover:bg-[#F7F1EA] transition"
+            >
+              Security
+            </Link>
+            <Link
+              href="/how-it-works"
+              className="hidden lg:inline-flex items-center rounded-full border border-[#E5E0D8] bg-white px-4 py-2 text-sm font-semibold text-[#1A1614] hover:bg-[#F7F1EA] transition"
+            >
+              Examples
             </Link>
 
             {isAuthenticated ? (
@@ -241,16 +253,23 @@ export default function Home() {
       <section className="flex-1 flex items-center">
         <div className="mx-auto max-w-5xl w-full px-4 sm:px-6 py-12 sm:py-16">
           <div className="grid grid-cols-1 lg:grid-cols-2 items-start gap-12">
-            <div className="flex-1 max-w-3xl text-left space-y-6">
+            <div
+              className="flex-1 max-w-3xl text-left space-y-6"
+              style={{ fontFamily: "Inter, 'Helvetica Neue', Arial, sans-serif" }}
+            >
 
             {/* Headline */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-[#0F1419] leading-tight">
+            <h1
+              className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-[#0F1419] leading-tight tracking-tight"
+            >
               The automatic exhibit builder for lawyers.
             </h1>
 
             {/* Subheadline */}
-            <p className="text-lg sm:text-xl text-[#1A1614] max-w-2xl lg:max-w-xl">
-              Turn messy screenshots into court-ready PDFs. Drag, drop, and let CaseReady auto-sort, auto-rotate, Bates stamp, and merge in minutes.
+            <p
+              className="text-lg sm:text-xl text-[#1A1614] max-w-2xl lg:max-w-xl leading-relaxed"
+            >
+              Turn screenshots and PDFs into Bates-stamped, court-ready exhibit bundles in minutes—not hours.
             </p>
 
             {/* CTA buttons */}
