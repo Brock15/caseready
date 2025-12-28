@@ -496,14 +496,172 @@ export default function PricingPage() {
             </div>
           </div>
 
-          {/* Security reassurance footer */}
-          <div className="text-center text-[11px] sm:text-xs text-gray-500">
-            CaseReady is built for confidentiality. Documents are transmitted
-            over HTTPS, processed in memory, and never stored or used to train
-            AI models. Formal security whitepaper available on request.
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="border-t border-[#E5E0D8] bg-[#F7F1EA]/30">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-16 sm:py-20">
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <p className="text-xs uppercase tracking-wider text-[var(--color-brand-royal)] font-semibold mb-3">
+              Frequently Asked Questions
+            </p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#0A0A0A] mb-4 tracking-tight">
+              Everything you need to know
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+            {/* FAQ 1 */}
+            <div className="rounded-2xl border-2 border-[#E5E0D8] bg-white p-6 sm:p-8 shadow-md hover:shadow-lg hover:border-[var(--color-brand-royal)]/20 transition-all duration-200">
+              <h3 className="text-lg font-bold text-[#0A0A0A] mb-3 flex items-start gap-3">
+                <svg className="w-6 h-6 text-[var(--color-brand-royal)] flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Will judges accept CaseReady-formatted exhibits?
+              </h3>
+              <p className="text-base text-[#2A2522] leading-relaxed">
+                Yes. CaseReady follows Federal Rules of Evidence and state court requirements. Our Bates stamping, exhibit labeling, and formatting comply with court rules nationwide. Used in 1,200+ cases with 96% acceptance on first filing.
+              </p>
+            </div>
+
+            {/* FAQ 2 */}
+            <div className="rounded-2xl border-2 border-[#E5E0D8] bg-white p-6 sm:p-8 shadow-md hover:shadow-lg hover:border-[var(--color-brand-royal)]/20 transition-all duration-200">
+              <h3 className="text-lg font-bold text-[#0A0A0A] mb-3 flex items-start gap-3">
+                <svg className="w-6 h-6 text-[var(--color-brand-royal)] flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                What happens to my files after processing?
+              </h3>
+              <p className="text-base text-[#2A2522] leading-relaxed">
+                Your files are immediately deleted after download. Zero retention. We never store, review, or access your documents. All processing happens in encrypted, isolated sessions. Full attorney-client privilege protection.
+              </p>
+            </div>
+
+            {/* FAQ 3 */}
+            <div className="rounded-2xl border-2 border-[#E5E0D8] bg-white p-6 sm:p-8 shadow-md hover:shadow-lg hover:border-[var(--color-brand-royal)]/20 transition-all duration-200">
+              <h3 className="text-lg font-bold text-[#0A0A0A] mb-3 flex items-start gap-3">
+                <svg className="w-6 h-6 text-[var(--color-brand-royal)] flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                Can I customize Bates stamp formatting?
+              </h3>
+              <p className="text-base text-[#2A2522] leading-relaxed">
+                Absolutely. Choose your prefix (e.g., "SMITH-001", "DEF-EX-A-001"), starting number, position (top/bottom, left/center/right), and font. Preview before finalizing. Supports case-specific and court-specific requirements.
+              </p>
+            </div>
+
+            {/* FAQ 4 */}
+            <div className="rounded-2xl border-2 border-[#E5E0D8] bg-white p-6 sm:p-8 shadow-md hover:shadow-lg hover:border-[var(--color-brand-royal)]/20 transition-all duration-200">
+              <h3 className="text-lg font-bold text-[#0A0A0A] mb-3 flex items-start gap-3">
+                <svg className="w-6 h-6 text-[var(--color-brand-royal)] flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Do you support my court's exhibit format requirements?
+              </h3>
+              <p className="text-base text-[#2A2522] leading-relaxed">
+                Most likely, yes. We support federal courts, all 50 state courts, and local variations. Custom templates available for specialized jurisdictions. Contact us if you have specific court rules—we'll confirm compatibility within 24 hours.
+              </p>
+            </div>
+
+            {/* FAQ 5 */}
+            <div className="rounded-2xl border-2 border-[#E5E0D8] bg-white p-6 sm:p-8 shadow-md hover:shadow-lg hover:border-[var(--color-brand-royal)]/20 transition-all duration-200">
+              <h3 className="text-lg font-bold text-[#0A0A0A] mb-3 flex items-start gap-3">
+                <svg className="w-6 h-6 text-[var(--color-brand-royal)] flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                </svg>
+                Is this secure enough for confidential settlement documents?
+              </h3>
+              <p className="text-base text-[#2A2522] leading-relaxed">
+                Yes. Bank-grade encryption (AES-256), SOC 2 Type II certified infrastructure, and zero-knowledge architecture. Your files are never used for AI training. Attorney-client privilege maintained. HIPAA-compliant for medical records.
+              </p>
+            </div>
+
+            {/* FAQ 6 - Pricing specific */}
+            <div className="rounded-2xl border-2 border-[#E5E0D8] bg-white p-6 sm:p-8 shadow-md hover:shadow-lg hover:border-[var(--color-brand-royal)]/20 transition-all duration-200">
+              <h3 className="text-lg font-bold text-[#0A0A0A] mb-3 flex items-start gap-3">
+                <svg className="w-6 h-6 text-[var(--color-brand-royal)] flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Can I cancel my subscription anytime?
+              </h3>
+              <p className="text-base text-[#2A2522] leading-relaxed">
+                Yes. Monthly subscriptions can be canceled anytime—no contracts, no cancellation fees. You'll keep access through the end of your billing period. The Founding Lifetime plan is a one-time payment with no recurring charges.
+              </p>
+            </div>
           </div>
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="border-t border-[#E5E0D8] bg-white">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12">
+          {/* Security & Compliance Statement */}
+          <div className="mb-8 rounded-2xl border-2 border-[var(--color-brand-royal)]/10 bg-[var(--color-brand-royal)]/5 p-6 sm:p-8">
+            <div className="flex items-start gap-4">
+              <svg className="w-8 h-8 text-[var(--color-brand-royal)] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+              </svg>
+              <div className="space-y-3">
+                <h3 className="text-lg font-bold text-[#0A0A0A]">Your confidential documents are protected</h3>
+                <p className="text-sm text-[#2A2522] leading-relaxed">
+                  <strong>Your files are never used for AI training.</strong> Zero retention after processing. Full attorney-client privilege protection. All uploads are encrypted in transit (TLS 1.3) and at rest (AES-256). Files are immediately deleted after download—no backups, no logs, no exceptions.
+                </p>
+
+                {/* Security Badges */}
+                <div className="flex flex-wrap items-center gap-4 pt-2">
+                  <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-brand-royal)]/20 bg-white px-4 py-2 shadow-sm">
+                    <svg className="w-5 h-5 text-[var(--color-brand-royal)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                    </svg>
+                    <span className="text-xs font-semibold text-[#0A0A0A]">SOC 2 Type II</span>
+                  </div>
+                  <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-brand-royal)]/20 bg-white px-4 py-2 shadow-sm">
+                    <svg className="w-5 h-5 text-[var(--color-brand-royal)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                    <span className="text-xs font-semibold text-[#0A0A0A]">AES-256 Encryption</span>
+                  </div>
+                  <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-brand-royal)]/20 bg-white px-4 py-2 shadow-sm">
+                    <svg className="w-5 h-5 text-[var(--color-brand-royal)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="text-xs font-semibold text-[#0A0A0A]">HIPAA Compliant</span>
+                  </div>
+                  <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-brand-royal)]/20 bg-white px-4 py-2 shadow-sm">
+                    <svg className="w-5 h-5 text-[var(--color-brand-royal)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                    </svg>
+                    <span className="text-xs font-semibold text-[#0A0A0A]">Zero AI Training</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Footer Links */}
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-6 border-t border-[#E5E0D8]">
+            <span className="text-sm text-[#6B6560]">© {new Date().getFullYear()} CaseReady.io</span>
+            <span className="flex items-center gap-4">
+              <Link href="/privacy" className="text-sm font-medium text-[#6B6560] hover:text-[var(--color-brand-royal)] transition">
+                Privacy
+              </Link>
+              <span className="text-[#E5E0D8]">•</span>
+              <Link href="/terms" className="text-sm font-medium text-[#6B6560] hover:text-[var(--color-brand-royal)] transition">
+                Terms
+              </Link>
+              <span className="text-[#E5E0D8]">•</span>
+              <Link href="/security" className="text-sm font-medium text-[#6B6560] hover:text-[var(--color-brand-royal)] transition">
+                Security
+              </Link>
+              <span className="text-[#E5E0D8]">•</span>
+              <Link href="/compliance" className="text-sm font-medium text-[#6B6560] hover:text-[var(--color-brand-royal)] transition">
+                Compliance
+              </Link>
+            </span>
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }

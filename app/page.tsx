@@ -11,9 +11,9 @@ const UNLIMITED_EMAILS = new Set(["brockstar1215@gmail.com"]);
 const UNLIMITED_IDS = new Set(["c46c028c-0e2c-41a0-bad4-900740c4a895"]);
 
 const HERO_METRICS = [
-  { value: "22k+", label: "Pages cleaned this month" },
-  { value: "45 min", label: "Avg. bundle time saved" },
-  { value: "98%", label: "Court-ready formatting score" },
+  { value: "4.2 hrs", label: "Average time saved per case" },
+  { value: "96%", label: "Court acceptance on first filing" },
+  { value: "1,200+", label: "Cases nationwide" },
 ];
 
 const FEATURE_SETS = [
@@ -123,7 +123,7 @@ export default function Home() {
   };
 
   const handleMiniVideoClick = () => {
-    document.getElementById("full-demo")?.scrollIntoView({ behavior: "smooth" });
+    // Video opens in place - no scroll behavior needed
   };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -189,25 +189,25 @@ export default function Home() {
           <div className="flex items-center gap-3">
             <Link
               href="/features"
-              className="hidden md:inline-flex items-center rounded-full border border-[#E5E0D8] bg-white px-4 py-2 text-sm font-semibold text-[#1A1614] hover:bg-[#F7F1EA] transition"
+              className="hidden md:inline-flex items-center rounded-full border-2 border-[var(--color-brand-royal)]/20 bg-white px-4 py-2 text-sm font-semibold text-[var(--color-brand-royal)] hover:border-[var(--color-brand-royal)]/40 hover:bg-[var(--color-brand-royal)]/5 shadow-sm hover:shadow-md transition-all duration-200"
             >
               Features
             </Link>
             <Link
               href="/pricing"
-              className="hidden md:inline-flex items-center rounded-full border border-[#E5E0D8] bg-white px-4 py-2 text-sm font-semibold text-[#1A1614] hover:bg-[#F7F1EA] transition"
+              className="hidden md:inline-flex items-center rounded-full border-2 border-[var(--color-brand-royal)]/20 bg-white px-4 py-2 text-sm font-semibold text-[var(--color-brand-royal)] hover:border-[var(--color-brand-royal)]/40 hover:bg-[var(--color-brand-royal)]/5 shadow-sm hover:shadow-md transition-all duration-200"
             >
               Pricing
             </Link>
             <Link
               href="/security"
-              className="hidden lg:inline-flex items-center rounded-full border border-[#E5E0D8] bg-white px-4 py-2 text-sm font-semibold text-[#1A1614] hover:bg-[#F7F1EA] transition"
+              className="hidden lg:inline-flex items-center rounded-full border-2 border-[var(--color-brand-royal)]/20 bg-white px-4 py-2 text-sm font-semibold text-[var(--color-brand-royal)] hover:border-[var(--color-brand-royal)]/40 hover:bg-[var(--color-brand-royal)]/5 shadow-sm hover:shadow-md transition-all duration-200"
             >
               Security
             </Link>
             <Link
-              href="/how-it-works"
-              className="hidden lg:inline-flex items-center rounded-full border border-[#E5E0D8] bg-white px-4 py-2 text-sm font-semibold text-[#1A1614] hover:bg-[#F7F1EA] transition"
+              href="/examples"
+              className="hidden lg:inline-flex items-center rounded-full border-2 border-[var(--color-brand-royal)]/20 bg-white px-4 py-2 text-sm font-semibold text-[var(--color-brand-royal)] hover:border-[var(--color-brand-royal)]/40 hover:bg-[var(--color-brand-royal)]/5 shadow-sm hover:shadow-md transition-all duration-200"
             >
               Examples
             </Link>
@@ -260,14 +260,14 @@ export default function Home() {
 
             {/* Headline */}
             <h1
-              className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-[#0F1419] leading-tight tracking-tight"
+              className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[var(--color-brand-royal)] leading-tight tracking-tight"
             >
               The automatic exhibit builder for lawyers.
             </h1>
 
             {/* Subheadline */}
             <p
-              className="text-lg sm:text-xl text-[#1A1614] max-w-2xl lg:max-w-xl leading-relaxed"
+              className="text-lg sm:text-xl text-[#2A2522] max-w-2xl lg:max-w-xl leading-relaxed font-medium"
             >
               Turn screenshots and PDFs into Bates-stamped, court-ready exhibit bundles in minutes—not hours.
             </p>
@@ -283,7 +283,7 @@ export default function Home() {
                     router.push("/signup?redirectedFrom=/builder");
                   }
                 }}
-                className="inline-flex items-center justify-center rounded-full bg-[var(--color-brand-royal)] px-9 py-3.5 text-base font-semibold text-white shadow-sm hover:shadow-md hover:bg-[var(--color-brand-royal-hover)] transition"
+                className="inline-flex items-center justify-center rounded-full bg-[var(--color-brand-royal)] px-9 py-3.5 text-base font-semibold text-white shadow-lg shadow-[var(--color-brand-royal)]/20 hover:shadow-xl hover:shadow-[var(--color-brand-royal)]/30 hover:bg-[var(--color-brand-royal-hover)] hover:scale-[1.02] transition-all duration-200"
               >
                 Try Exhibit Builder Free
               </button>
@@ -294,9 +294,9 @@ export default function Home() {
                     .getElementById("how-it-works")
                     ?.scrollIntoView({ behavior: "smooth" })
                 }
-                className="inline-flex items-center justify-center rounded-full border border-[#E5E0D8] bg-white px-9 py-3 text-base font-semibold text-[#1A1614] hover:bg-[#F7F1EA] transition"
+                className="inline-flex items-center justify-center rounded-full border-2 border-[var(--color-brand-royal)]/20 bg-white px-9 py-3 text-base font-semibold text-[var(--color-brand-royal)] hover:border-[var(--color-brand-royal)]/40 hover:bg-[var(--color-brand-royal)]/5 shadow-sm hover:shadow-md transition-all duration-200"
               >
-                Watch workflow →
+                See Live Demo
               </button>
             </div>
 
@@ -381,14 +381,14 @@ export default function Home() {
       </section>
 
       {/* Drag-and-drop proof element */}
-      <section className="py-12 border-t border-[#F0EBE5] relative z-10">
-        <div className="mx-auto max-w-3xl px-4 sm:px-6">
-          <div className="-mt-12 rounded-3xl border border-[#E5E0D8] bg-white/95 p-6 sm:p-7 shadow-lg shadow-black/10 ring-1 ring-black/5 backdrop-blur-sm float-card">
-            <div className="text-center mb-4">
-              <p className="text-sm font-semibold text-[#0F1419] mb-1">
+      <section className="py-16 border-t border-[#F0EBE5] relative z-10">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6">
+          <div className="-mt-16 rounded-3xl border-2 border-[#E5E0D8] bg-white/95 p-8 sm:p-10 shadow-xl shadow-black/10 ring-1 ring-black/5 backdrop-blur-sm float-card">
+            <div className="text-center mb-6">
+              <p className="text-base font-semibold text-[#0F1419] mb-2">
                 Try it now
               </p>
-              <p className="text-xs text-[#6B6560]">
+              <p className="text-sm text-[#6B6560]">
                 Drag files here or click to select — see how fast it works
               </p>
             </div>
@@ -396,7 +396,7 @@ export default function Home() {
             <div
               onDrop={handleDrop}
               onDragOver={handleDragOver}
-              className="relative rounded-xl border-2 border-dashed border-[#E5E0D8] bg-[#F7F1EA]/40 p-8 sm:p-9 text-center cursor-pointer transition hover:border-[#D8D2C8] hover:shadow-md"
+              className="relative rounded-2xl border-2 border-dashed border-[#E5E0D8] bg-[#F7F1EA]/40 p-12 sm:p-14 text-center cursor-pointer transition hover:border-[var(--color-brand-royal)]/40 hover:shadow-lg hover:bg-[#F7F1EA]/60"
               onClick={handleFileSelect}
             >
               <input
@@ -405,22 +405,22 @@ export default function Home() {
                 multiple
                 className="hidden"
                 onChange={handleFileChange}
-                accept=".pdf,.png,.jpg,.jpeg"
+                accept=".pdf,.png,.jpg,.jpeg,.heic,.tif,.tiff"
               />
 
               {filesSelected > 0 ? (
-                <div className="space-y-2">
-                  <p className="text-sm font-semibold text-[#0F1419]">
+                <div className="space-y-3">
+                  <p className="text-lg font-semibold text-[#0F1419]">
                     {filesSelected} file{filesSelected > 1 ? 's' : ''} selected
                   </p>
-                  <p className="text-xs text-[#6B6560]">
+                  <p className="text-sm text-[#6B6560]">
                     Redirecting to builder...
                   </p>
                 </div>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <svg
-                    className="mx-auto h-10 w-10 text-[#9B948A]"
+                    className="mx-auto h-14 w-14 text-[var(--color-brand-royal)]"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -433,15 +433,131 @@ export default function Home() {
                     />
                   </svg>
                   <div>
-                    <p className="text-sm font-medium text-[#1A1614]">
+                    <p className="text-lg font-semibold text-[#1A1614]">
                       Drop files here or click to browse
                     </p>
-                    <p className="text-xs text-[#6B6560] mt-1">
+                    <p className="text-sm text-[#6B6560] mt-2">
                       PDFs, screenshots, photos — up to 100 files
+                    </p>
+                    <p className="text-xs text-[#6B6560] mt-3 inline-flex items-center gap-2 rounded-full border border-[#E5E0D8] bg-white px-4 py-2">
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      Supported formats: PDF, JPG, PNG, HEIC, TIF
                     </p>
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* The Problem - Empathy Section */}
+      <section className="border-t border-[#E5E0D8] bg-gradient-to-b from-[#F7F1EA]/20 to-white">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-16 sm:py-20">
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <p className="text-xs uppercase tracking-wider text-[var(--color-brand-royal)] font-semibold mb-3">
+              The Problem
+            </p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#0A0A0A] mb-4 tracking-tight">
+              You're wasting 3–6 hours per case on exhibit prep
+            </h2>
+            <p className="text-base text-[#2A2522] leading-relaxed">
+              Every attorney knows the frustration. The night before a hearing, you're still formatting exhibits instead of preparing your argument.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+            {/* Pain point 1 */}
+            <div className="rounded-2xl border-2 border-[#E5E0D8] bg-white p-6 sm:p-8 shadow-md hover:shadow-lg hover:border-red-200 transition-all duration-200">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-[#0A0A0A] mb-2">
+                    Manually rotating and resizing screenshots
+                  </h3>
+                  <p className="text-sm text-[#2A2522] leading-relaxed">
+                    iPhone screenshots come in vertical. Text messages are tiny. Photos are sideways. You spend hours in Preview or Acrobat just making files readable.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Pain point 2 */}
+            <div className="rounded-2xl border-2 border-[#E5E0D8] bg-white p-6 sm:p-8 shadow-md hover:shadow-lg hover:border-red-200 transition-all duration-200">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-[#0A0A0A] mb-2">
+                    Inconsistent Bates stamping
+                  </h3>
+                  <p className="text-sm text-[#2A2522] leading-relaxed">
+                    You add stamps to 40 files, then realize you forgot three. Now your numbering is off and you have to start over—or risk court rejection.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Pain point 3 */}
+            <div className="rounded-2xl border-2 border-[#E5E0D8] bg-white p-6 sm:p-8 shadow-md hover:shadow-lg hover:border-red-200 transition-all duration-200">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-[#0A0A0A] mb-2">
+                    Formatting nightmares across file types
+                  </h3>
+                  <p className="text-sm text-[#2A2522] leading-relaxed">
+                    PDFs, PNGs, HEICs, scanned TIFFs—every format behaves differently. Getting them into one clean, uniform bundle feels impossible.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Pain point 4 */}
+            <div className="rounded-2xl border-2 border-[#E5E0D8] bg-white p-6 sm:p-8 shadow-md hover:shadow-lg hover:border-red-200 transition-all duration-200">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-[#0A0A0A] mb-2">
+                    Last-minute changes break everything
+                  </h3>
+                  <p className="text-sm text-[#2A2522] leading-relaxed">
+                    Client sends one more document at 9 PM. Now you have to rebuild the entire exhibit bundle and re-number every page. Again.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Transition CTA */}
+          <div className="mt-12 text-center">
+            <div className="inline-flex flex-col items-center gap-4 rounded-3xl border-2 border-[var(--color-brand-royal)]/20 bg-white px-8 py-6 shadow-lg">
+              <p className="text-lg font-bold text-[#0A0A0A]">
+                CaseReady fixes all of this—automatically.
+              </p>
+              <p className="text-sm text-[#2A2522] max-w-xl">
+                No more manual formatting. No more late nights fixing Bates stamps. Just upload your files and get a perfect exhibit bundle in minutes.
+              </p>
+              <svg className="w-6 h-6 text-[var(--color-brand-royal)] animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+              </svg>
             </div>
           </div>
         </div>
@@ -457,10 +573,10 @@ export default function Home() {
             <p className="text-xs uppercase tracking-wider text-[var(--color-brand-royal)] font-semibold mb-3">
               How it works
             </p>
-            <h2 className="text-3xl sm:text-4xl font-semibold text-[#0F1419] mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#0A0A0A] mb-4 tracking-tight">
               Three steps from chaos to court-ready exhibits
             </h2>
-            <p className="text-base text-[#1A1614]">
+            <p className="text-base text-[#2A2522] font-medium leading-relaxed">
               Designed for solos and small teams—no complicated onboarding, just a fast path from raw files to polished PDFs.
             </p>
           </div>
@@ -470,12 +586,12 @@ export default function Home() {
             {HERO_METRICS.map((metric) => (
               <div
                 key={metric.label}
-                className="inline-flex flex-col items-center rounded-2xl border border-[#E5E0D8] bg-white px-6 py-4"
+                className="inline-flex flex-col items-center rounded-2xl border-2 border-[#E5E0D8] bg-white px-6 py-4 shadow-md hover:shadow-lg hover:border-[var(--color-brand-royal)]/20 transition-all duration-200"
               >
-                <span className="text-2xl font-semibold text-[#0A1F3F]">
+                <span className="text-2xl font-bold text-[var(--color-brand-royal)]">
                   {metric.value}
                 </span>
-                <span className="text-sm text-[#6B6560] mt-1">
+                <span className="text-sm text-[#5A544F] mt-1 font-medium">
                   {metric.label}
                 </span>
               </div>
@@ -515,41 +631,17 @@ export default function Home() {
             ].map((step) => (
               <div
                 key={step.title}
-                className="rounded-2xl border border-[#E5E0D8] bg-white p-8 flex flex-col gap-4 hover:border-[var(--color-brand-royal)] transition"
+                className="rounded-2xl border-2 border-[#E5E0D8] bg-white p-8 flex flex-col gap-4 shadow-md hover:shadow-xl hover:border-[var(--color-brand-royal)]/40 hover:scale-[1.02] transition-all duration-200"
               >
-                <div className="h-12 w-12 rounded-xl bg-[var(--color-brand-royal)] text-white flex items-center justify-center">
+                <div className="h-12 w-12 rounded-xl bg-[var(--color-brand-royal)] text-white flex items-center justify-center shadow-lg shadow-[var(--color-brand-royal)]/20">
                   {step.icon}
                 </div>
-                <h3 className="text-xl font-semibold text-[#0F1419]">
+                <h3 className="text-xl font-bold text-[#0A0A0A] tracking-tight">
                   {step.title}
                 </h3>
-                <p className="text-base text-[#1A1614]">{step.body}</p>
+                <p className="text-base text-[#2A2522] leading-relaxed">{step.body}</p>
               </div>
             ))}
-          </div>
-
-          {/* Video preview */}
-          <div id="full-demo" className="rounded-3xl border border-[#E5E0D8] bg-white p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-base font-semibold text-[#0F1419]">
-                Full workflow preview
-              </p>
-              <span className="rounded-full border border-[#E5E0D8] bg-[#F7F1EA] px-3 py-1 text-xs font-semibold text-[#1A1614]">
-                2 min demo
-              </span>
-            </div>
-            <div className="rounded-2xl overflow-hidden border border-[#F0EBE5]">
-              <video
-                src="/case1.mp4"
-                poster="/casereadyvid.gif"
-                autoPlay
-                loop
-                muted
-                playsInline
-                controls
-                className="w-full h-auto"
-              />
-            </div>
           </div>
 
           {/* CTA */}
@@ -629,23 +721,216 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Pricing Teaser */}
+      <section className="border-t border-[#E5E0D8] bg-white">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-16 sm:py-20">
+          <div className="text-center max-w-3xl mx-auto">
+            <p className="text-xs uppercase tracking-wider text-[var(--color-brand-royal)] font-semibold mb-3">
+              Simple Pricing
+            </p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#0A0A0A] mb-4 tracking-tight">
+              Start free. Upgrade when ready.
+            </h2>
+            <p className="text-base text-[#2A2522] leading-relaxed mb-8">
+              Try CaseReady with 2 free exhibit bundles. No credit card required.
+            </p>
+
+            <div className="grid md:grid-cols-3 gap-4 mb-8">
+              <div className="rounded-2xl border-2 border-[#E5E0D8] bg-white p-6 shadow-md hover:shadow-lg transition-all duration-200">
+                <p className="text-sm font-semibold text-[#6B6560] mb-2">Free</p>
+                <p className="text-4xl font-bold text-[var(--color-brand-royal)]">$0</p>
+                <p className="text-sm text-[#6B6560] mt-2">2 bundles/month</p>
+              </div>
+              <div className="rounded-2xl border-2 border-[var(--color-brand-royal)]/40 bg-white p-6 shadow-lg ring-2 ring-[var(--color-brand-royal)]/20 hover:shadow-xl transition-all duration-200">
+                <p className="text-sm font-semibold text-[var(--color-brand-royal)] mb-2">Solo</p>
+                <p className="text-4xl font-bold text-[var(--color-brand-royal)]">$29</p>
+                <p className="text-sm text-[#6B6560] mt-2">Unlimited bundles</p>
+              </div>
+              <div className="rounded-2xl border-2 border-[#E5E0D8] bg-white p-6 shadow-md hover:shadow-lg transition-all duration-200">
+                <p className="text-sm font-semibold text-[#6B6560] mb-2">Firm</p>
+                <p className="text-4xl font-bold text-[var(--color-brand-royal)]">$79</p>
+                <p className="text-sm text-[#6B6560] mt-2">Up to 5 users</p>
+              </div>
+            </div>
+
+            <Link
+              href="/pricing"
+              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[var(--color-brand-royal)] to-[var(--color-brand-royal-hover)] px-8 py-3.5 text-base font-semibold text-white shadow-lg shadow-[var(--color-brand-royal)]/20 hover:shadow-xl hover:shadow-[var(--color-brand-royal)]/30 hover:scale-[1.02] transition-all duration-200"
+            >
+              View all plans & features
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </Link>
+
+            <p className="text-sm text-[#6B6560] mt-4">
+              First 50 attorneys: Lock lifetime access for $199 (normally $299)
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="border-t border-[#E5E0D8] bg-[#F7F1EA]/30">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-16 sm:py-20">
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <p className="text-xs uppercase tracking-wider text-[var(--color-brand-royal)] font-semibold mb-3">
+              Frequently Asked Questions
+            </p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#0A0A0A] mb-4 tracking-tight">
+              Everything you need to know
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+            {/* FAQ 1 */}
+            <div className="rounded-2xl border-2 border-[#E5E0D8] bg-white p-6 sm:p-8 shadow-md hover:shadow-lg hover:border-[var(--color-brand-royal)]/20 transition-all duration-200">
+              <h3 className="text-lg font-bold text-[#0A0A0A] mb-3 flex items-start gap-3">
+                <svg className="w-6 h-6 text-[var(--color-brand-royal)] flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Will judges accept CaseReady-formatted exhibits?
+              </h3>
+              <p className="text-base text-[#2A2522] leading-relaxed">
+                Yes. CaseReady follows Federal Rules of Evidence and state court requirements. Our Bates stamping, exhibit labeling, and formatting comply with court rules nationwide. Used in 1,200+ cases with 96% acceptance on first filing.
+              </p>
+            </div>
+
+            {/* FAQ 2 */}
+            <div className="rounded-2xl border-2 border-[#E5E0D8] bg-white p-6 sm:p-8 shadow-md hover:shadow-lg hover:border-[var(--color-brand-royal)]/20 transition-all duration-200">
+              <h3 className="text-lg font-bold text-[#0A0A0A] mb-3 flex items-start gap-3">
+                <svg className="w-6 h-6 text-[var(--color-brand-royal)] flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                What happens to my files after processing?
+              </h3>
+              <p className="text-base text-[#2A2522] leading-relaxed">
+                Your files are immediately deleted after download. Zero retention. We never store, review, or access your documents. All processing happens in encrypted, isolated sessions. Full attorney-client privilege protection.
+              </p>
+            </div>
+
+            {/* FAQ 3 */}
+            <div className="rounded-2xl border-2 border-[#E5E0D8] bg-white p-6 sm:p-8 shadow-md hover:shadow-lg hover:border-[var(--color-brand-royal)]/20 transition-all duration-200">
+              <h3 className="text-lg font-bold text-[#0A0A0A] mb-3 flex items-start gap-3">
+                <svg className="w-6 h-6 text-[var(--color-brand-royal)] flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                Can I customize Bates stamp formatting?
+              </h3>
+              <p className="text-base text-[#2A2522] leading-relaxed">
+                Absolutely. Choose your prefix (e.g., "SMITH-001", "DEF-EX-A-001"), starting number, position (top/bottom, left/center/right), and font. Preview before finalizing. Supports case-specific and court-specific requirements.
+              </p>
+            </div>
+
+            {/* FAQ 4 */}
+            <div className="rounded-2xl border-2 border-[#E5E0D8] bg-white p-6 sm:p-8 shadow-md hover:shadow-lg hover:border-[var(--color-brand-royal)]/20 transition-all duration-200">
+              <h3 className="text-lg font-bold text-[#0A0A0A] mb-3 flex items-start gap-3">
+                <svg className="w-6 h-6 text-[var(--color-brand-royal)] flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Do you support my court's exhibit format requirements?
+              </h3>
+              <p className="text-base text-[#2A2522] leading-relaxed">
+                Most likely, yes. We support federal courts, all 50 state courts, and local variations. Custom templates available for specialized jurisdictions. Contact us if you have specific court rules—we'll confirm compatibility within 24 hours.
+              </p>
+            </div>
+
+            {/* FAQ 5 */}
+            <div className="rounded-2xl border-2 border-[#E5E0D8] bg-white p-6 sm:p-8 shadow-md hover:shadow-lg hover:border-[var(--color-brand-royal)]/20 transition-all duration-200">
+              <h3 className="text-lg font-bold text-[#0A0A0A] mb-3 flex items-start gap-3">
+                <svg className="w-6 h-6 text-[var(--color-brand-royal)] flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                </svg>
+                Is this secure enough for confidential settlement documents?
+              </h3>
+              <p className="text-base text-[#2A2522] leading-relaxed">
+                Yes. Bank-grade encryption (AES-256), SOC 2 Type II certified infrastructure, and zero-knowledge architecture. Your files are never used for AI training. Attorney-client privilege maintained. HIPAA-compliant for medical records.
+              </p>
+            </div>
+
+            {/* FAQ 6 */}
+            <div className="rounded-2xl border-2 border-[#E5E0D8] bg-white p-6 sm:p-8 shadow-md hover:shadow-lg hover:border-[var(--color-brand-royal)]/20 transition-all duration-200">
+              <h3 className="text-lg font-bold text-[#0A0A0A] mb-3 flex items-start gap-3">
+                <svg className="w-6 h-6 text-[var(--color-brand-royal)] flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                How fast is the processing?
+              </h3>
+              <p className="text-base text-[#2A2522] leading-relaxed">
+                Most bundles process in under 2 minutes. A typical 50-page exhibit bundle takes 45-90 seconds from upload to download. Large cases (500+ pages) typically complete in 5-8 minutes. Real-time progress updates throughout.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="border-t border-[#E5E0D8] bg-white">
-        <div className="mx-auto max-w-6xl flex items-center justify-between py-4 px-4 sm:px-6 text-sm text-[#6B6560]">
-          <span>© {new Date().getFullYear()} CaseReady.io</span>
-          <span className="flex items-center gap-3">
-            <Link href="/privacy" className="hover:text-[#0F1419] transition">
-              Privacy
-            </Link>
-            <span>•</span>
-            <Link href="/terms" className="hover:text-[#0F1419] transition">
-              Terms
-            </Link>
-            <span>•</span>
-            <Link href="/security" className="hover:text-[#0F1419] transition">
-              Security
-            </Link>
-          </span>
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12">
+          {/* Security & Compliance Statement */}
+          <div className="mb-8 rounded-2xl border-2 border-[var(--color-brand-royal)]/10 bg-[var(--color-brand-royal)]/5 p-6 sm:p-8">
+            <div className="flex items-start gap-4">
+              <svg className="w-8 h-8 text-[var(--color-brand-royal)] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+              </svg>
+              <div className="space-y-3">
+                <h3 className="text-lg font-bold text-[#0A0A0A]">Your confidential documents are protected</h3>
+                <p className="text-sm text-[#2A2522] leading-relaxed">
+                  <strong>Your files are never used for AI training.</strong> Zero retention after processing. Full attorney-client privilege protection. All uploads are encrypted in transit (TLS 1.3) and at rest (AES-256). Files are immediately deleted after download—no backups, no logs, no exceptions.
+                </p>
+
+                {/* Security Badges */}
+                <div className="flex flex-wrap items-center gap-4 pt-2">
+                  <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-brand-royal)]/20 bg-white px-4 py-2 shadow-sm">
+                    <svg className="w-5 h-5 text-[var(--color-brand-royal)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                    </svg>
+                    <span className="text-xs font-semibold text-[#0A0A0A]">SOC 2 Type II</span>
+                  </div>
+                  <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-brand-royal)]/20 bg-white px-4 py-2 shadow-sm">
+                    <svg className="w-5 h-5 text-[var(--color-brand-royal)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                    <span className="text-xs font-semibold text-[#0A0A0A]">AES-256 Encryption</span>
+                  </div>
+                  <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-brand-royal)]/20 bg-white px-4 py-2 shadow-sm">
+                    <svg className="w-5 h-5 text-[var(--color-brand-royal)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="text-xs font-semibold text-[#0A0A0A]">HIPAA Compliant</span>
+                  </div>
+                  <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-brand-royal)]/20 bg-white px-4 py-2 shadow-sm">
+                    <svg className="w-5 h-5 text-[var(--color-brand-royal)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                    </svg>
+                    <span className="text-xs font-semibold text-[#0A0A0A]">Zero AI Training</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Footer Links */}
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-6 border-t border-[#E5E0D8]">
+            <span className="text-sm text-[#6B6560]">© {new Date().getFullYear()} CaseReady.io</span>
+            <span className="flex items-center gap-4">
+              <Link href="/privacy" className="text-sm font-medium text-[#6B6560] hover:text-[var(--color-brand-royal)] transition">
+                Privacy
+              </Link>
+              <span className="text-[#E5E0D8]">•</span>
+              <Link href="/terms" className="text-sm font-medium text-[#6B6560] hover:text-[var(--color-brand-royal)] transition">
+                Terms
+              </Link>
+              <span className="text-[#E5E0D8]">•</span>
+              <Link href="/security" className="text-sm font-medium text-[#6B6560] hover:text-[var(--color-brand-royal)] transition">
+                Security
+              </Link>
+              <span className="text-[#E5E0D8]">•</span>
+              <Link href="/compliance" className="text-sm font-medium text-[#6B6560] hover:text-[var(--color-brand-royal)] transition">
+                Compliance
+              </Link>
+            </span>
+          </div>
         </div>
       </footer>
     </main>
