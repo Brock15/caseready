@@ -9,7 +9,7 @@ import {
   rgb,
 } from "pdf-lib";
 import sharp from "sharp";
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from "@/lib/supabaseConfig";
 import {
   FormatOptions,
@@ -530,15 +530,29 @@ const loadPdfOrImageAsPages = async (
 export async function POST(req: NextRequest) {
   try {
     const cookieStore = await cookies();
-    const supabase = createRouteHandlerClient(
+    const supabase = createServerClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY,
       {
-        cookies: (() => cookieStore) as unknown as () => ReturnType<
-          typeof cookies
-        >,
-      },
-      {
-        supabaseUrl: SUPABASE_URL,
-        supabaseKey: SUPABASE_ANON_KEY,
+        cookies: {
+          get(name: string) {
+            return cookieStore.get(name)?.value;
+          },
+          set(name: string, value: string, options: CookieOptions) {
+            try {
+              cookieStore.set({ name, value, ...options });
+            } catch (error) {
+              // Cookie setting can fail in middleware
+            }
+          },
+          remove(name: string, options: CookieOptions) {
+            try {
+              cookieStore.set({ name, value: "", ...options });
+            } catch (error) {
+              // Cookie removal can fail in middleware
+            }
+          },
+        },
       }
     );
     const {
