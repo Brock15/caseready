@@ -171,28 +171,40 @@ export default function RedactPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50">
-      <div className="mx-auto max-w-4xl px-4 py-10 sm:py-14">
-        <div className="text-center mb-8">
-          <span className="inline-flex items-center rounded-full bg-blue-100 text-blue-700 px-3 py-1 text-xs font-semibold">
-            Stealth Mode • PDF Redaction
-          </span>
-          <h1 className="mt-3 text-3xl font-semibold text-slate-900">
-            Redact sensitive details in seconds
-          </h1>
-          <p className="mt-2 text-sm text-slate-600">
-            Upload a PDF, choose what to hide, and download the redacted version securely.
-          </p>
-        </div>
+    <main className="min-h-screen bg-[#F5F2ED]">
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 py-12 space-y-8">
+        {/* Header */}
+        <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between pb-2 border-b border-[#E5E0D8]">
+          <div>
+            <p className="text-xs uppercase tracking-[0.3em] text-[var(--color-brand-royal)] font-semibold">
+              Stealth Redaction
+            </p>
+            <h1 className="text-3xl font-semibold text-[#0F1419] tracking-tight mt-2">
+              Secure client-side PDF redaction
+            </h1>
+            <p className="text-sm text-[#6B6560] mt-2 max-w-2xl">
+              Remove sensitive information from legal documents. All processing happens in your browser—nothing is stored or sent to our servers.
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center rounded-full border border-[#E5E0D8] bg-white px-4 py-2 text-xs font-semibold text-[#1A1614] hover:bg-[#F5F2ED] transition"
+            >
+              ← Dashboard
+            </Link>
+          </div>
+        </header>
 
-        <div className="rounded-3xl bg-white shadow-xl border border-slate-100 p-6 sm:p-8 space-y-6">
+        {/* Main upload card */}
+        <section className="rounded-3xl border border-[#E5E0D8] bg-white p-8 shadow-sm space-y-6">
           {error && (
-            <div className="rounded-2xl border border-red-200 bg-red-50 text-red-700 px-4 py-3 text-sm">
+            <div className="rounded-2xl border border-red-200 bg-red-50 text-red-700 px-4 py-3 text-sm font-medium">
               {error}
             </div>
           )}
           {status && !error && (
-            <div className="rounded-2xl border border-blue-100 bg-blue-50 text-blue-800 px-4 py-3 text-sm">
+            <div className="rounded-2xl border border-[var(--color-brand-royal)]/20 bg-[var(--color-brand-royal)]/5 text-[#0A1F3F] px-4 py-3 text-sm font-medium">
               {status}
             </div>
           )}
@@ -201,16 +213,16 @@ export default function RedactPage() {
             onDrop={onDrop}
             onDragOver={onDragOver}
             onDragLeave={onDragLeave}
-            className={`rounded-2xl border-2 border-dashed px-5 py-8 text-center transition ${
-              isDragging ? "border-blue-400 bg-blue-50" : "border-slate-200 bg-slate-50"
+            className={`rounded-2xl border-2 border-dashed px-5 py-8 text-center transition-all ${
+              isDragging ? "border-[var(--color-brand-royal)] bg-[var(--color-brand-royal)]/5" : "border-[#E5E0D8] bg-[#F5F2ED]/50"
             }`}
           >
-            <p className="text-sm font-semibold text-slate-800">
+            <p className="text-sm font-semibold text-[#0F1419]">
               Drag & drop a PDF or click to upload
             </p>
-            <p className="text-xs text-slate-500 mt-1">Single PDF up to ~20MB</p>
+            <p className="text-xs text-[#6B6560] mt-1">Single PDF up to ~20MB</p>
             <div className="mt-4">
-              <label className="inline-flex cursor-pointer items-center rounded-full bg-[#0056D6] px-4 py-2 text-sm font-semibold text-white shadow hover:brightness-110">
+              <label className="inline-flex cursor-pointer items-center rounded-full bg-[var(--color-brand-royal)] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[var(--color-brand-royal-hover)] transition">
                 Choose PDF
                 <input
                   type="file"
@@ -220,15 +232,15 @@ export default function RedactPage() {
                 />
               </label>
             </div>
-            <p className="mt-3 text-[11px] text-slate-500">
+            <p className="mt-3 text-[11px] text-[#6B6560]">
               Your files are processed securely and are not stored on our servers.
             </p>
             {file && (
-              <div className="mt-4 inline-flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 shadow-sm">
+              <div className="mt-4 inline-flex items-center gap-3 rounded-xl border border-[#E5E0D8] bg-white px-4 py-2 text-sm text-[#0F1419] shadow-sm">
                 <span className="font-semibold">{file.name}</span>
-                <span className="text-xs text-slate-500">{formatBytes(file.size)}</span>
+                <span className="text-xs text-[#6B6560]">{formatBytes(file.size)}</span>
                 {pageCount !== null && (
-                  <span className="text-xs text-slate-500">{pageCount} pages</span>
+                  <span className="text-xs text-[#6B6560]">{pageCount} pages</span>
                 )}
               </div>
             )}
@@ -262,7 +274,7 @@ export default function RedactPage() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-slate-800">
+            <label className="text-sm font-semibold text-[#0F1419]">
               Custom regex (advanced)
             </label>
             <input
@@ -272,9 +284,9 @@ export default function RedactPage() {
               onChange={(event) =>
                 setOptions((prev) => ({ ...prev, customPattern: event.target.value }))
               }
-              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 focus:border-blue-500 focus:outline-none"
+              className="w-full rounded-2xl border border-[#E5E0D8] bg-white px-4 py-2.5 text-sm text-[#0F1419] focus:border-[var(--color-brand-royal)] focus:outline-none"
             />
-            <p className="text-[11px] text-slate-500">
+            <p className="text-[11px] text-[#6B6560]">
               Regex is applied on normalized line text (lowercase). Leave blank to skip.
             </p>
           </div>
@@ -284,10 +296,10 @@ export default function RedactPage() {
               type="button"
               onClick={handleSubmit}
               disabled={!file || isLoading}
-              className={`inline-flex items-center justify-center rounded-full px-5 py-2.5 text-sm font-semibold text-white shadow ${
+              className={`inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold text-white shadow-sm transition ${
                 !file || isLoading
-                  ? "bg-slate-400 cursor-not-allowed"
-                  : "bg-[#0056D6] hover:brightness-110"
+                  ? "bg-gray-300 cursor-not-allowed"
+                  : "bg-[var(--color-brand-royal)] hover:bg-[var(--color-brand-royal-hover)]"
               }`}
             >
               {isLoading ? "Redacting…" : "Redact PDF"}
@@ -296,22 +308,22 @@ export default function RedactPage() {
               <a
                 href={downloadUrl}
                 download="redacted.pdf"
-                className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-800 shadow-sm hover:bg-slate-50"
+                className="inline-flex items-center justify-center rounded-full border border-[#E5E0D8] bg-white px-6 py-3 text-sm font-semibold text-[#0F1419] shadow-sm hover:bg-[#F5F2ED] transition"
               >
                 Download redacted PDF
               </a>
             )}
           </div>
 
-          <div className="rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3 text-xs text-slate-600">
-            <p className="font-semibold text-slate-800">Notes & tuning</p>
+          <div className="rounded-2xl border border-[#E5E0D8] bg-[#F5F2ED]/50 px-4 py-3 text-xs text-[#6B6560]">
+            <p className="font-semibold text-[#0F1419]">Notes & tuning</p>
             <ul className="mt-2 list-disc space-y-1 pl-5">
-              <li>Regex patterns live in <code>lib/redaction/redactPdf.ts</code>.</li>
+              <li>Regex patterns live in <code className="text-[#0A1F3F]">lib/redaction/redactPdf.ts</code>.</li>
               <li>Redactions cover entire matching lines; swap detection to plug in OCR/PII later.</li>
-              <li>Rectangles are opaque black; adjust color or padding in <code>redactPdf</code>.</li>
+              <li>Rectangles are opaque black; adjust color or padding in <code className="text-[#0A1F3F]">redactPdf</code>.</li>
             </ul>
           </div>
-        </div>
+        </section>
       </div>
     </main>
   );
@@ -326,16 +338,16 @@ type OptionRowProps = {
 
 function OptionRow({ label, description, checked, onChange }: OptionRowProps) {
   return (
-    <label className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 shadow-sm">
+    <label className="flex items-start gap-3 rounded-2xl border border-[#E5E0D8] bg-[#F5F2ED]/50 px-4 py-3 text-sm text-[#0F1419] shadow-sm cursor-pointer hover:border-[var(--color-brand-royal)]/30 transition">
       <input
         type="checkbox"
         checked={checked}
         onChange={onChange}
-        className="mt-1 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+        className="mt-1 h-4 w-4 rounded border-[#E5E0D8] text-[var(--color-brand-royal)] focus:ring-[var(--color-brand-royal)]"
       />
       <span>
         <span className="font-semibold">{label}</span>
-        <p className="text-xs text-slate-500">{description}</p>
+        <p className="text-xs text-[#6B6560]">{description}</p>
       </span>
     </label>
   );

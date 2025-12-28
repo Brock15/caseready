@@ -51,11 +51,11 @@ const quickActions: QuickAction[] = [
 export default function DashboardClient({
   initialSession,
 }: {
-  initialSession: Session;
-}) {
+  initialSession?: Session | null;
+} = {}) {
   const supabase = useMemo(() => createBrowserSupabaseClient(), []);
   const router = useRouter();
-  const [session, setSession] = useState<Session | null>(initialSession);
+  const [session, setSession] = useState<Session | null>(initialSession || null);
   const [search, setSearch] = useState("");
   const [documents, setDocuments] = useState<
     {
@@ -89,6 +89,20 @@ export default function DashboardClient({
   const exportsLimit = 2;
   const exportsLeft = Math.max(0, exportsLimit - exportsUsed);
 
+  // Load initial session if not provided
+  useEffect(() => {
+    if (!initialSession) {
+      supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+        if (currentSession) {
+          setSession(currentSession);
+        } else {
+          router.replace("/signin?redirectedFrom=/dashboard");
+        }
+      });
+    }
+  }, [initialSession, router, supabase]);
+
+  // Listen for auth changes
   useEffect(() => {
     const {
       data: { subscription },
@@ -239,45 +253,49 @@ export default function DashboardClient({
       {/* Main content */}
       <main className="mx-auto max-w-6xl px-4 sm:px-6 py-12 space-y-8">
         {/* Welcome */}
-        <div>
-          <h1 className="text-3xl font-semibold text-[#0F1419]">
+        <div className="pb-2 border-b border-[#E5E0D8]">
+          <h1 className="text-3xl font-semibold text-[#0F1419] tracking-tight">
             {session?.user?.user_metadata?.full_name
-              ? `Hi, ${session.user.user_metadata.full_name.split(" ")[0]}`
+              ? `Welcome back, ${session.user.user_metadata.full_name.split(" ")[0]}`
               : "Your workspace"}
           </h1>
-          <p className="text-base text-[#6B6560] mt-1">
-            Continue prepping exhibits or explore new automation tools.
+          <p className="text-sm text-[#6B6560] mt-2 flex items-center gap-2">
+            <span>{documents.length} active {documents.length === 1 ? 'matter' : 'matters'}</span>
           </p>
         </div>
 
         {/* Primary action - Create Exhibit Packet */}
-        <section className="rounded-3xl border border-[#E5E0D8] bg-white p-8 shadow-sm hover:shadow-lg transition">
-          <div className="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between">
+        <section className="rounded-3xl border-2 border-[#0A1F3F]/10 bg-gradient-to-br from-white via-white to-[#F7F1EA]/30 p-10 shadow-md hover:shadow-xl transition-shadow duration-300">
+          <div className="flex flex-col md:flex-row gap-8 items-start md:items-center justify-between">
             <div className="flex-1">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-2xl">📁</span>
-                <h2 className="text-2xl font-semibold text-[#0F1419]">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="text-4xl">📁</span>
+                <h2 className="text-2xl font-semibold text-[#0F1419] tracking-tight">
                   Create Exhibit Packet
                 </h2>
               </div>
-              <p className="text-base text-[#1A1614] mb-4">
-                Upload screenshots → auto-sort → Bates stamp → export judge-ready PDF.
+              <p className="text-base text-[#6B6560] mb-4 max-w-xl leading-relaxed">
+                Upload exhibits, apply Bates stamps, and export court-ready PDFs with automatic formatting and indexing.
               </p>
-              <div className="flex items-center gap-3 text-sm text-[#6B6560]">
-                <span className="inline-flex items-center gap-1.5">
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  {hasPremium ? "Unlimited exports" : `${exportsLeft} of ${exportsLimit} exports remaining`}
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#0A1F3F]/5 border border-[#0A1F3F]/10">
+                <svg className="w-4 h-4 text-[#0A1F3F]/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" fill="none" strokeWidth="2"/>
+                  <path d="M12 6v6l4 2" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"/>
+                </svg>
+                <span className="text-sm font-medium text-[#0A1F3F]">
+                  {hasPremium ? "Unlimited exports" : `${exportsLeft} free exports remaining`}
                 </span>
               </div>
             </div>
             <button
               type="button"
               onClick={() => router.push("/builder")}
-              className="inline-flex items-center gap-2 rounded-full bg-[var(--color-brand-royal)] px-8 py-3 text-base font-semibold text-white hover:bg-[var(--color-brand-royal-hover)] transition shadow-sm"
+              className="inline-flex items-center gap-2 rounded-full bg-[var(--color-brand-royal)] px-10 py-4 text-base font-semibold text-white hover:bg-[var(--color-brand-royal-hover)] transition-all shadow-lg shadow-[var(--color-brand-royal)]/20 hover:shadow-xl hover:shadow-[var(--color-brand-royal)]/30 hover:-translate-y-0.5"
             >
               Open Exhibit Builder
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
             </button>
           </div>
         </section>
@@ -285,7 +303,7 @@ export default function DashboardClient({
         {/* Recent Matters */}
         <section>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-[#0F1419]">Recent Matters</h2>
+            <h2 className="text-lg font-semibold text-[#0F1419] tracking-tight">Recent Matters</h2>
             <div className="flex items-center rounded-full border border-[#E5E0D8] bg-white px-4 py-2 text-sm">
               <span className="mr-2 text-[#6B6560]">🔎</span>
               <input
@@ -330,64 +348,68 @@ export default function DashboardClient({
                     {starredDocs.map((doc) => (
                       <div
                         key={doc.id}
-                        className="relative flex flex-col md:flex-row gap-4 rounded-2xl border border-[#E5E0D8] bg-white p-6 hover:border-[var(--color-brand-royal)] transition"
+                        className="rounded-2xl border border-[#E5E0D8] bg-white hover:border-[#0A1F3F]/20 hover:shadow-sm transition-all duration-200 overflow-hidden group"
                       >
-                        <button
-                          type="button"
-                          onClick={() => toggleStar(doc.id, !doc.starred)}
-                          className={`absolute right-4 top-4 text-xl ${
-                            doc.starred ? "text-yellow-500" : "text-gray-300 hover:text-yellow-500"
-                          }`}
-                          aria-label={doc.starred ? "Unstar matter" : "Star matter"}
-                        >
-                          {doc.starred ? "★" : "☆"}
-                        </button>
-                        <div className="flex-1">
-                          <Link
-                            href={`/matters/${doc.id}`}
-                            className="text-lg font-semibold text-[#0F1419] hover:text-[var(--color-brand-royal)] transition"
-                          >
-                            {doc.title}
-                          </Link>
-                          <p className="text-sm text-[#6B6560] mt-1">
-                            Updated {doc.updated} · Owner {doc.owner}
-                          </p>
-                          <div className="mt-3 flex flex-wrap gap-2">
-                            {doc.tags.map((tag) => (
-                              <span
-                                key={tag}
-                                className="rounded-full border border-[#E5E0D8] bg-[#F5F2ED] px-3 py-1 text-xs font-medium text-[#1A1614]"
-                              >
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <span
-                            className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${
+                        {/* Header stripe */}
+                        <div className="h-1 bg-gradient-to-r from-[var(--color-brand-royal)]/60 via-[var(--color-brand-royal)]/30 to-transparent" />
+
+                        <div className="p-6">
+                          {/* Title row */}
+                          <div className="flex items-start justify-between gap-4 mb-3">
+                            <h3 className="text-lg font-semibold text-[#0F1419] tracking-tight leading-tight">
+                              {doc.title}
+                            </h3>
+                            <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${
                               doc.status === "Ready"
-                                ? "bg-green-50 text-green-700 border border-green-200"
-                                : doc.status === "Draft"
-                                ? "bg-amber-50 text-amber-800 border border-amber-200"
-                                : "bg-blue-50 text-blue-800 border border-blue-200"
-                            }`}
-                          >
-                            {doc.status}
-                          </span>
-                          <Link
-                            href={`/matters/${doc.id}`}
-                            className="inline-flex items-center rounded-full border border-[#E5E0D8] bg-white px-3 py-1 text-xs font-semibold text-[#1A1614] hover:bg-[#F5F2ED] transition"
-                          >
-                            Open
-                          </Link>
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteMatter(doc.id)}
-                            className="inline-flex items-center rounded-full border border-red-200 bg-red-50 px-3 py-1 text-xs font-semibold text-red-700 hover:bg-red-100 transition"
-                          >
-                            Delete
-                          </button>
+                                ? "bg-[#0A1F3F]/5 text-[#0A1F3F] border border-[#0A1F3F]/10"
+                                : "bg-[#6B6560]/5 text-[#6B6560] border border-[#6B6560]/10"
+                            }`}>
+                              {doc.status === "Ready" ? "Ready" : "Draft"}
+                            </span>
+                          </div>
+
+                          {/* Metadata grid */}
+                          <dl className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm mb-4 pb-4 border-b border-[#E5E0D8]">
+                            <div>
+                              <dt className="text-xs uppercase tracking-wider text-[#6B6560]/80 font-medium mb-0.5">
+                                Updated
+                              </dt>
+                              <dd className="text-[#0F1419] font-medium">
+                                {doc.updated}
+                              </dd>
+                            </div>
+                            <div>
+                              <dt className="text-xs uppercase tracking-wider text-[#6B6560]/80 font-medium mb-0.5">
+                                Owner
+                              </dt>
+                              <dd className="text-[#0F1419] font-medium">
+                                {doc.owner}
+                              </dd>
+                            </div>
+                          </dl>
+
+                          {/* Action row */}
+                          <div className="flex items-center gap-3">
+                            <Link
+                              href={`/matters/${doc.id}`}
+                              className="inline-flex items-center gap-2 rounded-full bg-[var(--color-brand-royal)] px-5 py-2 text-sm font-semibold text-white hover:bg-[var(--color-brand-royal-hover)] transition shadow-sm"
+                            >
+                              Open matter
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                              </svg>
+                            </Link>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteMatter(doc.id)}
+                              className="inline-flex items-center gap-2 rounded-full border border-[#E5E0D8] bg-white px-4 py-2 text-sm font-medium text-[#6B6560] hover:border-red-200 hover:bg-red-50 hover:text-red-600 transition"
+                            >
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                              Delete
+                            </button>
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -405,64 +427,68 @@ export default function DashboardClient({
                     {unstarredDocs.map((doc) => (
                       <div
                         key={doc.id}
-                        className="relative flex flex-col md:flex-row gap-4 rounded-2xl border border-[#E5E0D8] bg-white p-6 hover:border-[var(--color-brand-royal)] transition"
+                        className="rounded-2xl border border-[#E5E0D8] bg-white hover:border-[#0A1F3F]/20 hover:shadow-sm transition-all duration-200 overflow-hidden group"
                       >
-                        <button
-                          type="button"
-                          onClick={() => toggleStar(doc.id, !doc.starred)}
-                          className={`absolute right-4 top-4 text-xl ${
-                            doc.starred ? "text-yellow-500" : "text-gray-300 hover:text-yellow-500"
-                          }`}
-                          aria-label={doc.starred ? "Unstar matter" : "Star matter"}
-                        >
-                          {doc.starred ? "★" : "☆"}
-                        </button>
-                        <div className="flex-1">
-                          <Link
-                            href={`/matters/${doc.id}`}
-                            className="text-lg font-semibold text-[#0F1419] hover:text-[var(--color-brand-royal)] transition"
-                          >
-                            {doc.title}
-                          </Link>
-                          <p className="text-sm text-[#6B6560] mt-1">
-                            Updated {doc.updated} · Owner {doc.owner}
-                          </p>
-                          <div className="mt-3 flex flex-wrap gap-2">
-                            {doc.tags.map((tag) => (
-                              <span
-                                key={tag}
-                                className="rounded-full border border-[#E5E0D8] bg-[#F5F2ED] px-3 py-1 text-xs font-medium text-[#1A1614]"
-                              >
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <span
-                            className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${
+                        {/* Header stripe */}
+                        <div className="h-1 bg-gradient-to-r from-[var(--color-brand-royal)]/60 via-[var(--color-brand-royal)]/30 to-transparent" />
+
+                        <div className="p-6">
+                          {/* Title row */}
+                          <div className="flex items-start justify-between gap-4 mb-3">
+                            <h3 className="text-lg font-semibold text-[#0F1419] tracking-tight leading-tight">
+                              {doc.title}
+                            </h3>
+                            <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${
                               doc.status === "Ready"
-                                ? "bg-green-50 text-green-700 border border-green-200"
-                                : doc.status === "Draft"
-                                ? "bg-amber-50 text-amber-800 border border-amber-200"
-                                : "bg-blue-50 text-blue-800 border border-blue-200"
-                            }`}
-                          >
-                            {doc.status}
-                          </span>
-                          <Link
-                            href={`/matters/${doc.id}`}
-                            className="inline-flex items-center rounded-full border border-[#E5E0D8] bg-white px-3 py-1 text-xs font-semibold text-[#1A1614] hover:bg-[#F5F2ED] transition"
-                          >
-                            Open
-                          </Link>
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteMatter(doc.id)}
-                            className="inline-flex items-center rounded-full border border-red-200 bg-red-50 px-3 py-1 text-xs font-semibold text-red-700 hover:bg-red-100 transition"
-                          >
-                            Delete
-                          </button>
+                                ? "bg-[#0A1F3F]/5 text-[#0A1F3F] border border-[#0A1F3F]/10"
+                                : "bg-[#6B6560]/5 text-[#6B6560] border border-[#6B6560]/10"
+                            }`}>
+                              {doc.status === "Ready" ? "Ready" : "Draft"}
+                            </span>
+                          </div>
+
+                          {/* Metadata grid */}
+                          <dl className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm mb-4 pb-4 border-b border-[#E5E0D8]">
+                            <div>
+                              <dt className="text-xs uppercase tracking-wider text-[#6B6560]/80 font-medium mb-0.5">
+                                Updated
+                              </dt>
+                              <dd className="text-[#0F1419] font-medium">
+                                {doc.updated}
+                              </dd>
+                            </div>
+                            <div>
+                              <dt className="text-xs uppercase tracking-wider text-[#6B6560]/80 font-medium mb-0.5">
+                                Owner
+                              </dt>
+                              <dd className="text-[#0F1419] font-medium">
+                                {doc.owner}
+                              </dd>
+                            </div>
+                          </dl>
+
+                          {/* Action row */}
+                          <div className="flex items-center gap-3">
+                            <Link
+                              href={`/matters/${doc.id}`}
+                              className="inline-flex items-center gap-2 rounded-full bg-[var(--color-brand-royal)] px-5 py-2 text-sm font-semibold text-white hover:bg-[var(--color-brand-royal-hover)] transition shadow-sm"
+                            >
+                              Open matter
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                              </svg>
+                            </Link>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteMatter(doc.id)}
+                              className="inline-flex items-center gap-2 rounded-full border border-[#E5E0D8] bg-white px-4 py-2 text-sm font-medium text-[#6B6560] hover:border-red-200 hover:bg-red-50 hover:text-red-600 transition"
+                            >
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                              Delete
+                            </button>
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -474,53 +500,71 @@ export default function DashboardClient({
         </section>
 
         {/* CaseReady Labs */}
-        <section className="rounded-3xl border border-[#E5E0D8] bg-white p-8 hover:shadow-md transition">
+        <section className="rounded-3xl border border-[#E5E0D8] bg-white p-8 hover:shadow-sm transition-shadow">
           <button
             type="button"
             onClick={() => setShowLabsExpanded(!showLabsExpanded)}
-            className="w-full flex items-center justify-between"
+            className="w-full flex items-center justify-between group"
           >
             <div className="flex items-center gap-3">
-              <h3 className="text-lg font-semibold text-[#0F1419]">
-                CaseReady Labs (Beta)
-              </h3>
-              <span className="rounded-full bg-amber-100 text-amber-800 px-3 py-1 text-xs font-semibold border border-amber-200">
-                Experimental
-              </span>
+              <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-[var(--color-brand-royal)]/5 border border-[var(--color-brand-royal)]/10 group-hover:bg-[var(--color-brand-royal)]/10 transition">
+                <svg className="w-5 h-5 text-[var(--color-brand-royal)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                </svg>
+              </div>
+              <div className="text-left">
+                <h3 className="text-lg font-semibold text-[#0F1419] tracking-tight">
+                  CaseReady Labs
+                </h3>
+                <p className="text-xs text-[#6B6560] mt-0.5">
+                  Early access features
+                </p>
+              </div>
             </div>
-            <span className="text-[#6B6560] text-xl">
-              {showLabsExpanded ? "−" : "+"}
-            </span>
+            <svg className={`w-5 h-5 text-[#6B6560] transition-transform ${showLabsExpanded ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
           </button>
 
           {showLabsExpanded && (
-            <div className="mt-6 grid gap-4 md:grid-cols-2">
-              {quickActions.map((action) => (
-                <Link
-                  key={action.id}
-                  href={action.href || "/coming-soon"}
-                  className="group rounded-2xl border border-[#E5E0D8] bg-[#F5F2ED] p-5 hover:border-[var(--color-brand-royal)] transition"
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="rounded-full bg-white border border-[#E5E0D8] px-3 py-1 text-xs font-semibold text-[#1A1614]">
-                      {action.badge}
-                    </span>
-                  </div>
-                  <p className="text-base font-semibold text-[#0F1419] mb-1">
-                    {action.title}
-                  </p>
-                  <p className="text-sm text-[#6B6560]">
-                    {action.description}
-                  </p>
-                </Link>
-              ))}
-            </div>
+            <>
+              <div className="mt-6 mb-5 p-4 rounded-2xl bg-[#0A1F3F]/[0.02] border border-[#0A1F3F]/5">
+                <p className="text-xs text-[#6B6560] leading-relaxed">
+                  These tools are production-ready but actively refined based on attorney feedback.
+                  Your data remains secure and never used for training.
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                {quickActions.map((action) => (
+                  <Link
+                    key={action.id}
+                    href={action.href || "/coming-soon"}
+                    className="block rounded-2xl border border-[#E5E0D8] bg-white p-5 hover:border-[var(--color-brand-royal)]/30 hover:bg-[#F7F1EA]/30 transition-all group"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <h4 className="text-base font-semibold text-[#0F1419] mb-1 group-hover:text-[var(--color-brand-royal)] transition tracking-tight">
+                          {action.title}
+                        </h4>
+                        <p className="text-sm text-[#6B6560] leading-relaxed">
+                          {action.description}
+                        </p>
+                      </div>
+                      <svg className="w-5 h-5 text-[#E5E0D8] group-hover:text-[var(--color-brand-royal)] transition flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                      </svg>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </>
           )}
         </section>
 
         {/* Account info */}
         <section className="rounded-3xl border border-[#E5E0D8] bg-white p-8">
-          <h3 className="text-lg font-semibold text-[#0F1419] mb-4">Account</h3>
+          <h3 className="text-lg font-semibold text-[#0F1419] tracking-tight mb-4">Account</h3>
           <div className="space-y-3 text-sm">
             <div className="flex items-center justify-between">
               <span className="text-[#6B6560]">Email</span>

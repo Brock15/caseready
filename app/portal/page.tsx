@@ -17,114 +17,135 @@ const mockIntake: IntakeItem[] = [
 
 export default function ClientPortalPreview() {
   return (
-    <main className="min-h-screen bg-[#F6F7FB] text-[#0F172A]">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-10 space-y-8">
-        <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <main className="min-h-screen bg-[#F5F2ED]">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 space-y-8">
+        {/* Header */}
+        <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between pb-2 border-b border-[#E5E0D8]">
           <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-[#1A3DE3] font-semibold">
-              Client portal (mock)
+            <p className="text-xs uppercase tracking-[0.3em] text-[var(--color-brand-royal)] font-semibold">
+              Client Portal
             </p>
-            <h1 className="text-3xl font-semibold">Secure upload links for matters</h1>
-            <p className="text-sm text-slate-600 mt-1">
-              Preview of the upcoming client portal: invite clients, collect uploads, and monitor status per matter.
+            <h1 className="text-3xl font-semibold text-[#0F1419] tracking-tight mt-2">
+              Secure upload links for client collaboration
+            </h1>
+            <p className="text-sm text-[#6B6560] mt-2 max-w-2xl">
+              Create private upload portals for each matter. Clients upload directly to your secure storage—no email attachments, no file-size limits.
             </p>
           </div>
           <div className="flex gap-2">
             <Link
               href="/dashboard"
-              className="inline-flex items-center rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-50 shadow-sm"
+              className="inline-flex items-center rounded-full border border-[#E5E0D8] bg-white px-4 py-2 text-xs font-semibold text-[#1A1614] hover:bg-[#F5F2ED] transition"
             >
-              ← Back to dashboard
+              ← Dashboard
             </Link>
             <Link
               href="/coming-soon"
-              className="inline-flex items-center rounded-full bg-gradient-to-r bg-[#0056D6] px-4 py-2 text-xs font-semibold text-white shadow-sm hover:brightness-110"
+              className="inline-flex items-center rounded-full bg-[var(--color-brand-royal)] px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-[var(--color-brand-royal-hover)] transition"
             >
               Join beta list
             </Link>
           </div>
         </header>
 
-        <section className="grid gap-6 lg:grid-cols-[1.1fr,0.9fr] items-start">
-          <div className="rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-sm space-y-4">
+        <div className="grid gap-6 lg:grid-cols-[1.1fr,0.9fr] items-start">
+          {/* Portal setup card */}
+          <section className="rounded-3xl border border-[#E5E0D8] bg-white p-8 shadow-sm space-y-5">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-slate-900">Portal link setup</h2>
-              <span className="rounded-full bg-blue-50 px-3 py-1 text-[11px] font-semibold text-[#1A3DE3] border border-blue-100">
+              <h2 className="text-lg font-semibold text-[#0F1419] tracking-tight">Portal link setup</h2>
+              <span className="rounded-full bg-[var(--color-brand-royal)]/5 px-3 py-1 text-[11px] font-semibold text-[var(--color-brand-royal)] border border-[var(--color-brand-royal)]/10">
                 Preview
               </span>
             </div>
-            <div className="space-y-3">
-              <label className="flex flex-col text-sm font-semibold text-slate-700">
+
+            <div className="space-y-4">
+              <label className="flex flex-col text-sm font-semibold text-[#0F1419]">
                 Matter name
                 <input
                   type="text"
                   defaultValue="Doe v. Metro Transit"
-                  className="mt-1 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm focus:border-[#1A3DE3] focus:outline-none"
+                  className="mt-1 rounded-2xl border border-[#E5E0D8] bg-white px-4 py-2.5 text-sm text-[#0F1419] focus:border-[var(--color-brand-royal)] focus:outline-none"
                   readOnly
                 />
               </label>
-              <label className="flex flex-col text-sm font-semibold text-slate-700">
-                Portal URL
-                <div className="mt-1 flex items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-700">
-                  <span>https://portal.caseready.io/m/abc123</span>
-                  <span className="ml-auto rounded-full bg-slate-200 px-3 py-1 text-[11px] font-semibold text-slate-700">
+
+              <div className="flex flex-col text-sm font-semibold text-[#0F1419]">
+                <span className="mb-1">Portal URL</span>
+                <div className="flex items-center gap-2 rounded-2xl border border-[#E5E0D8] bg-[#F5F2ED]/50 px-4 py-2.5 text-sm text-[#6B6560]">
+                  <span className="flex-1">https://portal.caseready.io/m/abc123</span>
+                  <button
+                    type="button"
+                    className="rounded-full bg-white border border-[#E5E0D8] px-3 py-1 text-[11px] font-semibold text-[#0F1419] hover:bg-[#F5F2ED] transition"
+                  >
                     Copy
-                  </span>
+                  </button>
                 </div>
-              </label>
-              <div className="grid gap-2 sm:grid-cols-2">
-                <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
-                  <input type="checkbox" defaultChecked className="h-4 w-4 rounded border-slate-300 text-[#1A3DE3] focus:ring-[#1A3DE3]" />
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-[#0F1419] cursor-pointer">
+                  <input type="checkbox" defaultChecked className="h-4 w-4 rounded border-[#E5E0D8] text-[var(--color-brand-royal)] focus:ring-[var(--color-brand-royal)]" />
                   Require email verification
                 </label>
-                <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
-                  <input type="checkbox" defaultChecked className="h-4 w-4 rounded border-slate-300 text-[#1A3DE3] focus:ring-[#1A3DE3]" />
+                <label className="flex items-center gap-2 text-sm font-medium text-[#0F1419] cursor-pointer">
+                  <input type="checkbox" defaultChecked className="h-4 w-4 rounded border-[#E5E0D8] text-[var(--color-brand-royal)] focus:ring-[var(--color-brand-royal)]" />
                   Auto-sort uploads into exhibits
                 </label>
               </div>
             </div>
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-              <p className="text-sm font-semibold text-slate-900">What clients see</p>
-              <p className="mt-1 text-xs text-slate-600">
-                A simple upload page with drag-and-drop, progress bars, and automatic file renaming for exhibits.
+
+            <div className="rounded-2xl border border-[#E5E0D8] bg-[#F5F2ED]/50 p-5 space-y-2">
+              <p className="text-sm font-semibold text-[#0F1419]">What clients see</p>
+              <p className="text-xs text-[#6B6560] leading-relaxed">
+                A simple upload page with drag-and-drop, progress bars, and automatic file renaming for exhibits. No login required—just a secure link.
               </p>
             </div>
-          </div>
+          </section>
 
-          <div className="rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-sm space-y-4">
+          {/* Incoming uploads card */}
+          <section className="rounded-3xl border border-[#E5E0D8] bg-white p-8 shadow-sm space-y-5">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-slate-900">Incoming uploads</h2>
-              <span className="text-xs text-slate-500">Live mock feed</span>
+              <h2 className="text-lg font-semibold text-[#0F1419] tracking-tight">Incoming uploads</h2>
+              <span className="text-xs text-[#6B6560]">Live feed</span>
             </div>
-            <div className="space-y-2">
+
+            <div className="space-y-3">
               {mockIntake.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm"
+                  className="rounded-2xl border border-[#E5E0D8] bg-white hover:border-[#0A1F3F]/20 hover:shadow-sm transition-all duration-200 overflow-hidden group"
                 >
-                  <div>
-                    <p className="text-sm font-semibold text-slate-900">{item.name}</p>
-                    <p className="text-xs text-slate-500">Uploaded: {item.uploaded}</p>
+                  {/* Stripe */}
+                  <div className="h-1 bg-gradient-to-r from-[var(--color-brand-royal)]/60 via-[var(--color-brand-royal)]/30 to-transparent" />
+
+                  <div className="p-4">
+                    <div className="flex items-center justify-between gap-4">
+                      <div>
+                        <p className="text-sm font-semibold text-[#0F1419] tracking-tight">{item.name}</p>
+                        <p className="text-xs text-[#6B6560] mt-0.5">Uploaded: {item.uploaded}</p>
+                      </div>
+                      <span
+                        className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-medium ${
+                          item.status === "Reviewed"
+                            ? "bg-[#0A1F3F]/5 text-[#0A1F3F] border border-[#0A1F3F]/10"
+                            : item.status === "Received"
+                            ? "bg-[var(--color-brand-royal)]/5 text-[var(--color-brand-royal)] border border-[var(--color-brand-royal)]/10"
+                            : "bg-[#6B6560]/5 text-[#6B6560] border border-[#6B6560]/10"
+                        }`}
+                      >
+                        {item.status}
+                      </span>
+                    </div>
                   </div>
-                  <span
-                    className={`rounded-full px-3 py-1 text-[11px] font-semibold ${
-                      item.status === "Reviewed"
-                        ? "bg-green-50 text-green-700 border border-green-100"
-                        : item.status === "Received"
-                        ? "bg-blue-50 text-blue-700 border border-blue-100"
-                        : "bg-amber-50 text-amber-700 border border-amber-100"
-                    }`}
-                  >
-                    {item.status}
-                  </span>
                 </div>
               ))}
             </div>
-            <p className="text-xs text-slate-500">
-              Turn this into a live portal by wiring uploads to Supabase storage and the matters table.
+
+            <p className="text-xs text-[#6B6560]">
+              Wire this to Supabase storage and the matters table to create a live portal with real client uploads.
             </p>
-          </div>
-        </section>
+          </section>
+        </div>
       </div>
     </main>
   );
