@@ -3,9 +3,8 @@
 import NextImage from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { createBrowserSupabaseClient } from "@/lib/createBrowserSupabaseClient";
-import { SUPABASE_URL } from "@/lib/supabaseConfig";
 
 export default function SigninForm() {
   const supabase = useMemo(() => createBrowserSupabaseClient(), []);
@@ -16,6 +15,13 @@ export default function SigninForm() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isOauthLoading, setIsOauthLoading] = useState(false);
+
+  useEffect(() => {
+    const oauthError = searchParams.get("error");
+    if (oauthError) {
+      setErrorMessage(oauthError);
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -63,17 +69,14 @@ export default function SigninForm() {
     try {
       setIsOauthLoading(true);
       const redirectTo = searchParams.get("redirectedFrom") || "/dashboard";
-      const callbackUrl = `${SUPABASE_URL}/auth/v1/callback?redirect_to=${encodeURIComponent(
-        `${window.location.origin}${redirectTo}`
-      )}`;
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
+          redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectTo)}`,
           queryParams: {
             access_type: "offline",
             prompt: "consent",
           },
-          redirectTo: callbackUrl,
         },
       });
       if (error) {
@@ -191,8 +194,12 @@ export default function SigninForm() {
             <button
               type="button"
               onClick={handleGoogleSignIn}
-              disabled
-              className="mt-4 w-full inline-flex items-center justify-center gap-3 rounded-full border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm font-semibold text-gray-400"
+              disabled={isOauthLoading}
+              className={`mt-4 w-full inline-flex items-center justify-center gap-3 rounded-full border px-4 py-2.5 text-sm font-semibold transition ${
+                isOauthLoading
+                  ? "border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed"
+                  : "border-gray-300 text-gray-700 bg-white hover:bg-gray-50"
+              }`}
             >
               <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-white">
                 <svg viewBox="0 0 48 48" className="h-4 w-4 opacity-50">
@@ -203,11 +210,8 @@ export default function SigninForm() {
                   <path fill="none" d="M0 0h48v48H0z" />
                 </svg>
               </span>
-              Google sign-in temporarily unavailable
+              {isOauthLoading ? "Redirecting…" : "Continue with Google"}
             </button>
-            <p className="mt-2 text-center text-xs text-gray-500">
-              We’re finishing the Google sign-in integration. Please use email + password for now.
-            </p>
           </div>
         </div>
       </section>

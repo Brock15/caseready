@@ -2,9 +2,8 @@
 
 import NextImage from "next/image";
 import Link from "next/link";
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { createBrowserSupabaseClient } from "@/lib/createBrowserSupabaseClient";
-import { SUPABASE_URL } from "@/lib/supabaseConfig";
 
 export default function SignupPage() {
   const supabase = useMemo(() => createBrowserSupabaseClient(), []);
@@ -14,6 +13,15 @@ export default function SignupPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isOauthLoading, setIsOauthLoading] = useState(false);
+  const searchParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+
+  useEffect(() => {
+    if (!searchParams) return;
+    const oauthError = searchParams.get("error");
+    if (oauthError) {
+      setErrorMessage(oauthError);
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -51,18 +59,14 @@ export default function SignupPage() {
     if (isOauthLoading) return;
     try {
       setIsOauthLoading(true);
-      const callbackUrl = `${SUPABASE_URL}/auth/v1/callback?redirect_to=${encodeURIComponent(
-        `${window.location.origin}/dashboard`
-      )}`;
-
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
+          redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent("/dashboard")}`,
           queryParams: {
             access_type: "offline",
             prompt: "consent",
           },
-          redirectTo: callbackUrl,
         },
       });
       if (error) {

@@ -1,4 +1,4 @@
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createBrowserClient } from "@supabase/ssr";
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from "./supabaseConfig";
 
 /**
@@ -6,7 +6,4 @@ import { SUPABASE_ANON_KEY, SUPABASE_URL } from "./supabaseConfig";
  * so that middleware and server routes can read auth state.
  */
 export const createBrowserSupabaseClient = () =>
-  createClientComponentClient({
-    supabaseUrl: SUPABASE_URL,
-    supabaseKey: SUPABASE_ANON_KEY,
-  });
+  createBrowserClient(SUPABASE_URL, SUPABASE_ANON_KEY);
