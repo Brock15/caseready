@@ -333,100 +333,118 @@ export default function PricingPage() {
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {plansByTier.map((plan) => {
               const isLifetime = plan.name === "Founding Lifetime";
+              const isFree = plan.name === "Free";
               return (
                 <div
                   key={plan.name}
                   id={plan.highlighted ? "founders" : undefined}
-                  className={`relative rounded-3xl border p-6 sm:p-7 shadow-md flex flex-col gap-5 transition hover:-translate-y-1 hover:shadow-lg overflow-hidden ${
+                  className={`relative rounded-3xl border-2 p-6 sm:p-7 flex flex-col gap-5 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl overflow-hidden ${
                     plan.highlighted
                       ? isLifetime
-                        ? "border-[#D4AF37] ring-2 ring-[#D4AF37]/25 bg-white/98"
-                        : "border-[#0056D6] ring-2 ring-[#0056D6]/30 bg-white/95"
-                      : "border-gray-200 bg-white/95"
+                        ? "border-[#D4AF37] bg-gradient-to-br from-[#FFFBF0] via-white to-[#FFF9E6] shadow-xl shadow-[#D4AF37]/20"
+                        : "border-[var(--color-brand-royal)] bg-gradient-to-br from-[#EEF3FF] via-white to-[#F8FAFF] shadow-xl shadow-[var(--color-brand-royal)]/20"
+                      : isFree
+                      ? "border-[#E5E0D8] bg-gradient-to-br from-white to-[#F7F1EA]/30 shadow-lg hover:border-[var(--color-brand-royal)]/30"
+                      : "border-[#E5E0D8] bg-gradient-to-br from-white to-[#F5F2ED]/40 shadow-lg hover:border-[var(--color-brand-royal)]/40"
                   }`}
                 >
+                  {/* Decorative top accent */}
+                  {plan.highlighted && (
+                    <div className={`absolute top-0 left-0 right-0 h-1.5 ${
+                      isLifetime
+                        ? "bg-gradient-to-r from-[#F7DE95] via-[#D4AF37] to-[#C4A035]"
+                        : "bg-gradient-to-r from-[var(--color-brand-royal)] via-[#1E4A7A] to-[var(--color-brand-royal)]"
+                    }`} />
+                  )}
+
                   <div className="space-y-3">
-                    <div className="flex flex-col items-center text-center gap-1">
+                    <div className="flex flex-col items-center text-center gap-2">
                       <p
-                        className={`text-xs uppercase tracking-wide ${
-                          isLifetime ? "text-gray-900 font-semibold" : "text-gray-500"
+                        className={`text-xs uppercase tracking-widest font-bold ${
+                          isLifetime ? "text-[#D4AF37]" : isFree ? "text-[#6B6560]" : "text-[var(--color-brand-royal)]"
                         }`}
                       >
                         {plan.name}
                       </p>
                       {plan.badge && (
                         <span
-                          className={`inline-flex items-center justify-center rounded-full px-3 py-1 text-[10px] font-semibold ${
-                            isLifetime ? "bg-[#D4AF37] text-[#0B0F1F]" : "bg-[var(--color-brand-royal)] text-white"
+                          className={`inline-flex items-center justify-center rounded-full px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-wide shadow-lg ${
+                            isLifetime
+                              ? "bg-gradient-to-r from-[#F7DE95] via-[#EBC867] to-[#D8B240] text-[#0F172A]"
+                              : "bg-gradient-to-r from-[var(--color-brand-royal)] to-[#1E4A7A] text-white"
                           }`}
                         >
                           {plan.badge}
                         </span>
                       )}
-                      <p className={`text-[11px] ${isLifetime ? "text-black" : "text-gray-400"}`}>
+                      <p className={`text-[11px] font-medium ${isLifetime ? "text-[#5A4A2F]" : "text-[#6B6560]"}`}>
                         {plan.audience}
                       </p>
                     </div>
 
-                    <div className="flex items-baseline justify-center gap-2">
+                    <div className="flex items-baseline justify-center gap-2 py-4">
                       <p
-                        className={`text-3xl sm:text-4xl font-semibold ${
-                          isLifetime ? "text-white" : "text-gray-900"
+                        className={`text-4xl sm:text-5xl font-bold bg-clip-text ${
+                          isLifetime
+                            ? "text-transparent bg-gradient-to-br from-[#D4AF37] to-[#B8941F]"
+                            : "text-[#0A0A0A]"
                         }`}
                       >
                         {plan.price}
                       </p>
-                      <span
-                        className={`text-xs sm:text-sm font-normal ${
-                          isLifetime ? "text-gray-500" : "text-gray-500"
-                        }`}
-                      >
-                        {plan.duration}
-                      </span>
-                      {"originalPrice" in plan && plan.originalPrice && (
-                        <span
-                          className={`text-[11px] line-through ml-auto ${
-                            isLifetime ? "text-gray-400" : "text-gray-400"
-                          }`}
-                        >
-                          {plan.originalPrice}
+                      <div className="flex flex-col items-start">
+                        <span className="text-xs font-medium text-[#6B6560]">
+                          {plan.duration}
                         </span>
-                      )}
+                        {"originalPrice" in plan && plan.originalPrice && (
+                          <span className="text-[11px] line-through text-red-500/80 font-medium">
+                            {plan.originalPrice}
+                          </span>
+                        )}
+                      </div>
                     </div>
 
-                    <p className={`text-xs sm:text-sm text-center ${isLifetime ? "text-black" : "text-gray-600"}`}>
+                    <p className={`text-sm text-center leading-relaxed ${
+                      isLifetime ? "text-[#2A2522] font-medium" : "text-[#5A544F]"
+                    }`}>
                       {plan.description}
                     </p>
                   </div>
 
-                  <ul className={`space-y-2 text-xs sm:text-sm ${isLifetime ? "text-black" : "text-gray-700"}`}>
+                  <ul className="space-y-2.5 text-sm">
                     {plan.perks.map((perk) => (
                       <li
                         key={perk}
-                        className={`flex items-start gap-2 ${isLifetime ? "text-black" : "text-gray-600"}`}
+                        className={`flex items-start gap-3 ${isLifetime ? "text-[#1A1614]" : "text-[#2A2522]"}`}
                       >
-                        <span
-                          className={`mt-1 h-1.5 w-1.5 rounded-full ${
-                            isLifetime ? "bg-[#D4AF37]" : "bg-[var(--color-brand-royal)]"
+                        <svg
+                          className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
+                            isLifetime ? "text-[#D4AF37]" : "text-[var(--color-brand-royal)]"
                           }`}
-                        />
-                        <span>{perk}</span>
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span className="leading-relaxed">{perk}</span>
                       </li>
                     ))}
                   </ul>
 
-                  <div className="mt-auto space-y-2">
+                  <div className="mt-auto space-y-3 pt-4">
                     {"priceId" in plan.cta && plan.cta.priceId ? (
                       <button
                         type="button"
                         onClick={() => startCheckout((plan.cta as any).priceId)}
                         disabled={checkoutLoading[(plan.cta as any).priceId]}
-                        className={`inline-flex justify-center items-center w-full rounded-full px-4 py-2.5 text-sm font-semibold transition ${
+                        className={`inline-flex justify-center items-center w-full rounded-full px-5 py-3.5 text-sm font-bold transition-all duration-300 ${
                           isLifetime
-                            ? "bg-gradient-to-r from-[#F7DE95] via-[#EBC867] to-[#D8B240] text-[#0F172A] shadow-lg shadow-[#D4AF37]/30 hover:-translate-y-0.5"
+                            ? "bg-gradient-to-r from-[#F7DE95] via-[#EBC867] to-[#D8B240] text-[#0F172A] shadow-xl shadow-[#D4AF37]/40 hover:shadow-2xl hover:-translate-y-1 hover:scale-[1.02]"
                             : plan.highlighted
-                            ? "bg-[var(--color-brand-royal)] text-white shadow-lg shadow-[var(--color-brand-royal)]/40 hover:-translate-y-0.5"
-                            : "border border-gray-200 text-gray-700 hover:bg-gray-50"
+                            ? "bg-gradient-to-r from-[var(--color-brand-royal)] to-[#1E4A7A] text-white shadow-xl shadow-[var(--color-brand-royal)]/40 hover:shadow-2xl hover:-translate-y-1 hover:scale-[1.02]"
+                            : "border-2 border-[var(--color-brand-royal)]/30 text-[var(--color-brand-royal)] hover:bg-[var(--color-brand-royal)] hover:text-white hover:border-[var(--color-brand-royal)] shadow-lg hover:shadow-xl"
                         } ${checkoutLoading[(plan.cta as any).priceId] ? "opacity-60 cursor-not-allowed" : ""}`}
                       >
                         {checkoutLoading[(plan.cta as any).priceId] ? "Redirecting…" : plan.cta.label}
@@ -434,12 +452,12 @@ export default function PricingPage() {
                     ) : (
                       <Link
                         href={plan.cta.href || "/pricing"}
-                        className={`inline-flex justify-center items-center w-full rounded-full px-4 py-2.5 text-sm font-semibold transition ${
+                        className={`inline-flex justify-center items-center w-full rounded-full px-5 py-3.5 text-sm font-bold transition-all duration-300 ${
                           isLifetime
-                            ? "bg-[#D4AF37] text-[#0B0F1F] shadow-lg shadow-[#D4AF37]/30 hover:-translate-y-0.5"
+                            ? "bg-gradient-to-r from-[#F7DE95] via-[#EBC867] to-[#D8B240] text-[#0F172A] shadow-xl shadow-[#D4AF37]/40 hover:shadow-2xl hover:-translate-y-1 hover:scale-[1.02]"
                             : plan.highlighted
-                            ? "bg-[var(--color-brand-royal)] text-white shadow-lg shadow-[var(--color-brand-royal)]/40 hover:-translate-y-0.5"
-                            : "border border-gray-200 text-gray-700 hover:bg-gray-50"
+                            ? "bg-gradient-to-r from-[var(--color-brand-royal)] to-[#1E4A7A] text-white shadow-xl shadow-[var(--color-brand-royal)]/40 hover:shadow-2xl hover:-translate-y-1 hover:scale-[1.02]"
+                            : "border-2 border-[var(--color-brand-royal)]/30 text-[var(--color-brand-royal)] hover:bg-[var(--color-brand-royal)] hover:text-white hover:border-[var(--color-brand-royal)] shadow-lg hover:shadow-xl"
                         }`}
                       >
                         {plan.cta.label}
@@ -447,8 +465,8 @@ export default function PricingPage() {
                     )}
                     {plan.note && (
                       <p
-                        className={`text-[11px] text-center font-semibold ${
-                          isLifetime ? "text-[#0B0F1F]" : "text-gray-700"
+                        className={`text-[11px] text-center font-medium leading-relaxed ${
+                          isLifetime ? "text-[#5A4A2F]" : "text-[#6B6560]"
                         }`}
                       >
                         {plan.note}
