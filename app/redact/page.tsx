@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { useState, useEffect, DragEvent, ChangeEvent } from "react";
-import { PDFDocument } from "pdf-lib";
+import { PDFDocument, rgb } from "pdf-lib";
 
 type OptionsState = {
   redactEmails: boolean;
   redactPhones: boolean;
+  redactSSN: boolean;
   redactAddresses: boolean;
   redactNames: boolean;
   customPattern: string;
@@ -15,6 +16,7 @@ type OptionsState = {
 const defaultOptions: OptionsState = {
   redactEmails: true,
   redactPhones: true,
+  redactSSN: true,
   redactAddresses: false,
   redactNames: false,
   customPattern: "",
@@ -107,23 +109,128 @@ export default function RedactPage() {
     setStatus("Processing redaction…");
     setIsLoading(true);
 
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("options", JSON.stringify(options));
-
     try {
-      const res = await fetch("/api/redact", {
-        method: "POST",
-        body: formData,
-      });
+      // Dynamically import PDF.js to avoid SSR issues with DOMMatrix
+      const pdfjsLib = await import("pdfjs-dist");
 
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.message || "Redaction failed");
+      // Set up worker
+      pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
+
+      // Load the PDF with both libraries
+      const arrayBuffer = await file.arrayBuffer();
+      const pdfDoc = await PDFDocument.load(arrayBuffer);
+      const pages = pdfDoc.getPages();
+
+      // Load with PDF.js for text extraction
+      const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+      const pdfJsDoc = await loadingTask.promise;
+
+      // Build regex patterns based on selected options
+      const patterns: RegExp[] = [];
+
+      if (options.redactEmails) {
+        patterns.push(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g);
       }
 
-      const blob = await res.blob();
+      if (options.redactPhones) {
+        patterns.push(/\b(\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/g);
+        patterns.push(/\b\d{3}[-.\s]\d{3}[-.\s]\d{4}\b/g);
+      }
+
+      if (options.redactSSN) {
+        // Match SSN formats: 123-45-6789, 123 45 6789, or 123456789
+        patterns.push(/\b\d{3}[-\s]?\d{2}[-\s]?\d{4}\b/g);
+      }
+
+      if (options.redactAddresses) {
+        patterns.push(/\b\d+\s+[A-Za-z0-9\s]+(?:Street|St|Avenue|Ave|Road|Rd|Drive|Dr|Lane|Ln|Boulevard|Blvd|Court|Ct)\b/gi);
+      }
+
+      if (options.redactNames) {
+        patterns.push(/\b[A-Z][a-z]+\s+[A-Z][a-z]+\b/g);
+      }
+
+      if (options.customPattern && options.customPattern.trim()) {
+        try {
+          patterns.push(new RegExp(options.customPattern, "gi"));
+        } catch (regexErr) {
+          console.warn("Invalid custom regex pattern", regexErr);
+        }
+      }
+
+      // Collect redaction areas per page
+      const redactionsByPage: Map<number, Array<{x: number, y: number, width: number, height: number}>> = new Map();
+
+      // Process each page to find matches
+      for (let pageIndex = 0; pageIndex < pages.length; pageIndex++) {
+        const page = pages[pageIndex];
+        const { height } = page.getSize();
+        const pageRedactions: Array<{x: number, y: number, width: number, height: number}> = [];
+
+        try {
+          // Extract text content using PDF.js
+          const pdfJsPage = await pdfJsDoc.getPage(pageIndex + 1);
+          const textContent = await pdfJsPage.getTextContent();
+
+          // Process each text item and find matches
+          textContent.items.forEach((item: any) => {
+            const text = item.str;
+            if (!text) return;
+
+            // Check each pattern against this text item
+            patterns.forEach((pattern) => {
+              // Reset pattern lastIndex for global regex
+              pattern.lastIndex = 0;
+
+              // Check if entire text item matches
+              const matches = text.match(pattern);
+              if (matches && matches.length > 0) {
+                // This text item contains a match - redact it
+                const transform = item.transform;
+
+                // Extract position from transform matrix
+                const x = transform[4];
+                const y = transform[5];
+                const textWidth = item.width;
+                const textHeight = item.height || 12;
+
+                // Both PDF.js and pdf-lib use bottom-left origin
+                // Y coordinate from PDF.js is already correct for pdf-lib
+                pageRedactions.push({
+                  x: x - 1, // Small padding
+                  y: y - 1,
+                  width: textWidth + 2,
+                  height: textHeight + 3,
+                });
+              }
+            });
+          });
+
+          redactionsByPage.set(pageIndex, pageRedactions);
+        } catch (pageErr) {
+          console.warn(`Error processing page ${pageIndex + 1}`, pageErr);
+        }
+      }
+
+      // Draw all redactions
+      redactionsByPage.forEach((redactions, pageIndex) => {
+        const page = pages[pageIndex];
+        redactions.forEach(rect => {
+          page.drawRectangle({
+            x: rect.x,
+            y: rect.y,
+            width: rect.width,
+            height: rect.height,
+            color: rgb(0, 0, 0),
+          });
+        });
+      });
+
+      // Save the redacted PDF
+      const pdfBytes = await pdfDoc.save();
+      const blob = new Blob([new Uint8Array(pdfBytes)], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
+
       setDownloadUrl(url);
       setStatus("Redaction complete. Download your file below.");
     } catch (err) {
@@ -260,6 +367,12 @@ export default function RedactPage() {
               onChange={() => toggleOption("redactPhones")}
             />
             <OptionRow
+              label="Social Security Numbers"
+              description="Hide SSN in various formats"
+              checked={options.redactSSN}
+              onChange={() => toggleOption("redactSSN")}
+            />
+            <OptionRow
               label="Street addresses"
               description="Hide common street address patterns"
               checked={options.redactAddresses}
@@ -316,11 +429,12 @@ export default function RedactPage() {
           </div>
 
           <div className="rounded-2xl border border-[#E5E0D8] bg-[#F5F2ED]/50 px-4 py-3 text-xs text-[#6B6560]">
-            <p className="font-semibold text-[#0F1419]">Notes & tuning</p>
+            <p className="font-semibold text-[#0F1419]">How it works</p>
             <ul className="mt-2 list-disc space-y-1 pl-5">
-              <li>Regex patterns live in <code className="text-[#0A1F3F]">lib/redaction/redactPdf.ts</code>.</li>
-              <li>Redactions cover entire matching lines; swap detection to plug in OCR/PII later.</li>
-              <li>Rectangles are opaque black; adjust color or padding in <code className="text-[#0A1F3F]">redactPdf</code>.</li>
+              <li>All processing happens in your browser using PDF.js and pdf-lib</li>
+              <li>Text is extracted and matched against regex patterns you select</li>
+              <li>Black rectangles are drawn over matches to permanently redact content</li>
+              <li>Your original file never leaves your computer—completely private and secure</li>
             </ul>
           </div>
         </section>

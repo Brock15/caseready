@@ -72,6 +72,8 @@ export default function DashboardClient({
   const [listMessage, setListMessage] = useState<string | null>(null);
   const [loadingMatters, setLoadingMatters] = useState(false);
   const [showLabsExpanded, setShowLabsExpanded] = useState(false);
+  const [showCreateMatter, setShowCreateMatter] = useState(false);
+  const [newMatterName, setNewMatterName] = useState("");
 
   const plan = String(session?.user?.user_metadata?.plan ?? "").toLowerCase();
   const hasPremium =
@@ -201,6 +203,30 @@ export default function DashboardClient({
     }
   };
 
+  const handleCreateMatter = async () => {
+    if (!newMatterName.trim()) return;
+    const { data: sessionData } = await supabase.auth.getSession();
+    if (!sessionData.session?.user) return;
+
+    const { data, error } = await supabase
+      .from("matters")
+      .insert({
+        user_id: sessionData.session.user.id,
+        name: newMatterName.trim(),
+        status: "draft",
+      })
+      .select()
+      .single();
+
+    if (!error && data) {
+      // Navigate to the new matter's workspace
+      router.push(`/matters/${data.id}`);
+    } else {
+      console.error("Error creating matter:", error);
+      setListMessage(`Could not create matter. ${error?.message ?? ""}`);
+    }
+  };
+
   const initials =
     session?.user?.email?.slice(0, 1).toUpperCase() ||
     session?.user?.user_metadata?.full_name?.slice(0, 1) ||
@@ -302,19 +328,31 @@ export default function DashboardClient({
 
         {/* Recent Matters */}
         <section>
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between mb-6 gap-3">
             <h2 className="text-lg font-semibold text-[#0F1419] tracking-tight">Recent Matters</h2>
-            <div className="flex items-center rounded-full border border-[#E5E0D8] bg-white px-4 py-2 text-sm">
-              <span className="mr-2 text-[#6B6560]">🔎</span>
-              <input
-                type="text"
-                value={search}
-                placeholder="Search matters"
-                onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                  setSearch(event.target.value)
-                }
-                className="w-full bg-transparent outline-none text-[#1A1614] placeholder:text-[#6B6560]"
-              />
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setShowCreateMatter(true)}
+                className="inline-flex items-center gap-2 rounded-full bg-[var(--color-brand-royal)] px-5 py-2 text-sm font-semibold text-white hover:bg-[var(--color-brand-royal-hover)] transition shadow-sm"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+                New Matter
+              </button>
+              <div className="flex items-center rounded-full border border-[#E5E0D8] bg-white px-4 py-2 text-sm">
+                <span className="mr-2 text-[#6B6560]">🔎</span>
+                <input
+                  type="text"
+                  value={search}
+                  placeholder="Search matters"
+                  onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                    setSearch(event.target.value)
+                  }
+                  className="w-full bg-transparent outline-none text-[#1A1614] placeholder:text-[#6B6560]"
+                />
+              </div>
             </div>
           </div>
 
@@ -595,6 +633,75 @@ export default function DashboardClient({
           </div>
         </section>
       </main>
+
+      {/* Create New Matter Modal */}
+      {showCreateMatter && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl border border-[#E5E0D8] shadow-2xl max-w-md w-full p-8">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-semibold text-[#0F1419] tracking-tight">Create New Matter</h3>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowCreateMatter(false);
+                  setNewMatterName("");
+                }}
+                className="text-[#6B6560] hover:text-[#0F1419] transition"
+              >
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="matter-name" className="block text-sm font-medium text-[#0F1419] mb-2">
+                  Matter Name
+                </label>
+                <input
+                  id="matter-name"
+                  type="text"
+                  value={newMatterName}
+                  onChange={(e) => setNewMatterName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && newMatterName.trim()) {
+                      handleCreateMatter();
+                    }
+                  }}
+                  placeholder="e.g., Smith v. Johnson"
+                  className="w-full px-4 py-3 rounded-xl border border-[#E5E0D8] bg-white text-[#0F1419] placeholder:text-[#6B6560] focus:outline-none focus:border-[var(--color-brand-royal)] focus:ring-2 focus:ring-[var(--color-brand-royal)]/20 transition"
+                  autoFocus
+                />
+              </div>
+
+              <div className="flex items-center gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={handleCreateMatter}
+                  disabled={!newMatterName.trim()}
+                  className="flex-1 inline-flex items-center justify-center gap-2 rounded-full bg-[var(--color-brand-royal)] px-6 py-3 text-sm font-semibold text-white hover:bg-[var(--color-brand-royal-hover)] transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Create Matter
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowCreateMatter(false);
+                    setNewMatterName("");
+                  }}
+                  className="px-6 py-3 rounded-full border border-[#E5E0D8] bg-white text-sm font-medium text-[#6B6560] hover:bg-[#F5F2ED] transition"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
