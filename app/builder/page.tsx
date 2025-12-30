@@ -32,6 +32,7 @@ type SelectedFile = {
   file: File;
   label: string;
   labelLocked: boolean;
+  excludeFromLettering: boolean;
   description: string;
   assumedDate: string;
   pages: string;
@@ -123,9 +124,11 @@ const sortFilesByMode = (
 
 const relabelFiles = (list: SelectedFile[], numberingType: ExhibitNumberingType = "letters") => {
   let changed = false;
-  const next = list.map((file, index) => {
-    if (file.labelLocked) return file;
-    const generated = getExhibitLabel(index, numberingType);
+  let exhibitIndex = 0;
+  const next = list.map((file) => {
+    if (file.labelLocked || file.excludeFromLettering) return file;
+    const generated = getExhibitLabel(exhibitIndex, numberingType);
+    exhibitIndex++;
     if (generated !== file.label) {
       changed = true;
       return { ...file, label: generated };
@@ -557,6 +560,7 @@ export default function ExhibitBuilderPage() {
           file,
           label: getExhibitLabel(prev.length + additions.length, exhibitNumberingType),
           labelLocked: false,
+          excludeFromLettering: false,
           description: stripExtension(file.name),
           assumedDate: formatDateForInput(file.lastModified),
           pages: "",
@@ -1056,37 +1060,10 @@ export default function ExhibitBuilderPage() {
                             <div className="space-y-0.5">
                               <p className="font-semibold">CaseReady footer</p>
                               <p className="text-xs text-[#6B6560]">
-                                Toggle the “Prepared with CaseReady” footer on/off.
+                                Toggle the "Prepared with CaseReady" footer on/off.
                               </p>
                             </div>
                           </label>
-                          <div className="rounded-xl border border-[#E5E0D8] bg-[#F5F2ED]/50 px-3 py-3 text-sm text-[#0F1419]">
-                            <p className="font-semibold">Sticker position</p>
-                            <p className="text-xs text-[#6B6560]">Default top-right; adjust if needed.</p>
-                            <div className="mt-3 flex flex-wrap gap-2">
-                              {(["top-right", "bottom-right", "left-vertical"] as const).map((pos) => {
-                                const active = formatOptions.sticker_position === pos;
-                                return (
-                                  <button
-                                    key={pos}
-                                    type="button"
-                                    onClick={() => setStickerPosition(pos)}
-                                    className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
-                                      active
-                                        ? "border-[var(--color-brand-royal)] bg-white text-[var(--color-brand-royal)]"
-                                        : "border-[#E5E0D8] bg-white text-[#6B6560] hover:border-[var(--color-brand-royal)]/40"
-                                    }`}
-                                  >
-                                    {pos === "top-right"
-                                      ? "Top-right"
-                                      : pos === "bottom-right"
-                                      ? "Bottom-right"
-                                      : "Left vertical"}
-                                  </button>
-                                );
-                              })}
-                            </div>
-                          </div>
                           <div className="rounded-xl border border-[#E5E0D8] bg-[#F5F2ED]/50 px-3 py-3 text-sm text-[#0F1419]">
                             <p className="font-semibold">Case details (optional)</p>
                             <div className="mt-2 space-y-2">
@@ -1148,7 +1125,7 @@ export default function ExhibitBuilderPage() {
                                   }))
                                 }
                                 placeholder="Case title"
-                                className="w-full rounded-lg border border-[#E5E0D8] bg-white px-3 py-2 text-sm focus:border-[var(--color-brand-royal)] focus:outline-none"
+                                className="w-full rounded-lg border border-[#E5E0D8] bg-white px-3 py-2 text-sm text-[#0F1419] focus:border-[var(--color-brand-royal)] focus:outline-none"
                               />
                               <input
                                 type="text"
@@ -1160,7 +1137,7 @@ export default function ExhibitBuilderPage() {
                                   }))
                                 }
                                 placeholder="Court name"
-                                className="w-full rounded-lg border border-[#E5E0D8] bg-white px-3 py-2 text-sm focus:border-[var(--color-brand-royal)] focus:outline-none"
+                                className="w-full rounded-lg border border-[#E5E0D8] bg-white px-3 py-2 text-sm text-[#0F1419] focus:border-[var(--color-brand-royal)] focus:outline-none"
                               />
                             </div>
                           </div>
@@ -1179,7 +1156,7 @@ export default function ExhibitBuilderPage() {
                                   }))
                                 }
                                 placeholder="Firm logo URL (optional)"
-                                className="w-full rounded-lg border border-[#E5E0D8] bg-white px-3 py-2 text-sm focus:border-[var(--color-brand-royal)] focus:outline-none"
+                                className="w-full rounded-lg border border-[#E5E0D8] bg-white px-3 py-2 text-sm text-[#0F1419] focus:border-[var(--color-brand-royal)] focus:outline-none"
                               />
                               <textarea
                                 value={formatOptions.footer_text || ""}
@@ -1191,22 +1168,64 @@ export default function ExhibitBuilderPage() {
                                 }
                                 placeholder="Custom footer (firm name, address, phone, email)"
                                 rows={2}
-                                className="w-full rounded-lg border border-[#E5E0D8] bg-white px-3 py-2 text-sm focus:border-[var(--color-brand-royal)] focus:outline-none"
+                                className="w-full rounded-lg border border-[#E5E0D8] bg-white px-3 py-2 text-sm text-[#0F1419] focus:border-[var(--color-brand-royal)] focus:outline-none"
                               />
-                              <label className="flex items-start gap-2 text-sm text-[#0F1419]">
-                                <input
-                                  type="checkbox"
-                                  checked={Boolean(formatOptions.show_caseready_branding)}
-                                  onChange={() => toggleFormatOption("show_caseready_branding")}
-                                  className="mt-1 h-4 w-4 rounded border-[#E5E0D8] text-[var(--color-brand-royal)] focus:ring-[var(--color-brand-royal)]"
-                                />
-                                <div className="space-y-0.5">
-                                  <p className="font-medium">Show CaseReady footer</p>
-                                  <p className="text-xs text-[#6B6560]">
-                                    Uncheck for white-label documents.
-                                  </p>
+                              <div>
+                                <p className="font-medium text-sm text-[#0F1419] mb-2">CaseReady Branding</p>
+                                <div className="space-y-2">
+                                  <label className="flex items-center gap-2 text-sm text-[#0F1419]">
+                                    <input
+                                      type="radio"
+                                      checked={formatOptions.branding_placement === "metadata"}
+                                      onChange={() =>
+                                        setFormatOptions((prev) => ({
+                                          ...prev,
+                                          branding_placement: "metadata",
+                                        }))
+                                      }
+                                      className="h-4 w-4 border-[#E5E0D8] text-[var(--color-brand-royal)] focus:ring-[var(--color-brand-royal)]"
+                                    />
+                                    <div>
+                                      <p className="font-medium text-[#0F1419]">Metadata only</p>
+                                      <p className="text-xs text-[#6B6560]">Invisible to viewers (recommended)</p>
+                                    </div>
+                                  </label>
+                                  <label className="flex items-center gap-2 text-sm text-[#0F1419]">
+                                    <input
+                                      type="radio"
+                                      checked={formatOptions.branding_placement === "final_page"}
+                                      onChange={() =>
+                                        setFormatOptions((prev) => ({
+                                          ...prev,
+                                          branding_placement: "final_page",
+                                        }))
+                                      }
+                                      className="h-4 w-4 border-[#E5E0D8] text-[var(--color-brand-royal)] focus:ring-[var(--color-brand-royal)]"
+                                    />
+                                    <div>
+                                      <p className="font-medium text-[#0F1419]">Final page</p>
+                                      <p className="text-xs text-[#6B6560]">Single "Prepared with CaseReady" page at end</p>
+                                    </div>
+                                  </label>
+                                  <label className="flex items-center gap-2 text-sm text-[#0F1419]">
+                                    <input
+                                      type="radio"
+                                      checked={formatOptions.branding_placement === "footer_last_page"}
+                                      onChange={() =>
+                                        setFormatOptions((prev) => ({
+                                          ...prev,
+                                          branding_placement: "footer_last_page",
+                                        }))
+                                      }
+                                      className="h-4 w-4 border-[#E5E0D8] text-[var(--color-brand-royal)] focus:ring-[var(--color-brand-royal)]"
+                                    />
+                                    <div>
+                                      <p className="font-medium text-[#0F1419]">Footer on last page</p>
+                                      <p className="text-xs text-[#6B6560]">Small footer text on final page only</p>
+                                    </div>
+                                  </label>
                                 </div>
-                              </label>
+                              </div>
                             </div>
                           </div>
 
@@ -1218,67 +1237,49 @@ export default function ExhibitBuilderPage() {
                                 <label className="flex items-start gap-2 rounded-lg border border-[#E5E0D8] bg-[#F5F2ED]/30 px-3 py-2 text-sm text-[#0F1419]">
                                   <input
                                     type="checkbox"
-                                    checked={Boolean(formatOptions.include_cover)}
-                                    onChange={() => toggleFormatOption("include_cover")}
+                                    checked={Boolean(formatOptions.include_index)}
+                                    onChange={() => toggleFormatOption("include_index")}
                                     className="mt-1 h-4 w-4 rounded border-[#E5E0D8] text-[var(--color-brand-royal)] focus:ring-[var(--color-brand-royal)]"
                                   />
                                   <div className="space-y-0.5">
-                                    <p className="font-medium">Cover page</p>
+                                    <p className="font-medium">Exhibit Index</p>
                                     <p className="text-xs text-[#6B6560]">
-                                      Professional cover with case details.
+                                      "Index of Exhibits" with labels and Bates ranges.
                                     </p>
                                   </div>
                                 </label>
                                 <label className="flex items-start gap-2 rounded-lg border border-[#E5E0D8] bg-[#F5F2ED]/30 px-3 py-2 text-sm text-[#0F1419]">
                                   <input
                                     type="checkbox"
-                                    checked={Boolean(formatOptions.include_index)}
-                                    onChange={() => toggleFormatOption("include_index")}
+                                    checked={Boolean(formatOptions.show_exhibit_stickers)}
+                                    onChange={() => toggleFormatOption("show_exhibit_stickers")}
                                     className="mt-1 h-4 w-4 rounded border-[#E5E0D8] text-[var(--color-brand-royal)] focus:ring-[var(--color-brand-royal)]"
                                   />
                                   <div className="space-y-0.5">
-                                    <p className="font-medium">Table of Contents</p>
+                                    <p className="font-medium">Exhibit corner stickers</p>
                                     <p className="text-xs text-[#6B6560]">
-                                      Lists each exhibit with page ranges.
+                                      Small corner tags showing "Exhibit A" + Bates.
+                                    </p>
+                                  </div>
+                                </label>
+                                <label className="flex items-start gap-2 rounded-lg border border-[#E5E0D8] bg-[#F5F2ED]/30 px-3 py-2 text-sm text-[#0F1419]">
+                                  <input
+                                    type="checkbox"
+                                    checked={Boolean(formatOptions.show_page_numbers)}
+                                    onChange={() => toggleFormatOption("show_page_numbers")}
+                                    className="mt-1 h-4 w-4 rounded border-[#E5E0D8] text-[var(--color-brand-royal)] focus:ring-[var(--color-brand-royal)]"
+                                  />
+                                  <div className="space-y-0.5">
+                                    <p className="font-medium">Page numbers</p>
+                                    <p className="text-xs text-[#6B6560]">
+                                      Show "Page X of Y" (off by default).
                                     </p>
                                   </div>
                                 </label>
                               </div>
 
                               <div>
-                                <p className="font-medium text-sm mb-2">Cover template</p>
-                                <div className="flex flex-wrap gap-2">
-                                  {(["classic", "modern", "black-bar"] as const).map((template) => {
-                                    const active = formatOptions.cover_template === template;
-                                    return (
-                                      <button
-                                        key={template}
-                                        type="button"
-                                        onClick={() =>
-                                          setFormatOptions((prev) => ({
-                                            ...prev,
-                                            cover_template: template,
-                                          }))
-                                        }
-                                        className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
-                                          active
-                                            ? "border-[var(--color-brand-royal)] bg-[#EEF3FF] text-[var(--color-brand-royal)]"
-                                            : "border-[#E5E0D8] bg-[#F5F2ED]/50 text-[#6B6560] hover:border-[var(--color-brand-royal)]/40"
-                                        }`}
-                                      >
-                                        {template === "classic"
-                                          ? "Classic"
-                                          : template === "modern"
-                                          ? "Modern"
-                                          : "Black bar"}
-                                      </button>
-                                    );
-                                  })}
-                                </div>
-                              </div>
-
-                              <div>
-                                <p className="font-medium text-sm mb-2">Sticker position</p>
+                                <p className="font-medium text-sm text-[#0F1419] mb-2">Sticker position</p>
                                 <div className="flex flex-wrap gap-2">
                                   {(["top-right", "bottom-right", "left-vertical"] as const).map((pos) => {
                                     const active = formatOptions.sticker_position === pos;
@@ -1305,7 +1306,7 @@ export default function ExhibitBuilderPage() {
                               </div>
 
                               <div>
-                                <p className="font-medium text-sm mb-2">Exhibit numbering</p>
+                                <p className="font-medium text-sm text-[#0F1419] mb-2">Exhibit numbering</p>
                                 <div className="flex flex-wrap gap-2">
                                   {(
                                     [
@@ -1467,6 +1468,9 @@ export default function ExhibitBuilderPage() {
                             <th className="px-3 py-2 font-semibold">
                               Exhibit label
                             </th>
+                            <th className="px-3 py-2 font-semibold text-center" title="Exclude from exhibit lettering (e.g., cover pages)">
+                              Exclude
+                            </th>
                             <th className="px-3 py-2 font-semibold">
                               <span className="flex items-center justify-between gap-2">
                                 <span>Filename</span>
@@ -1527,6 +1531,20 @@ export default function ExhibitBuilderPage() {
                                     })
                                   }
                                   className="w-full rounded-xl border border-[#E5E0D8] bg-[#F5F2ED]/50 px-3 py-1.5 text-sm focus:border-[var(--color-brand-royal)] focus:outline-none"
+                                  disabled={item.excludeFromLettering}
+                                />
+                              </td>
+                              <td className="px-3 py-3 align-top text-center">
+                                <input
+                                  type="checkbox"
+                                  checked={item.excludeFromLettering}
+                                  onChange={(event) =>
+                                    updateFileMeta(item.id, {
+                                      excludeFromLettering: event.target.checked,
+                                    })
+                                  }
+                                  className="h-4 w-4 rounded border-[#E5E0D8] text-[var(--color-brand-royal)] focus:ring-[var(--color-brand-royal)]"
+                                  title="Check to exclude from exhibit lettering (e.g., for cover pages)"
                                 />
                               </td>
                               <td className="px-3 py-3 align-top text-[#6B6560]">

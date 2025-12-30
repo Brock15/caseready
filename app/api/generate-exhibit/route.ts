@@ -25,6 +25,7 @@ type ExhibitInput = {
   description?: string;
   detectedDate?: string;
   fileIndex: number;
+  excludeFromLettering?: boolean;
 };
 
 const BATES_PREFIX = "CR_";
@@ -68,18 +69,7 @@ const getExhibitLabel = (index: number, type: ExhibitNumberingType = "letters"):
   return result;
 };
 
-const drawExhibitStamp = (page: PDFPage, label: string, font: PDFFont, size = 12) => {
-  const { height, width } = page.getSize();
-  const text = sanitizeText(`EXHIBIT ${label}`);
-  const textWidth = font.widthOfTextAtSize(text, size);
-  page.drawText(text, {
-    x: (width - textWidth) / 2,
-    y: height - PAGE_MARGIN - 12,
-    size,
-    font,
-    color: rgb(0.13, 0.13, 0.13),
-  });
-};
+// Removed: drawExhibitStamp - redundant with stickers and too verbose for court-ready exhibits
 
 const drawBatesStamp = (
   page: PDFPage,
@@ -231,8 +221,9 @@ const drawWatermark = (page: PDFPage, font: PDFFont, text: string) => {
 };
 
 type TocEntry = {
+  label: string;
   description: string;
-  range: string;
+  batesRange: string;
 };
 
 const drawIndexPage = (
@@ -262,21 +253,38 @@ const drawIndexPage = (
 
   const startY = height - 190;
   const lineHeight = 20;
+  const labelWidth = 40;
+  const batesWidth = 140;
+
   entries.forEach((entry, idx) => {
     const y = startY - idx * lineHeight;
+    const label = sanitizeText(entry.label);
     const desc = sanitizeText(entry.description);
-    const range = sanitizeText(entry.range);
-    page.drawText(desc, {
+    const batesRange = sanitizeText(entry.batesRange);
+
+    // Draw exhibit label (A, B, C, etc.)
+    page.drawText(label, {
       x: PAGE_MARGIN,
+      y,
+      size: 12,
+      font: boldFont,
+      color: rgb(0.15, 0.16, 0.18),
+    });
+
+    // Draw description
+    page.drawText(desc, {
+      x: PAGE_MARGIN + labelWidth,
       y,
       size: 12,
       font,
       color: rgb(0.15, 0.16, 0.18),
-      maxWidth: width - PAGE_MARGIN * 2 - 120,
+      maxWidth: width - PAGE_MARGIN * 2 - labelWidth - batesWidth,
     });
-    const rangeWidth = font.widthOfTextAtSize(range, 12);
-    page.drawText(range, {
-      x: width - PAGE_MARGIN - rangeWidth,
+
+    // Draw Bates range (right-aligned)
+    const batesRangeWidth = font.widthOfTextAtSize(batesRange, 12);
+    page.drawText(batesRange, {
+      x: width - PAGE_MARGIN - batesRangeWidth,
       y,
       size: 12,
       font,
@@ -317,172 +325,6 @@ const addSlipSheet = (
     drawBrandingFooter(page, font, footerText);
   }
   return page;
-};
-
-const drawCoverPage = (
-  page: PDFPage,
-  options: {
-    exhibitLabel: string;
-    matterName: string;
-    caseNumber?: string | null;
-    caseTitle?: string;
-    courtName?: string;
-    generatedDate: string;
-    batesRange: string;
-    font: PDFFont;
-    boldFont: PDFFont;
-    showBranding: boolean;
-    coverTemplate: "classic" | "modern" | "black-bar";
-    contactBlock?: string;
-    firmLogoUrl?: string;
-    footerText?: string;
-  }
-) => {
-  const {
-    exhibitLabel,
-    matterName,
-    caseNumber,
-    caseTitle,
-    courtName,
-    generatedDate,
-    batesRange,
-    font,
-    boldFont,
-    showBranding,
-    coverTemplate,
-    contactBlock,
-    firmLogoUrl,
-    footerText,
-  } = options;
-  const { width, height } = page.getSize();
-  const centerX = width / 2;
-
-  if (coverTemplate === "modern") {
-    page.drawRectangle({
-      x: 0,
-      y: height - 180,
-      width,
-      height: 180,
-      color: rgb(0.02, 0.35, 0.78),
-      opacity: 0.1,
-    });
-  } else if (coverTemplate === "black-bar") {
-    page.drawRectangle({
-      x: 0,
-      y: height - 120,
-      width,
-      height: 120,
-      color: rgb(0.08, 0.08, 0.12),
-      opacity: 0.92,
-    });
-    page.drawText("Exhibit Packet", {
-      x: PAGE_MARGIN,
-      y: height - 70,
-      size: 14,
-      font: boldFont,
-      color: rgb(1, 1, 1),
-    });
-  }
-
-  const title = sanitizeText(caseTitle || `EXHIBIT ${exhibitLabel}`);
-  const subtitle = caseTitle ? sanitizeText(`Exhibit ${exhibitLabel}`) : "";
-  const titleWidth = boldFont.widthOfTextAtSize(title, 26);
-  page.drawText(title, {
-    x: centerX - titleWidth / 2,
-    y: height - 170,
-    size: 26,
-    font: boldFont,
-    color: rgb(0.1, 0.1, 0.1),
-  });
-  if (subtitle) {
-    const subtitleWidth = font.widthOfTextAtSize(subtitle, 12);
-    page.drawText(subtitle, {
-      x: centerX - subtitleWidth / 2,
-      y: height - 190,
-      size: 12,
-      font,
-      color: rgb(0.2, 0.22, 0.26),
-    });
-  }
-
-  page.drawLine({
-    start: { x: PAGE_MARGIN, y: height - 205 },
-    end: { x: width - PAGE_MARGIN, y: height - 205 },
-    thickness: 0.6,
-    color:
-      coverTemplate === "black-bar" ? rgb(0.9, 0.9, 0.9) : rgb(0.82, 0.85, 0.9),
-  });
-
-  const lines = [
-    courtName ? sanitizeText(courtName) : "",
-    sanitizeText(matterName),
-    caseNumber ? sanitizeText(`Case No.: ${caseNumber}`) : "",
-    sanitizeText(`Generated: ${generatedDate}`),
-    sanitizeText(`Bates: ${batesRange}`),
-  ];
-
-  if (showBranding) {
-    lines.splice(4, 0, sanitizeText("Prepared with CaseReady Exhibit Builder"));
-  }
-
-  const compacted = lines.filter(Boolean);
-
-  let offsetY = height - 240;
-  compacted.forEach((line, index) => {
-    const size = index <= 1 ? 13 : 12;
-    const useBold = index === 0;
-    const currentFont = useBold ? boldFont : font;
-    const textWidth = currentFont.widthOfTextAtSize(line, size);
-    page.drawText(line, {
-      x: centerX - textWidth / 2,
-      y: offsetY,
-      size,
-      font: currentFont,
-      color: rgb(0.2, 0.2, 0.2),
-    });
-    offsetY -= 22;
-  });
-
-  if (contactBlock) {
-    page.drawRectangle({
-      x: PAGE_MARGIN,
-      y: PAGE_MARGIN + 120,
-      width: width - PAGE_MARGIN * 2,
-      height: 60,
-      color: rgb(0.98, 0.99, 1),
-      borderColor: rgb(0.86, 0.89, 0.94),
-      borderWidth: 0.8,
-    });
-    page.drawText(sanitizeText(contactBlock), {
-      x: PAGE_MARGIN + 12,
-      y: PAGE_MARGIN + 140,
-      size: 11,
-      font,
-      color: rgb(0.16, 0.18, 0.22),
-      maxWidth: width - PAGE_MARGIN * 2 - 24,
-    });
-  }
-
-  if (firmLogoUrl) {
-    page.drawText("[Firm logo]", {
-      x: PAGE_MARGIN,
-      y: height - 130,
-      size: 10,
-      font,
-      color: rgb(0.25, 0.28, 0.32),
-    });
-  }
-
-  if (footerText) {
-    const textWidth = font.widthOfTextAtSize(footerText, 10);
-    page.drawText(footerText, {
-      x: centerX - textWidth / 2,
-      y: PAGE_MARGIN + 16,
-      size: 10,
-      font,
-      color: rgb(0.25, 0.28, 0.32),
-    });
-  }
 };
 
 const toJpegBuffer = async (input: Buffer, debugInfo: { name: string; type: string; size: number }): Promise<Buffer> => {
@@ -765,15 +607,14 @@ export async function POST(req: NextRequest) {
         options: formatOptions,
         plan,
       });
-    const includeCover = activePreset !== "quick" && activeOptions.include_cover;
-    const includeIndex =
-      activePreset !== "quick" && activeOptions.include_index;
-    const showBranding =
-      activePreset === "quick"
-        ? true
-        : activeOptions.show_caseready_branding || plan === "free";
+
+    // Court-ready defaults: no auto-generated covers, stickers OFF, page numbers OFF
+    const includeCover = false; // Never auto-generate covers
+    const includeIndex = activeOptions.include_index;
+    const showExhibitStickers = activeOptions.show_exhibit_stickers ?? false;
+    const showPageNumbers = activeOptions.show_page_numbers ?? false;
+    const brandingPlacement = activeOptions.branding_placement ?? "metadata";
     const stickerPosition = activeOptions.sticker_position ?? "top-right";
-    const coverTemplate = activeOptions.cover_template ?? "classic";
     const watermarkText =
       activePreset === "firm_branded" ? activeOptions.watermark_text || "" : "";
     const colorCodedStickers =
@@ -783,8 +624,6 @@ export async function POST(req: NextRequest) {
     const footerText =
       activePreset === "firm_branded" && activeOptions.footer_text
         ? activeOptions.footer_text
-        : showBranding
-        ? "Prepared with CaseReady"
         : "";
     const contactBlock =
       activePreset !== "quick" && activeOptions.include_contact_block
@@ -836,8 +675,9 @@ export async function POST(req: NextRequest) {
 
       const startBates = batesCounter;
       const startPage = runningPageNumber;
+      const isExcludedFromLettering = exhibit.excludeFromLettering ?? false;
 
-      if (slipSheets) {
+      if (slipSheets && !isExcludedFromLettering) {
         const slip = addSlipSheet(
           pdfDoc,
           label,
@@ -846,9 +686,10 @@ export async function POST(req: NextRequest) {
           batesFont,
           footerText
         );
-        drawExhibitStamp(slip, label, exhibitFont);
         const batesValue = `${BATES_PREFIX}${String(batesCounter).padStart(4, "0")}`;
-        drawExhibitSticker(slip, label, batesValue, batesFont, stickerPosition, colorCodedStickers);
+        if (showExhibitStickers) {
+          drawExhibitSticker(slip, label, batesValue, batesFont, stickerPosition, colorCodedStickers);
+        }
         drawBatesStamp(slip, batesCounter++, batesFont);
         drawWatermark(slip, batesFont, watermarkText);
         runningPageNumber += 1;
@@ -858,7 +699,8 @@ export async function POST(req: NextRequest) {
         name: file.name,
         type: file.type,
         size: file.size,
-        label
+        label,
+        excludeFromLettering: isExcludedFromLettering
       });
 
       let pages: PDFPage[];
@@ -888,24 +730,29 @@ export async function POST(req: NextRequest) {
       const endPage = startPage + pages.length - 1;
 
       pages.forEach((page) => {
-        drawExhibitStamp(page, label, exhibitFont);
         const batesValue = `${BATES_PREFIX}${String(batesCounter).padStart(4, "0")}`;
-        drawExhibitSticker(
-          page,
-          label,
-          batesValue,
-          batesFont,
-          stickerPosition,
-          colorCodedStickers
-        );
+        // Only show exhibit stickers for non-excluded files when enabled
+        if (showExhibitStickers && !isExcludedFromLettering) {
+          drawExhibitSticker(
+            page,
+            label,
+            batesValue,
+            batesFont,
+            stickerPosition,
+            colorCodedStickers
+          );
+        }
         drawBatesStamp(page, batesCounter++, batesFont);
         drawWatermark(page, batesFont, watermarkText);
       });
 
-      if (includeIndex) {
+      if (includeIndex && !isExcludedFromLettering) {
+        const batesStart = `${BATES_PREFIX}${String(startBates).padStart(4, "0")}`;
+        const batesEnd = `${BATES_PREFIX}${String(endBates).padStart(4, "0")}`;
         tocEntries.push({
+          label,
           description,
-          range: `pp. ${startPage}–${endPage}`,
+          batesRange: `${batesStart}–${batesEnd}`,
         });
       }
 
@@ -917,39 +764,41 @@ export async function POST(req: NextRequest) {
       drawIndexPage(indexPage, tocEntries, batesFont, exhibitFont);
     }
 
-    if (includeCover && cover) {
-      const overallEndBates = Math.max(1, batesCounter - 1);
-      drawCoverPage(cover, {
-        exhibitLabel: firstLabel,
-        matterName,
-        caseNumber,
-        caseTitle,
-        courtName,
-        generatedDate: new Date().toLocaleDateString(),
-        batesRange: `${BATES_PREFIX}${String(1).padStart(4, "0")} – ${BATES_PREFIX}${String(
-          overallEndBates
-        ).padStart(4, "0")}`,
-        font: batesFont,
-        boldFont: exhibitFont,
-        showBranding,
-        coverTemplate,
-        contactBlock,
-        firmLogoUrl,
-        footerText,
+    // Branding placement logic (court-ready: metadata only by default)
+    if (brandingPlacement === "final_page") {
+      // Add a final page with "Prepared with CaseReady"
+      const brandingPage = pdfDoc.addPage([DEFAULT_PAGE.width, DEFAULT_PAGE.height]);
+      const { height } = brandingPage.getSize();
+      brandingPage.drawText("Prepared with CaseReady", {
+        x: PAGE_MARGIN,
+        y: height / 2,
+        size: 14,
+        font: exhibitFont,
+        color: rgb(0.4, 0.4, 0.4),
       });
     }
 
-    const allPages = pdfDoc.getPages();
-    const totalPages = allPages.length;
-    allPages.forEach((page, idx) => {
-      drawPageNumber(page, idx + 1, totalPages, pageNumberFont);
-      const footerLine =
-        footerText ||
-        (showBranding ? "Prepared with CaseReady" : "");
-      if (footerLine) {
-        drawBrandingFooter(page, pageNumberFont, footerLine);
+    // Page numbers (only if enabled)
+    if (showPageNumbers) {
+      const allPages = pdfDoc.getPages();
+      const totalPages = allPages.length;
+      allPages.forEach((page, idx) => {
+        drawPageNumber(page, idx + 1, totalPages, pageNumberFont);
+      });
+    }
+
+    // Footer on last page only (if branding_placement is footer_last_page)
+    if (brandingPlacement === "footer_last_page") {
+      const allPages = pdfDoc.getPages();
+      if (allPages.length > 0) {
+        const lastPage = allPages[allPages.length - 1];
+        drawBrandingFooter(lastPage, pageNumberFont, "Prepared with CaseReady");
       }
-    });
+    }
+
+    // Always set metadata
+    pdfDoc.setCreator("CaseReady");
+    pdfDoc.setProducer("CaseReady Exhibit Builder");
 
     console.log("[POST] Saving PDF document...");
     const pdfBytes = await pdfDoc.save(

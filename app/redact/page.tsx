@@ -343,11 +343,11 @@ export default function RedactPage() {
               Your files are processed securely and are not stored on our servers.
             </p>
             {file && (
-              <div className="mt-4 inline-flex items-center gap-3 rounded-xl border border-[#E5E0D8] bg-white px-4 py-2 text-sm text-[#0F1419] shadow-sm">
-                <span className="font-semibold">{file.name}</span>
-                <span className="text-xs text-[#6B6560]">{formatBytes(file.size)}</span>
+              <div className="mt-4 inline-flex items-center gap-3 rounded-xl border border-[#E5E0D8] bg-white px-4 py-2 text-sm text-[#0F1419] shadow-sm max-w-full">
+                <span className="font-semibold truncate">{file.name}</span>
+                <span className="text-xs text-[#6B6560] hidden sm:inline">{formatBytes(file.size)}</span>
                 {pageCount !== null && (
-                  <span className="text-xs text-[#6B6560]">{pageCount} pages</span>
+                  <span className="text-xs text-[#6B6560] hidden sm:inline">{pageCount} pages</span>
                 )}
               </div>
             )}

@@ -5,10 +5,15 @@ export type StickerPosition = "top-right" | "bottom-right" | "left-vertical";
 export type CoverTemplate = "classic" | "modern" | "black-bar";
 export type ExhibitNumberingType = "letters" | "numbers" | "roman";
 
+export type BrandingPlacement = "metadata" | "final_page" | "footer_last_page";
+
 export type FormatOptions = {
   include_cover?: boolean;
   include_index?: boolean;
   show_caseready_branding?: boolean;
+  branding_placement?: BrandingPlacement;
+  show_exhibit_stickers?: boolean;
+  show_page_numbers?: boolean;
   sticker_position?: StickerPosition;
   cover_template?: CoverTemplate;
   include_contact_block?: boolean;
@@ -27,8 +32,11 @@ export type FormatOptions = {
 const FORMAT_DEFAULTS: Record<FormatPreset, Required<FormatOptions>> = {
   quick: {
     include_cover: false,
-    include_index: false,
-    show_caseready_branding: true,
+    include_index: true,
+    show_caseready_branding: false,
+    branding_placement: "metadata",
+    show_exhibit_stickers: false,
+    show_page_numbers: false,
     sticker_position: "top-right",
     cover_template: "classic",
     include_contact_block: false,
@@ -44,9 +52,12 @@ const FORMAT_DEFAULTS: Record<FormatPreset, Required<FormatOptions>> = {
     exhibit_numbering_type: "letters",
   },
   formal: {
-    include_cover: true,
+    include_cover: false,
     include_index: true,
-    show_caseready_branding: true,
+    show_caseready_branding: false,
+    branding_placement: "metadata",
+    show_exhibit_stickers: false,
+    show_page_numbers: false,
     sticker_position: "top-right",
     cover_template: "classic",
     include_contact_block: true,
@@ -62,9 +73,12 @@ const FORMAT_DEFAULTS: Record<FormatPreset, Required<FormatOptions>> = {
     exhibit_numbering_type: "letters",
   },
   firm_branded: {
-    include_cover: true,
+    include_cover: false,
     include_index: true,
     show_caseready_branding: false,
+    branding_placement: "metadata",
+    show_exhibit_stickers: false,
+    show_page_numbers: false,
     sticker_position: "top-right",
     cover_template: "modern",
     include_contact_block: true,
@@ -99,6 +113,13 @@ const sanitizeStickerPosition = (
   return "top-right";
 };
 
+const sanitizeBrandingPlacement = (
+  value?: BrandingPlacement | string | null
+): BrandingPlacement => {
+  if (value === "final_page" || value === "footer_last_page") return value;
+  return "metadata";
+};
+
 export const mergeOptionsWithDefaults = (
   preset: FormatPreset,
   options?: Partial<FormatOptions> | null
@@ -109,6 +130,9 @@ export const mergeOptionsWithDefaults = (
     include_cover: Boolean(merged.include_cover),
     include_index: Boolean(merged.include_index),
     show_caseready_branding: merged.show_caseready_branding !== false,
+    branding_placement: sanitizeBrandingPlacement(merged.branding_placement),
+    show_exhibit_stickers: Boolean(merged.show_exhibit_stickers),
+    show_page_numbers: Boolean(merged.show_page_numbers),
     sticker_position: sanitizeStickerPosition(merged.sticker_position),
     cover_template:
       merged.cover_template === "modern" || merged.cover_template === "black-bar"
@@ -142,9 +166,12 @@ export const resolveFormattingForPlan = (input: {
       options: {
         ...getDefaultFormatOptions("quick"),
         show_caseready_branding: true,
+        branding_placement: "metadata",
+        show_exhibit_stickers: false,
+        show_page_numbers: false,
         sticker_position: "top-right",
         include_cover: false,
-        include_index: false,
+        include_index: true,
         watermark_text: "",
         footer_text: "",
         slip_sheets: false,
@@ -165,7 +192,10 @@ export const resolveFormattingForPlan = (input: {
       preset,
       options: {
         ...getDefaultFormatOptions("quick"),
-        show_caseready_branding: true,
+        show_caseready_branding: false,
+        branding_placement: "metadata",
+        show_exhibit_stickers: false,
+        show_page_numbers: false,
       },
     };
   }
