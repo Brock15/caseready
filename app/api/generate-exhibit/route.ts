@@ -485,12 +485,69 @@ const drawCoverPage = (
   }
 };
 
-const toJpegBuffer = async (input: Buffer): Promise<Buffer> => {
+const toJpegBuffer = async (input: Buffer, debugInfo: { name: string; type: string; size: number }): Promise<Buffer> => {
   // Cap size and convert to JPEG. Rotate based on EXIF orientation for correct display.
+  console.log("[toJpegBuffer] Starting conversion:", debugInfo);
+
+  // For HEIC/HEIF files, use special handling with explicit format conversion
+  const isHeic = debugInfo.type === "image/heic" || debugInfo.type === "image/heif" ||
+                 debugInfo.name.toLowerCase().endsWith(".heic") ||
+                 debugInfo.name.toLowerCase().endsWith(".heif");
+
+  if (isHeic) {
+    console.log("[toJpegBuffer] HEIC/HEIF detected, using explicit conversion...");
+    try {
+      // For HEIC, explicitly specify the format and use a simpler pipeline
+      const result = await sharp(input, {
+        failOnError: false,
+        unlimited: true, // Allow processing of large images
+      })
+        .toFormat("jpeg") // Explicitly convert to JPEG first
+        .rotate() // Then apply EXIF orientation
+        .resize({
+          width: MAX_IMAGE_DIMENSION,
+          height: MAX_IMAGE_DIMENSION,
+          fit: "inside",
+          withoutEnlargement: true,
+          background: { r: 255, g: 255, b: 255, alpha: 1 },
+        })
+        .jpeg({ quality: 85, mozjpeg: true })
+        .toBuffer();
+      console.log("[toJpegBuffer] HEIC conversion success, output size:", result.length);
+      return result;
+    } catch (heicErr) {
+      console.error("[toJpegBuffer] HEIC conversion failed:", heicErr);
+      // Try without rotation as fallback for HEIC
+      try {
+        const result = await sharp(input, {
+          failOnError: false,
+          unlimited: true,
+        })
+          .toFormat("jpeg")
+          .resize({
+            width: MAX_IMAGE_DIMENSION,
+            height: MAX_IMAGE_DIMENSION,
+            fit: "inside",
+            withoutEnlargement: true,
+            background: { r: 255, g: 255, b: 255, alpha: 1 },
+          })
+          .jpeg({ quality: 85, mozjpeg: true })
+          .toBuffer();
+        console.log("[toJpegBuffer] HEIC conversion without rotation success:", result.length);
+        return result;
+      } catch (finalErr) {
+        console.error("[toJpegBuffer] HEIC conversion completely failed:", finalErr);
+        throw new Error(`HEIC/HEIF conversion not supported on this server. Please convert your iPhone photos to JPEG before uploading.`);
+      }
+    }
+  }
+
+  // Standard image processing for JPEG, PNG, etc.
   try {
     // Sharp's rotate() with no arguments applies EXIF orientation then removes the EXIF data
     // This ensures images display correctly regardless of how they were taken
-    return await sharp(input, { failOnError: false })
+    console.log("[toJpegBuffer] Attempting standard conversion with rotation...");
+    const result = await sharp(input, { failOnError: false })
       .rotate() // Apply EXIF orientation (auto-rotate to correct orientation)
       .resize({
         width: MAX_IMAGE_DIMENSION,
@@ -501,11 +558,14 @@ const toJpegBuffer = async (input: Buffer): Promise<Buffer> => {
       })
       .jpeg({ quality: 85, mozjpeg: true })
       .toBuffer();
+    console.log("[toJpegBuffer] Success with rotation, output size:", result.length);
+    return result;
   } catch (err) {
     // If rotation/conversion fails, try without rotation as fallback
-    console.warn("Image rotation failed, trying without rotation:", err);
+    console.error("[toJpegBuffer] Rotation failed:", err);
+    console.log("[toJpegBuffer] Attempting without rotation...");
     try {
-      return await sharp(input, { failOnError: false })
+      const result = await sharp(input, { failOnError: false })
         .resize({
           width: MAX_IMAGE_DIMENSION,
           height: MAX_IMAGE_DIMENSION,
@@ -515,9 +575,12 @@ const toJpegBuffer = async (input: Buffer): Promise<Buffer> => {
         })
         .jpeg({ quality: 85, mozjpeg: true })
         .toBuffer();
+      console.log("[toJpegBuffer] Success without rotation, output size:", result.length);
+      return result;
     } catch (fallbackErr) {
       // Common on platforms without HEIC support or corrupt images
-      throw new Error("Image conversion failed. If this is an iPhone HEIC photo, try converting to JPEG first.");
+      console.error("[toJpegBuffer] Both attempts failed:", fallbackErr);
+      throw new Error(`Image conversion failed (${debugInfo.type}, ${debugInfo.size} bytes).`);
     }
   }
 };
@@ -526,21 +589,32 @@ const loadPdfOrImageAsPages = async (
   fileBuffer: ArrayBuffer,
   fileType: string,
   targetDoc: PDFDocument,
-  options: { stickerPosition: StickerPosition }
+  options: { stickerPosition: StickerPosition; fileName: string; fileSize: number }
 ): Promise<PDFPage[]> => {
-  const { stickerPosition } = options;
+  const { stickerPosition, fileName, fileSize } = options;
+  console.log("[loadPdfOrImageAsPages] Processing file:", { fileName, fileType, fileSize });
+
   if (fileType === "application/pdf") {
+    console.log("[loadPdfOrImageAsPages] Loading as PDF...");
     const src = await PDFDocument.load(fileBuffer);
     const copies = await targetDoc.copyPages(src, src.getPageIndices());
     copies.forEach((page) => targetDoc.addPage(page));
+    console.log("[loadPdfOrImageAsPages] PDF loaded successfully, pages:", copies.length);
     return copies;
   }
 
+  console.log("[loadPdfOrImageAsPages] Processing as image...");
   let workingBuffer: Buffer = Buffer.from(fileBuffer);
 
   // Convert and rotate image based on EXIF orientation for correct display
-  const embeddedBuffer = await toJpegBuffer(workingBuffer);
+  const embeddedBuffer = await toJpegBuffer(workingBuffer, {
+    name: fileName,
+    type: fileType,
+    size: fileSize
+  });
+  console.log("[loadPdfOrImageAsPages] Image converted, embedding in PDF...");
   const embedded = await targetDoc.embedJpg(embeddedBuffer);
+  console.log("[loadPdfOrImageAsPages] Image embedded successfully");
 
   const page = targetDoc.addPage([DEFAULT_PAGE.width, DEFAULT_PAGE.height]);
   const pageWidth = DEFAULT_PAGE.width;
@@ -566,6 +640,7 @@ const loadPdfOrImageAsPages = async (
 };
 
 export async function POST(req: NextRequest) {
+  console.log("[POST] === Starting exhibit generation request ===");
   try {
     const cookieStore = await cookies();
     const supabase = createServerClient(
@@ -632,7 +707,10 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    console.log("[POST] Received files:", files.map(f => ({ name: f.name, type: f.type, size: f.size })));
+
     if (files.length === 0) {
+      console.error("[POST] No files received");
       return NextResponse.json(
         { ok: false, message: "No files received." },
         { status: 400 }
@@ -776,21 +854,32 @@ export async function POST(req: NextRequest) {
         runningPageNumber += 1;
       }
 
+      console.log(`[POST] Processing exhibit ${i + 1}/${exhibitsInput.length}:`, {
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        label
+      });
+
       let pages: PDFPage[];
       try {
         pages = await loadPdfOrImageAsPages(
           buffer,
           file.type || "",
           pdfDoc,
-          { stickerPosition }
+          {
+            stickerPosition,
+            fileName: file.name,
+            fileSize: file.size
+          }
         );
       } catch (fileError) {
-        console.error("Failed to process file", { name: file.name, type: file.type, fileError });
+        console.error("[POST] Failed to process file", { name: file.name, type: file.type, size: file.size, fileError });
         return NextResponse.json(
           {
             ok: false,
             message:
-              "We couldn’t process one of the uploads. If it’s an iPhone HEIC photo, try exporting as JPEG/PNG and re-upload.",
+              "We couldn't process one of the uploads. If it's an iPhone HEIC photo, try exporting as JPEG/PNG and re-upload.",
           },
           { status: 400 }
         );
@@ -862,10 +951,12 @@ export async function POST(req: NextRequest) {
       }
     });
 
+    console.log("[POST] Saving PDF document...");
     const pdfBytes = await pdfDoc.save(
       activeOptions.optimized_pdf !== false ? { useObjectStreams: true } : undefined
     );
     const pdfBuffer = Buffer.from(pdfBytes);
+    console.log("[POST] PDF saved successfully, size:", pdfBuffer.length);
 
     if (!isUnlimited) {
       await supabase.auth.updateUser({
@@ -873,6 +964,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    console.log("[POST] === Exhibit generation completed successfully ===");
     return new Response(pdfBuffer, {
       status: 200,
       headers: {
@@ -882,7 +974,9 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Failed to generate exhibit PDF", error);
+    console.error("[POST] === EXHIBIT GENERATION FAILED ===");
+    console.error("[POST] Error details:", error);
+    console.error("[POST] Error stack:", error instanceof Error ? error.stack : "No stack trace");
     return NextResponse.json(
       {
         ok: false,
