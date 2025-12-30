@@ -11,12 +11,6 @@ export type RedactOptions = {
 
 const pdfjsLibPromise = import("pdfjs-dist/legacy/build/pdf.mjs");
 
-const normalize = (value: string) =>
-  value
-    .toLowerCase()
-    .replace(/\s+/g, " ")
-    .trim();
-
 // Basic patterns for MVP
 const emailRegex = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i;
 const phoneRegex = /(\+?\d[\d\s().-]{7,}\d)/i;
@@ -30,13 +24,10 @@ const buildPattern = (pattern: RegExp | string, flags = "gi") => {
 };
 
 /**
- * SUPER IMPORTANT:
- * This MVP version does **page-level** redaction:
- * - If a page's text matches any pattern (email, phone, etc.),
- *   we black out the entire page.
- * - No Poppler, no sharp, no rasterization – works on Vercel.
- *
- * Later, you can upgrade this to line-level bounding boxes or full rasterization.
+ * Text-level redaction:
+ * - Extracts text with positioning from each page
+ * - Finds pattern matches and draws black rectangles only over matched text
+ * - Preserves all non-matching content
  */
 export async function redactPdf(
   pdfBytes: Uint8Array,
@@ -64,7 +55,7 @@ export async function redactPdf(
     return pdfDoc.save();
   }
 
-  // Use pdfjs to extract text per page
+  // Use pdfjs to extract text per page with positioning
   const rawPdfjsLib = await pdfjsLibPromise;
   const pdfjsLib = (rawPdfjsLib as any).default ?? rawPdfjsLib;
 
@@ -73,7 +64,6 @@ export async function redactPdf(
     disableWorker: true,
     useSystemFonts: true,
     isEvalSupported: true,
-    // Avoid bundling standard fonts path on serverless; rely on built-ins.
     standardFontDataUrl: undefined,
     disableFontFace: true,
   });
@@ -86,52 +76,62 @@ export async function redactPdf(
     return pdfDoc.save();
   }
 
-  const pagesToRedact: number[] = [];
-
+  // Process each page and find text items to redact
   for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
     try {
-      const page = await pdf.getPage(pageNumber);
-      const textContent = await page.getTextContent();
+      const pdfjsPage = await pdf.getPage(pageNumber);
+      const textContent = await pdfjsPage.getTextContent();
 
-      const fullText = (textContent.items as any[])
-        .map((item) => (typeof item?.str === "string" ? item.str : ""))
-        .join(" ");
+      // Get the pdf-lib page (0-indexed)
+      const pdfLibPage = pdfDoc.getPage(pageNumber - 1);
 
-      const normalizedText = normalize(fullText);
+      // Build text with position tracking
+      const textItems = textContent.items as any[];
 
-      const matches = patterns.some((pattern) => {
-        const re = new RegExp(pattern.source, pattern.flags);
-        return re.test(fullText) || re.test(normalizedText);
-      });
+      // Check each text item individually for matches
+      for (const item of textItems) {
+        if (!item?.str || typeof item.str !== "string" || !item.transform) continue;
 
-      if (matches) {
-        // pdf-lib pages are 0-indexed
-        pagesToRedact.push(pageNumber - 1);
+        const itemText = item.str;
+        if (!itemText.trim()) continue;
+
+        // Check if this text matches any pattern
+        let shouldRedact = false;
+        for (const pattern of patterns) {
+          const re = new RegExp(pattern.source, pattern.flags);
+          if (re.test(itemText)) {
+            shouldRedact = true;
+            break;
+          }
+        }
+
+        if (!shouldRedact) continue;
+
+        // Extract position from transform matrix
+        // Transform: [scaleX, skewX, skewY, scaleY, x, y]
+        const [, , , scaleY, x, y] = item.transform;
+
+        // Calculate actual text dimensions
+        const textWidth = item.width;
+        const fontSize = Math.abs(scaleY);
+
+        // The y coordinate is at the text baseline
+        // We need to cover only the visible text height, not extend too far up or down
+        const textHeight = fontSize * 0.85; // Reduce height to fit just the text
+        const yOffset = fontSize * 0.15; // Small offset from baseline
+
+        pdfLibPage.drawRectangle({
+          x: x,
+          y: y - yOffset,
+          width: textWidth,
+          height: textHeight,
+          color: rgb(0, 0, 0),
+        });
       }
     } catch (error) {
-      console.warn(`Failed to inspect page ${pageNumber} for redaction`, error);
+      console.warn(`Failed to redact page ${pageNumber}`, error);
       continue;
     }
-  }
-
-  // If nothing matched, just return original
-  if (!pagesToRedact.length) {
-    return pdfDoc.save();
-  }
-
-  // Black out entire pages that matched
-  for (const pageIndex of pagesToRedact) {
-    const page = pdfDoc.getPage(pageIndex);
-    const width = page.getWidth();
-    const height = page.getHeight();
-
-    page.drawRectangle({
-      x: 0,
-      y: 0,
-      width,
-      height,
-      color: rgb(0, 0, 0),
-    });
   }
 
   const outBytes = await pdfDoc.save();

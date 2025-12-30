@@ -16,6 +16,7 @@ import {
   FormatPreset,
   resolveFormattingForPlan,
   StickerPosition,
+  ExhibitNumberingType,
 } from "@/lib/formatting";
 import { getUserPlan } from "@/lib/userPlan";
 
@@ -37,7 +38,26 @@ const MAX_IMAGE_DIMENSION = 2400; // cap large mobile photos for lambda memory
 
 const sanitizeText = (value: string) => (value || "").replace(/\u202f/g, " ");
 
-const getExhibitLabel = (index: number): string => {
+const getExhibitLabel = (index: number, type: ExhibitNumberingType = "letters"): string => {
+  if (type === "numbers") {
+    return (index + 1).toString();
+  }
+
+  if (type === "roman") {
+    const romanNumerals = [
+      ["", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"],
+      ["", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC"],
+      ["", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM"],
+    ];
+    const num = index + 1;
+    if (num > 399) return num.toString(); // Fallback for large numbers
+    const hundreds = Math.floor(num / 100);
+    const tens = Math.floor((num % 100) / 10);
+    const ones = num % 10;
+    return romanNumerals[2][hundreds] + romanNumerals[1][tens] + romanNumerals[0][ones];
+  }
+
+  // Default: letters (A, B, C, ...)
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   let result = "";
   let n = index;
@@ -466,9 +486,12 @@ const drawCoverPage = (
 };
 
 const toJpegBuffer = async (input: Buffer): Promise<Buffer> => {
-  // Cap size and convert to JPEG for consistent embedding while preserving pixel orientation
+  // Cap size and convert to JPEG. Rotate based on EXIF orientation for correct display.
   try {
-    return await sharp(input)
+    // Sharp's rotate() with no arguments applies EXIF orientation then removes the EXIF data
+    // This ensures images display correctly regardless of how they were taken
+    return await sharp(input, { failOnError: false })
+      .rotate() // Apply EXIF orientation (auto-rotate to correct orientation)
       .resize({
         width: MAX_IMAGE_DIMENSION,
         height: MAX_IMAGE_DIMENSION,
@@ -476,11 +499,26 @@ const toJpegBuffer = async (input: Buffer): Promise<Buffer> => {
         withoutEnlargement: true,
         background: { r: 255, g: 255, b: 255, alpha: 1 },
       })
-      .jpeg({ quality: 85 })
+      .jpeg({ quality: 85, mozjpeg: true })
       .toBuffer();
   } catch (err) {
-    // Common on platforms without HEIC support
-    throw new Error("Image conversion failed (possible HEIC/unsupported format).");
+    // If rotation/conversion fails, try without rotation as fallback
+    console.warn("Image rotation failed, trying without rotation:", err);
+    try {
+      return await sharp(input, { failOnError: false })
+        .resize({
+          width: MAX_IMAGE_DIMENSION,
+          height: MAX_IMAGE_DIMENSION,
+          fit: "inside",
+          withoutEnlargement: true,
+          background: { r: 255, g: 255, b: 255, alpha: 1 },
+        })
+        .jpeg({ quality: 85, mozjpeg: true })
+        .toBuffer();
+    } catch (fallbackErr) {
+      // Common on platforms without HEIC support or corrupt images
+      throw new Error("Image conversion failed. If this is an iPhone HEIC photo, try converting to JPEG first.");
+    }
   }
 };
 
@@ -500,7 +538,7 @@ const loadPdfOrImageAsPages = async (
 
   let workingBuffer: Buffer = Buffer.from(fileBuffer);
 
-  // Do not rotate automatically; images are assumed visually upright. Always re-encode to JPEG to strip EXIF orientation.
+  // Convert and rotate image based on EXIF orientation for correct display
   const embeddedBuffer = await toJpegBuffer(workingBuffer);
   const embedded = await targetDoc.embedJpg(embeddedBuffer);
 
@@ -678,6 +716,7 @@ export async function POST(req: NextRequest) {
     const caseTitle = activePreset !== "quick" ? activeOptions.case_title || "" : "";
     const firmLogoUrl =
       activePreset === "firm_branded" ? activeOptions.firm_logo_url || "" : "";
+    const exhibitNumberingType = activeOptions.exhibit_numbering_type ?? "letters";
 
     const pdfDoc = await PDFDocument.create();
     const exhibitFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
@@ -685,7 +724,7 @@ export async function POST(req: NextRequest) {
     const pageNumberFont = batesFont;
     let batesCounter = 1;
     const firstLabel =
-      (exhibitsInput[0]?.label || getExhibitLabel(0)).trim() || "A";
+      (exhibitsInput[0]?.label || getExhibitLabel(0, exhibitNumberingType)).trim() || (exhibitNumberingType === "numbers" ? "1" : exhibitNumberingType === "roman" ? "I" : "A");
 
     const cover = includeCover
       ? pdfDoc.addPage([DEFAULT_PAGE.width, DEFAULT_PAGE.height])
@@ -713,7 +752,7 @@ export async function POST(req: NextRequest) {
       }
 
       const buffer = await file.arrayBuffer();
-      const label = (exhibit.label || getExhibitLabel(i)).trim() || "A";
+      const label = (exhibit.label || getExhibitLabel(i, exhibitNumberingType)).trim() || (exhibitNumberingType === "numbers" ? "1" : exhibitNumberingType === "roman" ? "I" : "A");
       const description =
         sanitizeText(exhibit.description?.trim() || file.name || `Exhibit ${label}`);
 

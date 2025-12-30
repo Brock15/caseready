@@ -3,6 +3,7 @@ import type { UserPlan } from "./userPlan";
 export type FormatPreset = "quick" | "formal" | "firm_branded";
 export type StickerPosition = "top-right" | "bottom-right" | "left-vertical";
 export type CoverTemplate = "classic" | "modern" | "black-bar";
+export type ExhibitNumberingType = "letters" | "numbers" | "roman";
 
 export type FormatOptions = {
   include_cover?: boolean;
@@ -20,6 +21,7 @@ export type FormatOptions = {
   color_coded_stickers?: boolean;
   firm_logo_url?: string;
   optimized_pdf?: boolean;
+  exhibit_numbering_type?: ExhibitNumberingType;
 };
 
 const FORMAT_DEFAULTS: Record<FormatPreset, Required<FormatOptions>> = {
@@ -39,6 +41,7 @@ const FORMAT_DEFAULTS: Record<FormatPreset, Required<FormatOptions>> = {
     color_coded_stickers: false,
     firm_logo_url: "",
     optimized_pdf: true,
+    exhibit_numbering_type: "letters",
   },
   formal: {
     include_cover: true,
@@ -56,6 +59,7 @@ const FORMAT_DEFAULTS: Record<FormatPreset, Required<FormatOptions>> = {
     color_coded_stickers: false,
     firm_logo_url: "",
     optimized_pdf: true,
+    exhibit_numbering_type: "letters",
   },
   firm_branded: {
     include_cover: true,
@@ -73,6 +77,7 @@ const FORMAT_DEFAULTS: Record<FormatPreset, Required<FormatOptions>> = {
     color_coded_stickers: true,
     firm_logo_url: "",
     optimized_pdf: true,
+    exhibit_numbering_type: "letters",
   },
 };
 
@@ -119,6 +124,10 @@ export const mergeOptionsWithDefaults = (
     color_coded_stickers: Boolean(merged.color_coded_stickers),
     firm_logo_url: merged.firm_logo_url || "",
     optimized_pdf: merged.optimized_pdf !== false,
+    exhibit_numbering_type:
+      merged.exhibit_numbering_type === "numbers" || merged.exhibit_numbering_type === "roman"
+        ? merged.exhibit_numbering_type
+        : "letters",
   };
 };
 

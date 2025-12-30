@@ -420,7 +420,7 @@ export default function MatterDetailPage() {
                   : "text-[#6B6560] hover:bg-[#F5F2ED]"
               }`}
             >
-              Exhibits
+              Timeline
               {exhibits.length > 0 && (
                 <span className={`inline-flex items-center justify-center h-5 min-w-5 rounded-full text-xs font-bold px-1.5 ${
                   activeTab === "exhibits" ? "bg-white/20 text-white" : "bg-[#E5E0D8] text-[#6B6560]"
@@ -790,77 +790,97 @@ export default function MatterDetailPage() {
 
         {activeTab === "exhibits" && (
           <div className="space-y-6">
-            {/* Exhibits Header */}
+            {/* Timeline Builder Header */}
             <div className="rounded-3xl border border-[#E5E0D8] bg-white p-6 shadow-sm">
-              <h3 className="text-lg font-semibold text-[#0F1419] mb-2">Exhibit Files</h3>
+              <h3 className="text-lg font-semibold text-[#0F1419] mb-2">Case Timeline</h3>
               <p className="text-sm text-[#6B6560] mb-4">
-                Files associated with this matter are tracked here. Upload exhibits through the Exhibit Builder.
+                Build and visualize the chronological timeline of events for this matter.
               </p>
               <Link
-                href="/builder"
+                href="/timeline"
                 className="inline-flex items-center gap-2 rounded-full bg-[var(--color-brand-royal)] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[var(--color-brand-royal-hover)] transition"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                Go to Exhibit Builder
+                Go to Timeline Builder
               </Link>
             </div>
 
-            {/* Exhibits List */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-[#0F1419]">
-                Tracked Files ({exhibits.length})
-              </h3>
+            {/* Timeline Display */}
+            <div className="rounded-3xl border border-[#E5E0D8] bg-white p-6 shadow-sm">
+              <h3 className="text-lg font-semibold text-[#0F1419] mb-6">Timeline Events</h3>
+
               {exhibits.length === 0 ? (
                 <div className="rounded-3xl border border-dashed border-[#E5E0D8] bg-white p-12 text-center">
                   <svg className="w-12 h-12 mx-auto text-[#E5E0D8] mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <p className="text-base font-semibold text-[#0F1419]">No exhibits yet</p>
+                  <p className="text-base font-semibold text-[#0F1419]">No timeline events yet</p>
                   <p className="text-sm text-[#6B6560] mt-1">
-                    Upload files through the Exhibit Builder to see them tracked here.
+                    Add events through the Timeline Builder to visualize your case chronology.
                   </p>
                 </div>
               ) : (
-                exhibits.map(exhibit => (
-                  <div key={exhibit.id} className="rounded-2xl border border-[#E5E0D8] bg-white p-5 shadow-sm hover:shadow-md transition">
-                    <div className="flex items-center justify-between gap-4">
-                      <div className="flex items-center gap-3 flex-1 min-w-0">
-                        <svg className="w-8 h-8 text-[var(--color-brand-royal)] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                        </svg>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-[#0F1419] truncate">{exhibit.file_name}</p>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className={`text-xs px-2 py-0.5 rounded-full ${
-                              exhibit.status === "ready" ? "bg-green-100 text-green-700" :
-                              exhibit.status === "processing" ? "bg-blue-100 text-blue-700" :
-                              "bg-gray-100 text-gray-700"
-                            }`}>
-                              {exhibit.status}
-                            </span>
-                            <span className="text-xs text-[#6B6560]">
-                              {(exhibit.file_size / 1024 / 1024).toFixed(2)} MB
-                            </span>
-                            <span className="text-xs text-[#6B6560]">
-                              {new Date(exhibit.created_at).toLocaleDateString()}
-                            </span>
+                <div className="relative">
+                  {/* Vertical Timeline Line */}
+                  <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-[#E5E0D8]" />
+
+                  <div className="space-y-6">
+                    {exhibits.map((exhibit, index) => (
+                      <div key={exhibit.id} className="relative pl-12">
+                        {/* Timeline Dot */}
+                        <div className="absolute left-2.5 top-2 w-3 h-3 rounded-full bg-[var(--color-brand-royal)] ring-4 ring-white" />
+
+                        {/* Event Card */}
+                        <div className="rounded-xl border border-[#E5E0D8] bg-[#F5F2ED]/30 p-4 hover:shadow-md transition">
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-2">
+                                <span className="text-xs font-semibold text-[var(--color-brand-royal)] bg-[var(--color-brand-royal)]/10 px-2 py-1 rounded-full">
+                                  {new Date(exhibit.created_at).toLocaleDateString()}
+                                </span>
+                                <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+                                  exhibit.status === "ready" ? "bg-green-100 text-green-700" :
+                                  exhibit.status === "processing" ? "bg-blue-100 text-blue-700" :
+                                  "bg-gray-100 text-gray-700"
+                                }`}>
+                                  {exhibit.status}
+                                </span>
+                              </div>
+                              <p className="text-sm font-semibold text-[#0F1419] mb-1">{exhibit.file_name}</p>
+                              <p className="text-xs text-[#6B6560]">
+                                File size: {(exhibit.file_size / 1024 / 1024).toFixed(2)} MB
+                              </p>
+                            </div>
+                            <div className="flex gap-2">
+                              <a
+                                href={exhibit.file_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-[var(--color-brand-royal)] hover:text-[var(--color-brand-royal-hover)] transition"
+                              >
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                              </a>
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteExhibit(exhibit.id)}
+                                className="text-red-600 hover:text-red-700 transition"
+                              >
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteExhibit(exhibit.id)}
-                        className="text-red-600 hover:text-red-700 transition flex-shrink-0"
-                      >
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
-                    </div>
+                    ))}
                   </div>
-                ))
+                </div>
               )}
             </div>
           </div>

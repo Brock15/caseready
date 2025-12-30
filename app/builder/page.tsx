@@ -46,9 +46,11 @@ const ACCEPTED_MIME_TYPES = new Set([
   "image/jpeg",
   "image/jpg",
   "image/png",
+  "image/heic",
+  "image/heif",
 ]);
 
-const ACCEPTED_EXTENSIONS = new Set(["pdf", "jpeg", "jpg", "png"]);
+const ACCEPTED_EXTENSIONS = new Set(["pdf", "jpeg", "jpg", "png", "heic", "heif", "tif", "tiff"]);
 
 const formatDateForInput = (timestamp: number) => {
   const date = new Date(timestamp || Date.now());
@@ -58,7 +60,28 @@ const formatDateForInput = (timestamp: number) => {
 const stripExtension = (filename: string) =>
   filename.replace(/\.[^/.]+$/, "");
 
-const getExhibitLabel = (index: number) => {
+type ExhibitNumberingType = "letters" | "numbers" | "roman";
+
+const getExhibitLabel = (index: number, type: ExhibitNumberingType = "letters") => {
+  if (type === "numbers") {
+    return (index + 1).toString();
+  }
+
+  if (type === "roman") {
+    const romanNumerals = [
+      ["", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"],
+      ["", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC"],
+      ["", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM"],
+    ];
+    const num = index + 1;
+    if (num > 399) return num.toString(); // Fallback for large numbers
+    const hundreds = Math.floor(num / 100);
+    const tens = Math.floor((num % 100) / 10);
+    const ones = num % 10;
+    return romanNumerals[2][hundreds] + romanNumerals[1][tens] + romanNumerals[0][ones];
+  }
+
+  // Default: letters (A, B, C, ...)
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   let n = index;
   let label = "";
@@ -98,11 +121,11 @@ const sortFilesByMode = (
   return [...list].sort((a, b) => getSortValue(a, mode) - getSortValue(b, mode));
 };
 
-const relabelFiles = (list: SelectedFile[]) => {
+const relabelFiles = (list: SelectedFile[], numberingType: ExhibitNumberingType = "letters") => {
   let changed = false;
   const next = list.map((file, index) => {
     if (file.labelLocked) return file;
-    const generated = getExhibitLabel(index);
+    const generated = getExhibitLabel(index, numberingType);
     if (generated !== file.label) {
       changed = true;
       return { ...file, label: generated };
@@ -151,6 +174,15 @@ export default function ExhibitBuilderPage() {
     ReturnType<typeof getDefaultFormatOptions>
   >(getDefaultFormatOptions("quick"));
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [exhibitNumberingType, setExhibitNumberingType] = useState<ExhibitNumberingType>("letters");
+  const [savedTemplates, setSavedTemplates] = useState<Array<{
+    name: string;
+    preset: FormatPreset;
+    options: ReturnType<typeof getDefaultFormatOptions>;
+    numberingType: ExhibitNumberingType;
+  }>>([]);
+  const [saveAsTemplate, setSaveAsTemplate] = useState(false);
+  const [templateName, setTemplateName] = useState("");
 
   const hasUnlimitedExports = useMemo(
     () =>
@@ -224,6 +256,26 @@ export default function ExhibitBuilderPage() {
       }
     };
   }, [downloadUrl]);
+
+  useEffect(() => {
+    // Re-label all files when numbering type changes
+    setFiles((prev) => relabelFiles(prev, exhibitNumberingType));
+  }, [exhibitNumberingType]);
+
+  useEffect(() => {
+    // Load saved templates from localStorage
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("caseready-templates");
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          setSavedTemplates(Array.isArray(parsed) ? parsed : []);
+        } catch (error) {
+          console.warn("Failed to parse saved templates", error);
+        }
+      }
+    }
+  }, []);
 
   const handleSignOut = async () => {
     if (isSigningOut) return;
@@ -326,7 +378,7 @@ export default function ExhibitBuilderPage() {
     setLoadingProgress(0);
     const sanitizedFormat = resolveFormattingForPlan({
       preset: formatPreset,
-      options: formatOptions,
+      options: { ...formatOptions, exhibit_numbering_type: exhibitNumberingType },
       plan: userPlan,
     });
     const progressTimer =
@@ -503,7 +555,7 @@ export default function ExhibitBuilderPage() {
             .toString(36)
             .slice(2)}`,
           file,
-          label: getExhibitLabel(prev.length + additions.length),
+          label: getExhibitLabel(prev.length + additions.length, exhibitNumberingType),
           labelLocked: false,
           description: stripExtension(file.name),
           assumedDate: formatDateForInput(file.lastModified),
@@ -514,7 +566,7 @@ export default function ExhibitBuilderPage() {
       if (!additions.length) return prev;
       const combined = [...prev, ...additions];
       const ordered = sortFilesByMode(combined, orderingMode);
-      return relabelFiles(ordered);
+      return relabelFiles(ordered, exhibitNumberingType);
     });
   }
 
@@ -530,11 +582,11 @@ export default function ExhibitBuilderPage() {
   ): void => {
     const value = event.target.value as "upload" | "timestamp" | "detected";
     setOrderingMode(value);
-    setFiles((prev) => relabelFiles(sortFilesByMode(prev, value)));
+    setFiles((prev) => relabelFiles(sortFilesByMode(prev, value), exhibitNumberingType));
   };
 
   const handleRemoveFile = (id: string) => {
-    setFiles((prev) => relabelFiles(prev.filter((file) => file.id !== id)));
+    setFiles((prev) => relabelFiles(prev.filter((file) => file.id !== id), exhibitNumberingType));
   };
 
   const updateFileMeta = (id: string, updates: Partial<SelectedFile>) => {
@@ -568,7 +620,7 @@ export default function ExhibitBuilderPage() {
       }
       const [moved] = next.splice(fromIndex, 1);
       next.splice(toIndex, 0, moved);
-      return relabelFiles(next);
+      return relabelFiles(next, exhibitNumberingType);
     });
     setDraggingId(null);
   };
@@ -581,6 +633,45 @@ export default function ExhibitBuilderPage() {
         left: tableRef.current.scrollWidth,
         behavior: "smooth",
       });
+    }
+  };
+
+  const handleSaveTemplate = () => {
+    if (!templateName.trim()) return;
+
+    const newTemplate = {
+      name: templateName.trim(),
+      preset: formatPreset,
+      options: formatOptions,
+      numberingType: exhibitNumberingType,
+    };
+
+    const updated = [...savedTemplates, newTemplate];
+    setSavedTemplates(updated);
+
+    if (typeof window !== "undefined") {
+      localStorage.setItem("caseready-templates", JSON.stringify(updated));
+    }
+
+    setTemplateName("");
+    setSaveAsTemplate(false);
+  };
+
+  const handleLoadTemplate = (templateIndex: number) => {
+    const template = savedTemplates[templateIndex];
+    if (!template) return;
+
+    setFormatPreset(template.preset);
+    setFormatOptions(template.options);
+    setExhibitNumberingType(template.numberingType);
+  };
+
+  const handleDeleteTemplate = (templateIndex: number) => {
+    const updated = savedTemplates.filter((_, i) => i !== templateIndex);
+    setSavedTemplates(updated);
+
+    if (typeof window !== "undefined") {
+      localStorage.setItem("caseready-templates", JSON.stringify(updated));
     }
   };
 
@@ -605,7 +696,7 @@ export default function ExhibitBuilderPage() {
       value: "firm_branded",
       title: "Firm Branded",
       description:
-        "Firm logo, custom footer, templates, sticker colors, watermark.",
+        "Firm logo, custom footer, cover templates, flexible layout controls.",
     },
   ];
 
@@ -791,6 +882,103 @@ export default function ExhibitBuilderPage() {
                 })}
               </div>
 
+              {/* Template Management */}
+              {formatPermissions.allowAdvanced && (
+                <div className="mt-4 border-t border-gray-100 pt-4">
+                  <div className="flex items-center justify-between gap-3 mb-3">
+                    <div>
+                      <p className="text-sm font-semibold text-[#0F1419]">Templates</p>
+                      <p className="text-xs text-[#6B6560]">Save your formatting preferences for quick reuse.</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setSaveAsTemplate(!saveAsTemplate)}
+                      className="inline-flex items-center gap-1 rounded-full border border-[#E5E0D8] bg-white px-3 py-1.5 text-xs font-semibold text-[#6B6560] hover:border-[var(--color-brand-royal)]/40"
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                      </svg>
+                      Save current
+                    </button>
+                  </div>
+
+                  {saveAsTemplate && (
+                    <div className="mb-3 rounded-xl border border-[#E5E0D8] bg-[#F5F2ED]/50 p-3">
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={templateName}
+                          onChange={(e) => setTemplateName(e.target.value)}
+                          placeholder="Template name (e.g., Personal Injury Default)"
+                          className="flex-1 rounded-lg border border-[#E5E0D8] bg-white px-3 py-2 text-sm focus:border-[var(--color-brand-royal)] focus:outline-none"
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              handleSaveTemplate();
+                            }
+                          }}
+                        />
+                        <button
+                          type="button"
+                          onClick={handleSaveTemplate}
+                          disabled={!templateName.trim()}
+                          className="rounded-lg bg-[var(--color-brand-royal)] px-4 py-2 text-xs font-semibold text-white hover:bg-[var(--color-brand-royal-hover)] disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          Save
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSaveAsTemplate(false);
+                            setTemplateName("");
+                          }}
+                          className="rounded-lg border border-[#E5E0D8] bg-white px-3 py-2 text-xs font-semibold text-[#6B6560] hover:bg-[#F5F2ED]"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {savedTemplates.length > 0 ? (
+                    <div className="grid gap-2 md:grid-cols-2">
+                      {savedTemplates.map((template, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center justify-between gap-2 rounded-lg border border-[#E5E0D8] bg-white px-3 py-2"
+                        >
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-[#0F1419] truncate">{template.name}</p>
+                            <p className="text-xs text-[#6B6560]">
+                              {template.preset === "quick" ? "Quick" : template.preset === "formal" ? "Court Formal" : "Firm Branded"}
+                            </p>
+                          </div>
+                          <div className="flex gap-1">
+                            <button
+                              type="button"
+                              onClick={() => handleLoadTemplate(index)}
+                              className="rounded-full border border-[#E5E0D8] bg-white px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-royal)] hover:bg-[#EEF3FF]"
+                            >
+                              Load
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteTemplate(index)}
+                              className="rounded-full border border-[#E5E0D8] bg-white px-2.5 py-1 text-xs font-semibold text-[#6B6560] hover:bg-red-50 hover:text-red-700 hover:border-red-200"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-[#6B6560] text-center py-3 rounded-lg border border-dashed border-[#E5E0D8] bg-[#F5F2ED]/30">
+                      No saved templates yet. Click "Save current" to create one.
+                    </p>
+                  )}
+                </div>
+              )}
+
               {formatPermissions.allowAdvanced ? (
                 <div className="mt-4 border-t border-gray-100 pt-4">
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -946,219 +1134,203 @@ export default function ExhibitBuilderPage() {
 
                       {formatPreset === "firm_branded" && (
                         <div className="space-y-3">
-                          <div className="grid gap-3 md:grid-cols-2">
-                            <label className="flex items-start gap-2 rounded-xl border border-[#E5E0D8] bg-[#F5F2ED]/50 px-3 py-2 text-sm text-[#0F1419]">
+                          {/* Essential Info Section */}
+                          <div className="rounded-xl border border-[#E5E0D8] bg-white px-4 py-3">
+                            <h4 className="font-semibold text-sm text-[#0F1419] mb-3">Essential Info</h4>
+                            <div className="space-y-2">
                               <input
-                                type="checkbox"
-                                checked={Boolean(formatOptions.include_cover)}
-                                onChange={() => toggleFormatOption("include_cover")}
-                                className="mt-1 h-4 w-4 rounded border-[#E5E0D8] text-[var(--color-brand-royal)] focus:ring-[var(--color-brand-royal)]"
+                                type="text"
+                                value={formatOptions.case_title || ""}
+                                onChange={(e) =>
+                                  setFormatOptions((prev) => ({
+                                    ...prev,
+                                    case_title: e.target.value,
+                                  }))
+                                }
+                                placeholder="Case title"
+                                className="w-full rounded-lg border border-[#E5E0D8] bg-white px-3 py-2 text-sm focus:border-[var(--color-brand-royal)] focus:outline-none"
                               />
-                              <div className="space-y-0.5">
-                                <p className="font-semibold">Cover page</p>
-                                <p className="text-xs text-[#6B6560]">
-                                  Professional cover with court + case details.
-                                </p>
-                              </div>
-                            </label>
-                            <label className="flex items-start gap-2 rounded-xl border border-[#E5E0D8] bg-[#F5F2ED]/50 px-3 py-2 text-sm text-[#0F1419]">
                               <input
-                                type="checkbox"
-                                checked={Boolean(formatOptions.include_index)}
-                                onChange={() => toggleFormatOption("include_index")}
-                                className="mt-1 h-4 w-4 rounded border-[#E5E0D8] text-[var(--color-brand-royal)] focus:ring-[var(--color-brand-royal)]"
+                                type="text"
+                                value={formatOptions.court_name || ""}
+                                onChange={(e) =>
+                                  setFormatOptions((prev) => ({
+                                    ...prev,
+                                    court_name: e.target.value,
+                                  }))
+                                }
+                                placeholder="Court name"
+                                className="w-full rounded-lg border border-[#E5E0D8] bg-white px-3 py-2 text-sm focus:border-[var(--color-brand-royal)] focus:outline-none"
                               />
-                              <div className="space-y-0.5">
-                                <p className="font-semibold">Table of Contents</p>
-                                <p className="text-xs text-[#6B6560]">
-                                  Adds page ranges for each exhibit.
-                                </p>
-                              </div>
-                            </label>
-                            <label className="flex items-start gap-2 rounded-xl border border-[#E5E0D8] bg-[#F5F2ED]/50 px-3 py-2 text-sm text-[#0F1419]">
-                              <input
-                                type="checkbox"
-                                checked={Boolean(formatOptions.show_caseready_branding)}
-                                onChange={() => toggleFormatOption("show_caseready_branding")}
-                                className="mt-1 h-4 w-4 rounded border-[#E5E0D8] text-[var(--color-brand-royal)] focus:ring-[var(--color-brand-royal)]"
-                              />
-                              <div className="space-y-0.5">
-                                <p className="font-semibold">CaseReady footer</p>
-                                <p className="text-xs text-[#6B6560]">
-                                  Hide for white-label, or keep for co-branding.
-                                </p>
-                              </div>
-                            </label>
-                            <label className="flex items-start gap-2 rounded-xl border border-[#E5E0D8] bg-[#F5F2ED]/50 px-3 py-2 text-sm text-[#0F1419]">
-                              <input
-                                type="checkbox"
-                                checked={Boolean(formatOptions.color_coded_stickers)}
-                                onChange={() => toggleFormatOption("color_coded_stickers")}
-                                className="mt-1 h-4 w-4 rounded border-[#E5E0D8] text-[var(--color-brand-royal)] focus:ring-[var(--color-brand-royal)]"
-                              />
-                              <div className="space-y-0.5">
-                                <p className="font-semibold">Color-coded stickers</p>
-                                <p className="text-xs text-[#6B6560]">
-                                  Adds subtle color by exhibit label.
-                                </p>
-                              </div>
-                            </label>
-                            <label className="flex items-start gap-2 rounded-xl border border-[#E5E0D8] bg-[#F5F2ED]/50 px-3 py-2 text-sm text-[#0F1419]">
-                              <input
-                                type="checkbox"
-                                checked={Boolean(formatOptions.slip_sheets)}
-                                onChange={() => toggleFormatOption("slip_sheets")}
-                                className="mt-1 h-4 w-4 rounded border-[#E5E0D8] text-[var(--color-brand-royal)] focus:ring-[var(--color-brand-royal)]"
-                              />
-                              <div className="space-y-0.5">
-                                <p className="font-semibold">Slip sheets</p>
-                                <p className="text-xs text-[#6B6560]">
-                                  Inserts firm-branded separators before each exhibit.
-                                </p>
-                              </div>
-                            </label>
-                          </div>
-
-                          <div className="rounded-xl border border-[#E5E0D8] bg-[#F5F2ED]/50 px-3 py-3 text-sm text-[#0F1419]">
-                            <p className="font-semibold">Sticker position</p>
-                            <p className="text-xs text-[#6B6560]">
-                              Choose from top-right, bottom-right, or left-vertical.
-                            </p>
-                            <div className="mt-3 flex flex-wrap gap-2">
-                              {(["top-right", "bottom-right", "left-vertical"] as const).map((pos) => {
-                                const active = formatOptions.sticker_position === pos;
-                                return (
-                                  <button
-                                    key={pos}
-                                    type="button"
-                                    onClick={() => setStickerPosition(pos)}
-                                    className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
-                                      active
-                                        ? "border-[var(--color-brand-royal)] bg-white text-[var(--color-brand-royal)]"
-                                        : "border-[#E5E0D8] bg-white text-[#6B6560] hover:border-[var(--color-brand-royal)]/40"
-                                    }`}
-                                  >
-                                    {pos === "top-right"
-                                      ? "Top-right"
-                                      : pos === "bottom-right"
-                                      ? "Bottom-right"
-                                      : "Left vertical"}
-                                  </button>
-                                );
-                              })}
                             </div>
                           </div>
 
-                          <div className="grid gap-3 md:grid-cols-2">
-                            <div className="rounded-xl border border-[#E5E0D8] bg-white px-3 py-3 text-sm text-[#0F1419]">
-                              <p className="font-semibold">Cover template</p>
-                              <div className="mt-2 flex flex-wrap gap-2">
-                                {(["classic", "modern", "black-bar"] as const).map((template) => {
-                                  const active = formatOptions.cover_template === template;
-                                  return (
-                                    <button
-                                      key={template}
-                                      type="button"
-                                      onClick={() =>
-                                        setFormatOptions((prev) => ({
-                                          ...prev,
-                                          cover_template: template,
-                                        }))
-                                      }
-                                      className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
-                                        active
-                                          ? "border-[var(--color-brand-royal)] bg-[#EEF3FF] text-[var(--color-brand-royal)]"
-                                          : "border-[#E5E0D8] bg-[#F5F2ED]/50 text-[#6B6560] hover:border-[var(--color-brand-royal)]/40"
-                                      }`}
-                                    >
-                                      {template === "classic"
-                                        ? "Classic"
-                                        : template === "modern"
-                                        ? "Modern"
-                                        : "Black bar"}
-                                    </button>
-                                  );
-                                })}
-                              </div>
-                              <div className="mt-3 space-y-2">
+                          {/* Branding Section */}
+                          <div className="rounded-xl border border-[#E5E0D8] bg-white px-4 py-3">
+                            <h4 className="font-semibold text-sm text-[#0F1419] mb-3">Branding</h4>
+                            <div className="space-y-3">
+                              <input
+                                type="text"
+                                value={formatOptions.firm_logo_url || ""}
+                                onChange={(e) =>
+                                  setFormatOptions((prev) => ({
+                                    ...prev,
+                                    firm_logo_url: e.target.value,
+                                  }))
+                                }
+                                placeholder="Firm logo URL (optional)"
+                                className="w-full rounded-lg border border-[#E5E0D8] bg-white px-3 py-2 text-sm focus:border-[var(--color-brand-royal)] focus:outline-none"
+                              />
+                              <textarea
+                                value={formatOptions.footer_text || ""}
+                                onChange={(e) =>
+                                  setFormatOptions((prev) => ({
+                                    ...prev,
+                                    footer_text: e.target.value,
+                                  }))
+                                }
+                                placeholder="Custom footer (firm name, address, phone, email)"
+                                rows={2}
+                                className="w-full rounded-lg border border-[#E5E0D8] bg-white px-3 py-2 text-sm focus:border-[var(--color-brand-royal)] focus:outline-none"
+                              />
+                              <label className="flex items-start gap-2 text-sm text-[#0F1419]">
                                 <input
-                                  type="text"
-                                  value={formatOptions.case_title || ""}
-                                  onChange={(e) =>
-                                    setFormatOptions((prev) => ({
-                                      ...prev,
-                                      case_title: e.target.value,
-                                    }))
-                                  }
-                                  placeholder="Case title"
-                                  className="w-full rounded-lg border border-[#E5E0D8] bg-white px-3 py-2 text-sm focus:border-[var(--color-brand-royal)] focus:outline-none"
+                                  type="checkbox"
+                                  checked={Boolean(formatOptions.show_caseready_branding)}
+                                  onChange={() => toggleFormatOption("show_caseready_branding")}
+                                  className="mt-1 h-4 w-4 rounded border-[#E5E0D8] text-[var(--color-brand-royal)] focus:ring-[var(--color-brand-royal)]"
                                 />
-                                <input
-                                  type="text"
-                                  value={formatOptions.court_name || ""}
-                                  onChange={(e) =>
-                                    setFormatOptions((prev) => ({
-                                      ...prev,
-                                      court_name: e.target.value,
-                                    }))
-                                  }
-                                  placeholder="Court name"
-                                  className="w-full rounded-lg border border-[#E5E0D8] bg-white px-3 py-2 text-sm focus:border-[var(--color-brand-royal)] focus:outline-none"
-                                />
-                              </div>
+                                <div className="space-y-0.5">
+                                  <p className="font-medium">Show CaseReady footer</p>
+                                  <p className="text-xs text-[#6B6560]">
+                                    Uncheck for white-label documents.
+                                  </p>
+                                </div>
+                              </label>
                             </div>
-                            <div className="rounded-xl border border-[#E5E0D8] bg-white px-3 py-3 text-sm text-[#0F1419]">
-                              <p className="font-semibold">Branding & extras</p>
-                              <div className="mt-2 space-y-2">
-                                <textarea
-                                  value={formatOptions.contact_block_text || ""}
-                                  onChange={(e) =>
-                                    setFormatOptions((prev) => ({
-                                      ...prev,
-                                      contact_block_text: e.target.value,
-                                      include_contact_block: true,
-                                    }))
-                                  }
-                                  placeholder="Attorney contact block (optional)"
-                                  rows={2}
-                                  className="w-full rounded-lg border border-[#E5E0D8] bg-white px-3 py-2 text-sm focus:border-[var(--color-brand-royal)] focus:outline-none"
-                                />
-                                <input
-                                  type="text"
-                                  value={formatOptions.footer_text || ""}
-                                  onChange={(e) =>
-                                    setFormatOptions((prev) => ({
-                                      ...prev,
-                                      footer_text: e.target.value,
-                                    }))
-                                  }
-                                  placeholder="Custom footer line (address/phone/email)"
-                                  className="w-full rounded-lg border border-[#E5E0D8] bg-white px-3 py-2 text-sm focus:border-[var(--color-brand-royal)] focus:outline-none"
-                                />
-                                <input
-                                  type="text"
-                                  value={formatOptions.firm_logo_url || ""}
-                                  onChange={(e) =>
-                                    setFormatOptions((prev) => ({
-                                      ...prev,
-                                      firm_logo_url: e.target.value,
-                                    }))
-                                  }
-                                  placeholder="Firm logo URL (optional)"
-                                  className="w-full rounded-lg border border-[#E5E0D8] bg-white px-3 py-2 text-sm focus:border-[var(--color-brand-royal)] focus:outline-none"
-                                />
-                                <input
-                                  type="text"
-                                  value={formatOptions.watermark_text || ""}
-                                  onChange={(e) =>
-                                    setFormatOptions((prev) => ({
-                                      ...prev,
-                                      watermark_text: e.target.value,
-                                    }))
-                                  }
-                                  placeholder='Watermark text (e.g., "CONFIDENTIAL")'
-                                  className="w-full rounded-lg border border-[#E5E0D8] bg-white px-3 py-2 text-sm focus:border-[var(--color-brand-royal)] focus:outline-none"
-                                />
+                          </div>
+
+                          {/* Layout Options Section */}
+                          <div className="rounded-xl border border-[#E5E0D8] bg-white px-4 py-3">
+                            <h4 className="font-semibold text-sm text-[#0F1419] mb-3">Layout Options</h4>
+                            <div className="space-y-3">
+                              <div className="grid gap-3 md:grid-cols-2">
+                                <label className="flex items-start gap-2 rounded-lg border border-[#E5E0D8] bg-[#F5F2ED]/30 px-3 py-2 text-sm text-[#0F1419]">
+                                  <input
+                                    type="checkbox"
+                                    checked={Boolean(formatOptions.include_cover)}
+                                    onChange={() => toggleFormatOption("include_cover")}
+                                    className="mt-1 h-4 w-4 rounded border-[#E5E0D8] text-[var(--color-brand-royal)] focus:ring-[var(--color-brand-royal)]"
+                                  />
+                                  <div className="space-y-0.5">
+                                    <p className="font-medium">Cover page</p>
+                                    <p className="text-xs text-[#6B6560]">
+                                      Professional cover with case details.
+                                    </p>
+                                  </div>
+                                </label>
+                                <label className="flex items-start gap-2 rounded-lg border border-[#E5E0D8] bg-[#F5F2ED]/30 px-3 py-2 text-sm text-[#0F1419]">
+                                  <input
+                                    type="checkbox"
+                                    checked={Boolean(formatOptions.include_index)}
+                                    onChange={() => toggleFormatOption("include_index")}
+                                    className="mt-1 h-4 w-4 rounded border-[#E5E0D8] text-[var(--color-brand-royal)] focus:ring-[var(--color-brand-royal)]"
+                                  />
+                                  <div className="space-y-0.5">
+                                    <p className="font-medium">Table of Contents</p>
+                                    <p className="text-xs text-[#6B6560]">
+                                      Lists each exhibit with page ranges.
+                                    </p>
+                                  </div>
+                                </label>
+                              </div>
+
+                              <div>
+                                <p className="font-medium text-sm mb-2">Cover template</p>
+                                <div className="flex flex-wrap gap-2">
+                                  {(["classic", "modern", "black-bar"] as const).map((template) => {
+                                    const active = formatOptions.cover_template === template;
+                                    return (
+                                      <button
+                                        key={template}
+                                        type="button"
+                                        onClick={() =>
+                                          setFormatOptions((prev) => ({
+                                            ...prev,
+                                            cover_template: template,
+                                          }))
+                                        }
+                                        className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                                          active
+                                            ? "border-[var(--color-brand-royal)] bg-[#EEF3FF] text-[var(--color-brand-royal)]"
+                                            : "border-[#E5E0D8] bg-[#F5F2ED]/50 text-[#6B6560] hover:border-[var(--color-brand-royal)]/40"
+                                        }`}
+                                      >
+                                        {template === "classic"
+                                          ? "Classic"
+                                          : template === "modern"
+                                          ? "Modern"
+                                          : "Black bar"}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+
+                              <div>
+                                <p className="font-medium text-sm mb-2">Sticker position</p>
+                                <div className="flex flex-wrap gap-2">
+                                  {(["top-right", "bottom-right", "left-vertical"] as const).map((pos) => {
+                                    const active = formatOptions.sticker_position === pos;
+                                    return (
+                                      <button
+                                        key={pos}
+                                        type="button"
+                                        onClick={() => setStickerPosition(pos)}
+                                        className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                                          active
+                                            ? "border-[var(--color-brand-royal)] bg-white text-[var(--color-brand-royal)]"
+                                            : "border-[#E5E0D8] bg-white text-[#6B6560] hover:border-[var(--color-brand-royal)]/40"
+                                        }`}
+                                      >
+                                        {pos === "top-right"
+                                          ? "Top-right"
+                                          : pos === "bottom-right"
+                                          ? "Bottom-right"
+                                          : "Left vertical"}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+
+                              <div>
+                                <p className="font-medium text-sm mb-2">Exhibit numbering</p>
+                                <div className="flex flex-wrap gap-2">
+                                  {(
+                                    [
+                                      { value: "letters", label: "A, B, C" },
+                                      { value: "numbers", label: "1, 2, 3" },
+                                      { value: "roman", label: "I, II, III" },
+                                    ] as const
+                                  ).map((option) => {
+                                    const active = exhibitNumberingType === option.value;
+                                    return (
+                                      <button
+                                        key={option.value}
+                                        type="button"
+                                        onClick={() => setExhibitNumberingType(option.value)}
+                                        className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                                          active
+                                            ? "border-[var(--color-brand-royal)] bg-white text-[var(--color-brand-royal)]"
+                                            : "border-[#E5E0D8] bg-white text-[#6B6560] hover:border-[var(--color-brand-royal)]/40"
+                                        }`}
+                                      >
+                                        {option.label}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
                               </div>
                             </div>
                           </div>
