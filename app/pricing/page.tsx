@@ -30,46 +30,24 @@ const plansByTier = [
     price: "$29",
     duration: "per month",
     originalPrice: "$39",
-    badge: "Monthly",
+    badge: "Most Popular",
     audience: "Solo practitioners who live in their inbox & scanner.",
     description:
-      "Unlimited, judge-ready exhibit packets with Bates numbers and labels. Built to replace late-night PDF surgery.",
+      "Unlimited exhibit packets, AI redaction, timeline builder, client portals, and all beta features. Everything you need for modern case management.",
     perks: [
-      "Unlimited exhibit PDFs",
-      "Unlimited files per packet",
-      "Exhibit labels (Ex. A, Ex. B…) and page stamping",
-      "Bates numbering (e.g. CR-0001, 0002…)",
-      "Higher-priority processing queue",
+      "Unlimited exhibit PDFs with Bates & labels",
+      "AI redaction toolkit (emails, SSN, names, addresses)",
+      "Case timeline builder & visualization",
+      "Client file-sharing portals",
+      "All beta features as they launch",
+      "Priority processing queue",
     ],
     cta: {
       label: "Start monthly",
       priceId: "price_1SfvgEAVvDE7fh9qEOJgP2kU",
     },
-    highlighted: false,
-    note: "Monthly, cancel anytime.",
-  },
-  {
-    name: "Founding Lifetime",
-    price: "$199",
-    duration: "one-time, first 50 only",
-    originalPrice: "$299",
-    badge: "Founding Attorney – first 50",
-    audience: "Solo practitioners who live in their inbox & scanner.",
-    description:
-      "Lifetime access to unlimited, judge-ready exhibit packets with Bates numbers and labels. Built to replace late-night PDF surgery.",
-    perks: [
-      "Unlimited exhibit PDFs forever",
-      "Unlimited files per packet",
-      "Exhibit labels (Ex. A, Ex. B…) and page stamping",
-      "Bates numbering (e.g. CR-0001, 0002…)",
-      "Higher-priority processing queue",
-    ],
-    cta: {
-      label: "Lock lifetime offer",
-      priceId: "price_1SgBd6AVvDE7fh9qhxkSYOyX",
-    },
     highlighted: true,
-    note: "Limited to the first 50 buyers. One-time payment, lifetime access.",
+    note: "Monthly, cancel anytime. Includes all current & upcoming features.",
   },
   {
     name: "Firm",
@@ -317,20 +295,54 @@ export default function PricingPage() {
             </p>
           </div>
 
-          {/* Founding offer banner */}
-          <div className="rounded-3xl border border-dashed border-[var(--color-brand-royal)]/60 bg-[#F1F7FF] px-4 py-5 sm:px-6 sm:py-6 text-xs sm:text-sm text-gray-800 text-center shadow-sm">
-            <span className="inline-flex items-center justify-center rounded-full bg-[var(--color-brand-royal)] text-white text-[10px] font-semibold px-2 py-0.5 mr-2">
-              Founding offer
-            </span>
-            First 50 attorneys can lock a{" "}
-            <span className="font-semibold">$199 lifetime</span> license (normally{" "}
-            <span className="line-through decoration-red-500/70">$299</span>). Or choose{" "}
-            <span className="font-semibold">$29/mo</span> if you prefer monthly.
-            One-time = lifetime access.
+          {/* Beta Access Banner */}
+          <div className="rounded-2xl border-2 border-[#7C3AED] bg-gradient-to-br from-[#F5F3FF] via-white to-[#EDE9FE] px-4 py-5 sm:px-6 sm:py-6 shadow-lg relative overflow-hidden">
+            {/* Decorative gradient overlay */}
+            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#7C3AED] via-[#A78BFA] to-[#7C3AED]" />
+
+            <div className="relative z-10 text-center space-y-3">
+              <div className="inline-flex items-center justify-center gap-2">
+                <span className="text-2xl">🚀</span>
+                <span className="inline-flex items-center justify-center rounded-full bg-[#7C3AED] text-white text-[10px] font-bold px-2.5 py-1 uppercase tracking-wider">
+                  Limited Beta
+                </span>
+              </div>
+
+              <h2 className="text-xl sm:text-2xl font-bold text-[#0F1419]">
+                Free Beta Access Available
+              </h2>
+
+              <p className="text-sm sm:text-base text-[#6B6560] max-w-xl mx-auto">
+                Limited to <span className="font-bold text-[#7C3AED]">50 Solo Practitioners</span> in Personal Injury, Criminal Defense, or Divorce practice areas.
+              </p>
+
+              <div className="pt-1">
+                <a
+                  href="/beta-apply"
+                  className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#7C3AED] to-[#6D28D9] px-6 py-3 text-sm font-bold text-white shadow-lg shadow-[#7C3AED]/30 hover:shadow-xl hover:-translate-y-0.5 hover:scale-105 transition-all duration-300"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Apply for Beta Access
+                </a>
+              </div>
+
+              <p className="text-[11px] text-[#6B6560] pt-1">
+                No credit card required • Instant approval • Full access to all features
+              </p>
+            </div>
+          </div>
+
+          {/* Beta Access Note */}
+          <div className="text-center">
+            <p className="text-sm text-[#6B6560]">
+              Currently offering <span className="font-semibold text-[#7C3AED]">free beta access</span> to solo PI/criminal/divorce attorneys. No credit card required.
+            </p>
           </div>
 
           {/* Main plans */}
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {plansByTier.map((plan) => {
               const isLifetime = plan.name === "Founding Lifetime";
               const isFree = plan.name === "Free";

@@ -543,13 +543,20 @@ export async function POST(req: NextRequest) {
 
     const formData = await req.formData();
     const files: File[] = [];
+    let coverPageFile: File | null = null;
+
     for (const [key, value] of formData.entries()) {
       if (key === "files" && value instanceof File) {
         files.push(value);
+      } else if (key === "coverPage" && value instanceof File) {
+        coverPageFile = value;
       }
     }
 
     console.log("[POST] Received files:", files.map(f => ({ name: f.name, type: f.type, size: f.size })));
+    if (coverPageFile) {
+      console.log("[POST] Cover page file:", { name: coverPageFile.name, type: coverPageFile.type, size: coverPageFile.size });
+    }
 
     if (files.length === 0) {
       console.error("[POST] No files received");
@@ -643,15 +650,42 @@ export async function POST(req: NextRequest) {
     const firstLabel =
       (exhibitsInput[0]?.label || getExhibitLabel(0, exhibitNumberingType)).trim() || (exhibitNumberingType === "numbers" ? "1" : exhibitNumberingType === "roman" ? "I" : "A");
 
-    const cover = includeCover
-      ? pdfDoc.addPage([DEFAULT_PAGE.width, DEFAULT_PAGE.height])
-      : null;
+    // Handle cover page - if user uploaded a custom cover page, insert it
+    let coverPageCount = 0;
+    if (includeCover && coverPageFile) {
+      console.log("[POST] Processing custom cover page...");
+      try {
+        const coverBuffer = await coverPageFile.arrayBuffer();
+        const coverPages = await loadPdfOrImageAsPages(
+          coverBuffer,
+          coverPageFile.type || "",
+          pdfDoc,
+          {
+            stickerPosition,
+            fileName: coverPageFile.name,
+            fileSize: coverPageFile.size
+          }
+        );
+        coverPageCount = coverPages.length;
+        console.log("[POST] Custom cover page added, pages:", coverPageCount);
+      } catch (coverError) {
+        console.error("[POST] Failed to process cover page:", coverError);
+        return NextResponse.json(
+          {
+            ok: false,
+            message: "Failed to process cover page file. Please ensure it's a valid PDF or image.",
+          },
+          { status: 400 }
+        );
+      }
+    }
+
     const indexPage = includeIndex
       ? pdfDoc.addPage([DEFAULT_PAGE.width, DEFAULT_PAGE.height])
       : null;
 
     const tocEntries: TocEntry[] = [];
-    const prefixPages = (includeCover ? 1 : 0) + (includeIndex ? 1 : 0);
+    const prefixPages = coverPageCount + (includeIndex ? 1 : 0);
     let runningPageNumber = prefixPages + 1;
 
     for (let i = 0; i < exhibitsInput.length; i += 1) {

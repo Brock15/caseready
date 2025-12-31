@@ -186,6 +186,8 @@ export default function ExhibitBuilderPage() {
   }>>([]);
   const [saveAsTemplate, setSaveAsTemplate] = useState(false);
   const [templateName, setTemplateName] = useState("");
+  const [coverPageFile, setCoverPageFile] = useState<File | null>(null);
+  const coverPageInputRef = useRef<HTMLInputElement | null>(null);
 
   const hasUnlimitedExports = useMemo(
     () =>
@@ -395,6 +397,12 @@ export default function ExhibitBuilderPage() {
 
     try {
       const formData = new FormData();
+
+      // Add cover page first if provided
+      if (coverPageFile && formatOptions.include_cover) {
+        formData.append("coverPage", coverPageFile);
+      }
+
       files.forEach(({ file }) => {
         formData.append("files", file);
       });
@@ -408,6 +416,7 @@ export default function ExhibitBuilderPage() {
             label: item.label,
             description: item.description,
             detectedDate: item.detectedDate,
+            excludeFromLettering: item.excludeFromLettering,
           })),
           matterName:
             matterName.trim() ||
@@ -1021,21 +1030,63 @@ export default function ExhibitBuilderPage() {
                       )}
 
                       {formatPreset === "formal" && (
-                        <div className="grid gap-3 md:grid-cols-2">
-                          <label className="flex items-start gap-2 rounded-xl border border-[#E5E0D8] bg-[#F5F2ED]/50 px-3 py-2 text-sm text-[#0F1419]">
-                            <input
-                              type="checkbox"
-                              checked={Boolean(formatOptions.include_cover)}
-                              onChange={() => toggleFormatOption("include_cover")}
-                              className="mt-1 h-4 w-4 rounded border-[#E5E0D8] text-[var(--color-brand-royal)] focus:ring-[var(--color-brand-royal)]"
-                            />
-                            <div className="space-y-0.5">
-                              <p className="font-semibold">Cover page</p>
-                              <p className="text-xs text-[#6B6560]">
-                                Adds a professional cover with case title, court, and Bates range.
-                              </p>
+                        <div className="space-y-3">
+                          {/* Cover Page Upload */}
+                          <div className="rounded-xl border border-[#E5E0D8] bg-white px-4 py-3">
+                            <h4 className="font-semibold text-sm text-[#0F1419] mb-2">Cover Page Upload</h4>
+                            <p className="text-xs text-[#6B6560] mb-3">
+                              Insert your own cover page (recommended for filings). Upload a PDF or image file to include as the first page.
+                            </p>
+                            <div className="flex items-center gap-3">
+                              <input
+                                ref={coverPageInputRef}
+                                type="file"
+                                accept=".pdf,.jpg,.jpeg,.png"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) {
+                                    setCoverPageFile(file);
+                                    setFormatOptions((prev) => ({ ...prev, include_cover: true }));
+                                  }
+                                }}
+                                className="hidden"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => coverPageInputRef.current?.click()}
+                                className="inline-flex items-center gap-2 rounded-lg border border-[#E5E0D8] bg-white px-4 py-2 text-sm font-semibold text-[#0F1419] hover:bg-[#F5F2ED] transition"
+                              >
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                </svg>
+                                {coverPageFile ? "Change Cover" : "Upload Cover"}
+                              </button>
+                              {coverPageFile && (
+                                <>
+                                  <span className="text-sm text-[#0F1419] font-medium truncate flex-1">
+                                    {coverPageFile.name}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setCoverPageFile(null);
+                                      setFormatOptions((prev) => ({ ...prev, include_cover: false }));
+                                      if (coverPageInputRef.current) {
+                                        coverPageInputRef.current.value = "";
+                                      }
+                                    }}
+                                    className="text-red-600 hover:text-red-700 transition"
+                                  >
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                  </button>
+                                </>
+                              )}
                             </div>
-                          </label>
+                          </div>
+
+                          <div className="grid gap-3 md:grid-cols-2">
                           <label className="flex items-start gap-2 rounded-xl border border-[#E5E0D8] bg-[#F5F2ED]/50 px-3 py-2 text-sm text-[#0F1419]">
                             <input
                               type="checkbox"
@@ -1106,11 +1157,67 @@ export default function ExhibitBuilderPage() {
                               />
                             </div>
                           </div>
+                          </div>
                         </div>
                       )}
 
                       {formatPreset === "firm_branded" && (
                         <div className="space-y-3">
+                          {/* Cover Page Upload */}
+                          <div className="rounded-xl border border-[#E5E0D8] bg-white px-4 py-3">
+                            <h4 className="font-semibold text-sm text-[#0F1419] mb-2">Cover Page Upload</h4>
+                            <p className="text-xs text-[#6B6560] mb-3">
+                              Insert your own cover page (recommended for filings). Upload a PDF or image file to include as the first page.
+                            </p>
+                            <div className="flex items-center gap-3">
+                              <input
+                                ref={coverPageInputRef}
+                                type="file"
+                                accept=".pdf,.jpg,.jpeg,.png"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) {
+                                    setCoverPageFile(file);
+                                    setFormatOptions((prev) => ({ ...prev, include_cover: true }));
+                                  }
+                                }}
+                                className="hidden"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => coverPageInputRef.current?.click()}
+                                className="inline-flex items-center gap-2 rounded-lg border border-[#E5E0D8] bg-white px-4 py-2 text-sm font-semibold text-[#0F1419] hover:bg-[#F5F2ED] transition"
+                              >
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                </svg>
+                                {coverPageFile ? "Change Cover" : "Upload Cover"}
+                              </button>
+                              {coverPageFile && (
+                                <>
+                                  <span className="text-sm text-[#0F1419] font-medium truncate flex-1">
+                                    {coverPageFile.name}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setCoverPageFile(null);
+                                      setFormatOptions((prev) => ({ ...prev, include_cover: false }));
+                                      if (coverPageInputRef.current) {
+                                        coverPageInputRef.current.value = "";
+                                      }
+                                    }}
+                                    className="text-red-600 hover:text-red-700 transition"
+                                  >
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                  </button>
+                                </>
+                              )}
+                            </div>
+                          </div>
+
                           {/* Essential Info Section */}
                           <div className="rounded-xl border border-[#E5E0D8] bg-white px-4 py-3">
                             <h4 className="font-semibold text-sm text-[#0F1419] mb-3">Essential Info</h4>
