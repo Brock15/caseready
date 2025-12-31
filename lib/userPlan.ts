@@ -32,7 +32,8 @@ export const getUserPlan = (user?: User | null): UserPlan => {
     planValue === "premium" ||
     user?.user_metadata?.isPaid === true ||
     user?.user_metadata?.premiumAccess === true ||
-    user?.user_metadata?.hasUnlimitedExports === true;
+    user?.user_metadata?.hasUnlimitedExports === true ||
+    user?.user_metadata?.isBetaTester === true;
 
   if (soloFlags) {
     return "solo";

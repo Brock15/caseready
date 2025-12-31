@@ -116,6 +116,23 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Grant beta tester privileges (Solo plan + unlimited exports)
+    const { error: updateError } = await supabase.auth.updateUser({
+      data: {
+        isBetaTester: true,
+        premiumAccess: true,
+        hasUnlimitedExports: true,
+        plan: "solo",
+        betaToken: betaToken,
+      },
+    });
+
+    if (updateError) {
+      console.error("Failed to grant beta access:", updateError);
+      // Don't fail the request, just log the error
+      // The application is still stored, admin can grant access manually
+    }
+
     // Return success
     return NextResponse.json({
       success: true,

@@ -75,18 +75,21 @@ export default function DashboardClient({
   const [showCreateMatter, setShowCreateMatter] = useState(false);
   const [newMatterName, setNewMatterName] = useState("");
 
+  const isBetaTester = session?.user?.user_metadata?.isBetaTester === true;
   const plan = String(session?.user?.user_metadata?.plan ?? "").toLowerCase();
   const hasPremium =
     plan === "premium" ||
     session?.user?.user_metadata?.premiumAccess === true ||
     session?.user?.user_metadata?.hasUnlimitedExports === true ||
+    isBetaTester ||
     session?.user?.email === "brockstar1215@gmail.com";
-  const planLabel =
-    hasPremium || plan === "premium"
-      ? "Premium"
-      : plan
-      ? plan.charAt(0).toUpperCase() + plan.slice(1)
-      : "Free";
+  const planLabel = isBetaTester
+    ? "Beta Tester"
+    : hasPremium || plan === "premium"
+    ? "Premium"
+    : plan
+    ? plan.charAt(0).toUpperCase() + plan.slice(1)
+    : "Free";
   const exportsUsed = Number(session?.user?.user_metadata?.exportsUsed ?? 0);
   const exportsLimit = 2;
   const exportsLeft = Math.max(0, exportsLimit - exportsUsed);
@@ -248,18 +251,24 @@ export default function DashboardClient({
           </Link>
 
           <div className="flex items-center gap-3">
-            {!hasPremium ? (
+            {isBetaTester && (
+              <span className="hidden md:inline-flex items-center gap-2 rounded-full border-2 border-[#7C3AED] bg-gradient-to-r from-[#F5F3FF] to-white px-4 py-2 text-sm font-bold text-[#7C3AED]">
+                <span className="text-base">🚀</span>
+                Beta Tester
+              </span>
+            )}
+            {!hasPremium && !isBetaTester ? (
               <Link
                 href="/pricing"
                 className="hidden md:inline-flex items-center rounded-full border border-[#E5E0D8] bg-white px-4 py-2 text-sm font-medium text-[#1A1614] hover:border-[var(--color-brand-royal)] hover:text-[var(--color-brand-royal)] transition"
               >
                 Upgrade
               </Link>
-            ) : (
+            ) : !isBetaTester ? (
               <span className="hidden md:inline-flex items-center rounded-full border border-[#E5E0D8] bg-white px-4 py-2 text-sm font-semibold text-[var(--color-brand-royal)]">
                 Premium active
               </span>
-            )}
+            ) : null}
             <div className="flex items-center gap-2">
               <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-brand-royal)] text-white text-sm font-semibold">
                 {initials}
@@ -610,10 +619,24 @@ export default function DashboardClient({
             </div>
             <div className="flex items-center justify-between">
               <span className="text-[#6B6560]">Current plan</span>
-              <span className="font-semibold text-[#0F1419]">{planLabel}</span>
+              {isBetaTester ? (
+                <span className="inline-flex items-center gap-2 rounded-full border-2 border-[#7C3AED] bg-gradient-to-r from-[#F5F3FF] to-white px-3 py-1 text-sm font-bold text-[#7C3AED]">
+                  <span className="text-base">🚀</span>
+                  {planLabel}
+                </span>
+              ) : (
+                <span className="font-semibold text-[#0F1419]">{planLabel}</span>
+              )}
             </div>
             <div className="pt-3 border-t border-[#F0EBE5]">
-              {hasPremium ? (
+              {isBetaTester ? (
+                <div className="rounded-xl bg-gradient-to-br from-[#F5F3FF] to-[#EDE9FE] border-2 border-[#7C3AED] p-4 text-center">
+                  <p className="text-sm font-bold text-[#7C3AED] mb-1">Beta Access Active</p>
+                  <p className="text-xs text-[#6B6560]">
+                    Unlimited exports • All features unlocked • Free during beta
+                  </p>
+                </div>
+              ) : hasPremium ? (
                 <button
                   type="button"
                   className="inline-flex items-center justify-center w-full rounded-full bg-[var(--color-brand-royal)] px-6 py-3 text-sm font-semibold text-white"
