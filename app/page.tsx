@@ -380,6 +380,36 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Beta Access Banner */}
+      <section className="py-6 border-t border-[#F0EBE5] bg-gradient-to-br from-[#F5F3FF] via-white to-[#EDE9FE]">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6">
+          <div className="rounded-2xl border border-[#7C3AED]/30 bg-white/90 backdrop-blur-sm p-5 sm:p-6 shadow-md hover:shadow-lg transition-shadow">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3 text-left">
+                <span className="text-2xl">🚀</span>
+                <div>
+                  <h3 className="text-base sm:text-lg font-bold text-[#0F1419]">
+                    Free Beta Access Available
+                  </h3>
+                  <p className="text-xs sm:text-sm text-[#6B6560] mt-0.5">
+                    Limited to <span className="font-semibold text-[#7C3AED]">50 Solo Practitioners</span> • Unlimited exports • All features free
+                  </p>
+                </div>
+              </div>
+              <Link
+                href="/beta-apply"
+                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#7C3AED] to-[#6D28D9] px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#7C3AED]/30 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 whitespace-nowrap"
+              >
+                Apply Now
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Drag-and-drop proof element */}
       <section className="py-16 border-t border-[#F0EBE5] relative z-10">
         <div className="mx-auto max-w-4xl px-4 sm:px-6">
