@@ -8,28 +8,40 @@ type Example = {
   title: string;
   description: string;
   category: string;
+  image: string;
+  href: string;
   badge?: string;
 };
 
 const examples: Example[] = [
   {
-    id: "1",
-    title: "Personal Injury Case Bundle",
-    description: "Complete exhibit packet with medical records, accident photos, and witness statements. Auto-sorted by date with custom cover page.",
-    category: "Personal Injury",
-    badge: "Popular",
+    id: "criminal-defense",
+    title: "Criminal Defense Trial Exhibits",
+    description:
+      "Police reports, body-cam stills, discovery PDFs, and witness statements compiled into a court-ready exhibit packet with clean indexing.",
+    category: "Criminal Defense",
+    badge: "High volume",
+    image: "/examples/criminal-defense-cover.png",
+    href: "/examples/criminal-defense",
   },
   {
-    id: "2",
-    title: "Employment Dispute Evidence",
-    description: "Email chains, contracts, and HR documentation compiled with redactions and professional formatting.",
-    category: "Employment Law",
+    id: "real-estate",
+    title: "Real Estate Litigation Evidence",
+    description:
+      "Contracts, inspection reports, emails, photos, and financial records organized into a single evidence bundle with Bates numbering.",
+    category: "Civil",
+    badge: "Civil",
+    image: "/examples/real-estate-cover.png",
+    href: "/examples/real-estate",
   },
   {
-    id: "3",
-    title: "Family Court Documentation",
-    description: "Financial records, text messages, and supporting documents organized chronologically with exhibit labels.",
-    category: "Family Law",
+    id: "immigration",
+    title: "Immigration & Asylum Filing Packet",
+    description:
+      "Passports, affidavits, country condition reports, and supporting documents compiled into a USCIS-ready PDF.",
+    category: "Immigration",
+    image: "/examples/immigration-cover.png",
+    href: "/examples/immigration",
   },
 ];
 
@@ -37,10 +49,10 @@ export default function ExamplesPage() {
   return (
     <div className="min-h-screen bg-[#F5F2ED]">
       {/* Header */}
-      <header className="w-full border-b border-[#E5E0D8] bg-white/80 backdrop-blur-sm">
-        <div className="mx-auto max-w-6xl flex items-center justify-between py-4 px-4 sm:px-6">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="h-12 w-12 rounded-2xl bg-white shadow-sm flex items-center justify-center border border-[#F0EBE5]">
+      <header className="w-full border-b border-[#E5E0D8] bg-[#F5F2ED]">
+        <div className="mx-auto max-w-6xl flex items-center justify-between py-6 px-4 sm:px-6">
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="h-12 w-12 rounded-2xl bg-white shadow-sm group-hover:shadow-md flex items-center justify-center border border-[#E5E0D8] transition-all duration-300 group-hover:scale-105">
               <NextImage
                 src="/logo.svg"
                 alt="CaseReady logo"
@@ -50,10 +62,10 @@ export default function ExamplesPage() {
               />
             </div>
             <div className="flex flex-col leading-tight">
-              <span className="font-semibold tracking-tight text-lg text-[#0F1419]">
+              <span className="font-semibold tracking-tight text-lg text-[#0F1419] group-hover:text-[#0F1419] transition-colors">
                 CaseReady
               </span>
-              <span className="text-xs text-[#6B6560] hidden sm:block">
+              <span className="text-xs text-[#6B6560] hidden sm:block group-hover:text-[#6B6560] transition-colors">
                 Evidence made effortless.
               </span>
             </div>
@@ -62,19 +74,19 @@ export default function ExamplesPage() {
           <div className="flex items-center gap-3">
             <Link
               href="/features"
-              className="hidden md:inline-flex items-center rounded-full border border-[#E5E0D8] bg-white px-4 py-2 text-sm font-semibold text-[#1A1614] hover:bg-[#F7F1EA] transition"
+              className="hidden md:inline-flex items-center rounded-full border border-[#E5E0D8] bg-white px-4 py-2 text-sm font-semibold text-[#0F1419] hover:border-[#D8D2C8] hover:bg-[#FDFCFB] shadow-sm hover:shadow-md transition-all duration-200"
             >
               Features
             </Link>
             <Link
               href="/pricing"
-              className="hidden md:inline-flex items-center rounded-full border border-[#E5E0D8] bg-white px-4 py-2 text-sm font-semibold text-[#1A1614] hover:bg-[#F7F1EA] transition"
+              className="hidden md:inline-flex items-center rounded-full border border-[#E5E0D8] bg-white px-4 py-2 text-sm font-semibold text-[#0F1419] hover:border-[#D8D2C8] hover:bg-[#FDFCFB] shadow-sm hover:shadow-md transition-all duration-200"
             >
               Pricing
             </Link>
             <Link
               href="/signin"
-              className="inline-flex items-center rounded-full bg-[var(--color-brand-royal)] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[var(--color-brand-royal-hover)] transition"
+              className="inline-flex items-center rounded-full border border-[#E5E0D8] bg-white px-4 py-2 text-sm font-semibold text-[#0F1419] hover:border-[#D8D2C8] hover:bg-[#FDFCFB] shadow-sm hover:shadow-md transition-all duration-200"
             >
               Sign in
             </Link>
@@ -102,25 +114,34 @@ export default function ExamplesPage() {
           {examples.map((example) => (
             <div
               key={example.id}
-              className="rounded-3xl border border-[#E5E0D8] bg-white hover:border-[var(--color-brand-royal)]/30 hover:shadow-md transition-all duration-200 overflow-hidden group"
+              className="rounded-3xl border border-[#E5E0D8] bg-white hover:border-[#D8D2C8] hover:shadow-lg transition-all duration-200 overflow-hidden group"
             >
-              {/* Top stripe */}
-              <div className="h-1 bg-gradient-to-r from-[var(--color-brand-royal)]/60 via-[var(--color-brand-royal)]/30 to-transparent" />
-
-              <div className="p-6 space-y-4">
-                {/* Badge and category */}
+              <div className="p-4 pb-0">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="inline-flex items-center rounded-full bg-[var(--color-brand-royal)]/5 px-3 py-1 text-[11px] font-semibold text-[var(--color-brand-royal)] border border-[var(--color-brand-royal)]/10">
+                  <span className="inline-flex items-center rounded-full bg-[#F5F2ED] px-3 py-1 text-[11px] font-semibold text-[#0F1419] border border-[#E5E0D8]">
                     {example.category}
                   </span>
                   {example.badge && (
-                    <span className="inline-flex items-center rounded-full bg-[#F5F2ED] px-2 py-0.5 text-[11px] font-medium text-[#6B6560] border border-[#E5E0D8]">
+                    <span className="inline-flex items-center rounded-full bg-[#EAF2EC] px-2 py-0.5 text-[11px] font-medium text-[#2F5D3B] border border-[#D8E7DD]">
                       {example.badge}
                     </span>
                   )}
                 </div>
+              </div>
 
-                {/* Title and description */}
+              <div className="p-4">
+                <div className="rounded-2xl border border-[#E5E0D8] bg-[#F8F6F2] overflow-hidden shadow-sm">
+                  <NextImage
+                    src={example.image}
+                    alt={`${example.title} cover`}
+                    width={800}
+                    height={520}
+                    className="w-full h-auto"
+                  />
+                </div>
+              </div>
+
+              <div className="px-6 pb-6 space-y-4">
                 <div className="space-y-2">
                   <h3 className="text-lg font-semibold text-[#0F1419] tracking-tight">
                     {example.title}
@@ -130,71 +151,18 @@ export default function ExamplesPage() {
                   </p>
                 </div>
 
-                {/* View button */}
-                <button
-                  type="button"
-                  className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[var(--color-brand-royal)] to-[var(--color-brand-royal-hover)] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02]"
+                <Link
+                  href={example.href}
+                  className="inline-flex items-center gap-2 rounded-full bg-[#16324A] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:shadow-md transition-all duration-200 hover:bg-[#12293C]"
                 >
                   View example
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                   </svg>
-                </button>
+                </Link>
               </div>
             </div>
           ))}
-        </section>
-
-        {/* Coming soon section */}
-        <section className="rounded-3xl border-2 border-dashed border-[#E5E0D8] bg-white p-10 text-center">
-          <div className="mx-auto max-w-2xl space-y-4">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--color-brand-royal)]/5 border border-[var(--color-brand-royal)]/10">
-              <svg
-                className="w-8 h-8 text-[var(--color-brand-royal)]"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth="1.5"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-              </svg>
-            </div>
-            <h2 className="text-2xl font-semibold text-[#0F1419] tracking-tight">
-              More examples coming soon
-            </h2>
-            <p className="text-sm text-[#6B6560] leading-relaxed">
-              We're building a comprehensive library of case examples across different practice areas. Check back soon for detailed walkthroughs, before-and-after comparisons, and best practices.
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-              <Link
-                href="/builder"
-                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[var(--color-brand-royal)] to-[var(--color-brand-royal-hover)] px-6 py-3 text-sm font-semibold text-white shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02]"
-              >
-                Try it yourself
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </Link>
-              <Link
-                href="/features"
-                className="inline-flex items-center gap-2 rounded-full border-2 border-[var(--color-brand-royal)]/20 bg-white px-6 py-3 text-sm font-semibold text-[var(--color-brand-royal)] hover:border-[var(--color-brand-royal)]/40 hover:bg-[var(--color-brand-royal)]/5 shadow-sm hover:shadow-md transition-all duration-200"
-              >
-                View features
-              </Link>
-            </div>
-          </div>
         </section>
       </main>
 

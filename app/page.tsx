@@ -290,7 +290,7 @@ export default function Home() {
                     router.push("/signup?redirectedFrom=/builder");
                   }
                 }}
-                className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#16324A] to-[#12293C] px-9 py-3.5 text-base font-semibold text-white shadow-lg shadow-[#16324A]/30 hover:shadow-xl hover:shadow-[#16324A]/40 hover:scale-[1.02] transition-all duration-200 group"
+                className="inline-flex items-center justify-center rounded-full border-2 border-white/30 bg-[#16324A] px-9 py-3.5 text-base font-semibold text-white hover:bg-[#12293C] hover:border-white/50 shadow-md hover:shadow-lg transition-all duration-200 group"
               >
                 <span>Try Exhibit Builder Free</span>
                 <svg className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
@@ -397,27 +397,22 @@ export default function Home() {
       </section>
 
       {/* Beta Access Banner */}
-      <section className="py-6 border-t border-[#F0EBE5] bg-gradient-to-br from-[#F5F3FF] via-white to-[#EDE9FE]">
+      <section className="py-4 border-t border-[#F0EBE5] bg-gradient-to-br from-[#F5F3FF] via-white to-[#EDE9FE]">
         <div className="mx-auto max-w-4xl px-4 sm:px-6">
-          <div className="rounded-2xl border border-[#7C3AED]/30 bg-white/90 backdrop-blur-sm p-5 sm:p-6 shadow-md hover:shadow-lg transition-shadow">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="flex items-center gap-3 text-left">
-                <span className="text-2xl">🚀</span>
-                <div>
-                  <h3 className="text-base sm:text-lg font-bold text-[#0F1419]">
-                    Free Beta Access Available
-                  </h3>
-                  <p className="text-xs sm:text-sm text-[#6B6560] mt-0.5">
-                    Limited to <span className="font-semibold text-[#7C3AED]">50 Solo Practitioners</span> • Unlimited exports • All features free
-                  </p>
-                </div>
+          <div className="rounded-xl border border-[#7C3AED]/30 bg-white/90 backdrop-blur-sm px-4 py-3 shadow-sm">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 text-center">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">🚀</span>
+                <p className="text-sm text-[#6B6560]">
+                  <span className="font-bold text-[#7C3AED]">Free Beta Access</span> • 50 Solo Practitioners • Unlimited exports
+                </p>
               </div>
               <Link
                 href="/beta-apply"
-                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#7C3AED] to-[#6D28D9] px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#7C3AED]/30 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 whitespace-nowrap"
+                className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#7C3AED] to-[#6D28D9] px-4 py-1.5 text-xs font-bold text-white shadow-sm hover:shadow-md transition-all"
               >
                 Apply Now
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
               </Link>

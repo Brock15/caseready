@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import NextImage from "next/image";
 
 type RoadmapItem = {
   title: string;
@@ -71,6 +72,61 @@ const statusStyles: Record<RoadmapItem["status"], string> = {
 export default function FeaturesPage() {
   return (
     <main className="min-h-screen bg-[#F5F2ED] text-[#0F172A]">
+      {/* Header */}
+      <header className="w-full border-b border-[#0F1419] bg-gradient-to-br from-[#1A202C] via-[#16324A] to-[#1A202C] backdrop-blur-sm relative overflow-hidden">
+        {/* Subtle animated gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-40 animate-shimmer"></div>
+
+        <div className="mx-auto max-w-6xl flex items-center justify-between py-4 px-4 sm:px-6 relative z-10">
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="h-12 w-12 rounded-2xl bg-white shadow-lg group-hover:shadow-xl flex items-center justify-center border border-[#F0EBE5] transition-all duration-300 group-hover:scale-105">
+              <NextImage
+                src="/logo.svg"
+                alt="CaseReady logo"
+                width={48}
+                height={48}
+                className="h-10 w-10"
+              />
+            </div>
+            <div className="flex flex-col leading-tight">
+              <span className="font-semibold tracking-tight text-lg text-white group-hover:text-gray-100 transition-colors">
+                CaseReady
+              </span>
+              <span className="text-xs text-gray-300 hidden sm:block group-hover:text-gray-200 transition-colors">
+                Evidence made effortless.
+              </span>
+            </div>
+          </Link>
+
+          <div className="flex items-center gap-3">
+            <Link
+              href="/examples"
+              className="hidden md:inline-flex items-center rounded-full border-2 border-white/30 bg-[#16324A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#12293C] hover:border-white/50 shadow-sm hover:shadow-md transition-all duration-200"
+            >
+              Examples
+            </Link>
+            <Link
+              href="/pricing"
+              className="hidden md:inline-flex items-center rounded-full border-2 border-white/30 bg-[#16324A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#12293C] hover:border-white/50 shadow-sm hover:shadow-md transition-all duration-200"
+            >
+              Pricing
+            </Link>
+            <Link
+              href="/security"
+              className="hidden lg:inline-flex items-center rounded-full border-2 border-white/30 bg-[#16324A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#12293C] hover:border-white/50 shadow-sm hover:shadow-md transition-all duration-200"
+            >
+              Security
+            </Link>
+            <Link
+              href="/signin"
+              className="inline-flex items-center rounded-full border-2 border-white/30 bg-[#16324A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#12293C] hover:border-white/50 shadow-sm hover:shadow-md transition-all duration-200"
+            >
+              Sign in
+            </Link>
+          </div>
+        </div>
+      </header>
+
       <div className="mx-auto max-w-5xl px-4 sm:px-6 py-12 space-y-10">
         <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>

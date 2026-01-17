@@ -297,40 +297,22 @@ export default function PricingPage() {
           </div>
 
           {/* Beta Access Banner - Compact */}
-          <div className="rounded-xl border border-[#7C3AED]/40 bg-gradient-to-r from-[#F5F3FF] to-white px-4 py-3 shadow-sm relative overflow-hidden">
-            {/* Decorative gradient overlay */}
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#7C3AED] via-[#A78BFA] to-[#7C3AED]" />
-
-            <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-3">
-              <div className="flex items-center gap-2 text-center sm:text-left">
-                <span className="text-lg">🚀</span>
-                <div>
-                  <h3 className="text-sm font-bold text-[#0F1419]">
-                    Free Beta Access Available
-                  </h3>
-                  <p className="text-xs text-[#6B6560] mt-0.5">
-                    Limited to <span className="font-semibold text-[#7C3AED]">50 Solo Practitioners</span> • Unlimited exports
-                  </p>
-                </div>
-              </div>
-
+          <div className="rounded-lg border border-[#7C3AED]/30 bg-gradient-to-r from-[#F5F3FF] to-white px-3 py-2 shadow-sm">
+            <div className="flex items-center justify-center gap-2 text-center">
+              <span className="text-base">🚀</span>
+              <p className="text-xs text-[#6B6560]">
+                <span className="font-bold text-[#7C3AED]">Free Beta Access</span> • 50 Solo Practitioners • Unlimited exports
+              </p>
               <a
                 href="/beta-apply"
-                className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#7C3AED] to-[#6D28D9] px-4 py-2 text-xs font-bold text-white shadow-md shadow-[#7C3AED]/20 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 whitespace-nowrap"
+                className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-[#7C3AED] to-[#6D28D9] px-3 py-1 text-xs font-bold text-white shadow-sm hover:shadow-md transition-all"
               >
-                Apply Now
-                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+                Apply
+                <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
               </a>
             </div>
-          </div>
-
-          {/* Beta Access Note */}
-          <div className="text-center">
-            <p className="text-sm text-[#6B6560]">
-              Currently offering <span className="font-semibold text-[#7C3AED]">free beta access</span> to solo PI/criminal/divorce attorneys. No credit card required.
-            </p>
           </div>
 
           {/* Main plans */}
