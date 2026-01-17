@@ -31,11 +31,13 @@ export default function SignupPage() {
     setErrorMessage(null);
     setStatusMessage(null);
 
+    const redirectPath = searchParams?.get("redirect") || "/dashboard";
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/dashboard`,
+        emailRedirectTo: `${window.location.origin}${redirectPath}`,
         data: {
           exportsUsed: 0,
         },
@@ -59,10 +61,11 @@ export default function SignupPage() {
     if (isOauthLoading) return;
     try {
       setIsOauthLoading(true);
+      const redirectPath = searchParams?.get("redirect") || "/dashboard";
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent("/dashboard")}`,
+          redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectPath)}`,
           queryParams: {
             access_type: "offline",
             prompt: "consent",

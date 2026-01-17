@@ -30,7 +30,7 @@ export default function BetaApplyPage() {
 
       if (!user) {
         // Redirect to signup if not authenticated
-        router.push("/signup");
+        router.push("/signup?redirect=/beta-apply");
         return;
       }
 

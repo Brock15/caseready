@@ -1029,13 +1029,19 @@ export default function Home() {
               </div>
 
               <div className="space-y-3">
-                <Link
-                  href="/beta-apply"
-                  onClick={() => setShowBetaModal(false)}
+                <button
+                  onClick={() => {
+                    setShowBetaModal(false);
+                    if (isAuthenticated) {
+                      router.push("/beta-apply");
+                    } else {
+                      router.push("/signup?redirect=/beta-apply");
+                    }
+                  }}
                   className="block w-full rounded-full bg-gradient-to-r from-[#7C3AED] to-[#6D28D9] px-6 py-3 text-base font-bold text-white shadow-lg shadow-[#7C3AED]/30 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
                 >
                   Apply for Beta Access
-                </Link>
+                </button>
                 <button
                   onClick={() => setShowBetaModal(false)}
                   className="block w-full text-sm text-[#6B6560] hover:text-[#0F1419] transition-colors"
