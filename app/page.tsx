@@ -55,6 +55,7 @@ export default function Home() {
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [isCheckingSession, setIsCheckingSession] = useState(true);
   const [filesSelected, setFilesSelected] = useState(0);
+  const [showBetaModal, setShowBetaModal] = useState(false);
   const isAuthenticated = Boolean(userId);
   const exportsLeft = Math.max(0, 2 - exportsUsed);
 
@@ -100,6 +101,18 @@ export default function Home() {
       subscription.unsubscribe();
     };
   }, [supabase]);
+
+  // Show beta modal after 3 seconds on first visit
+  useEffect(() => {
+    const hasSeenBetaModal = sessionStorage.getItem('hasSeenBetaModal');
+    if (!hasSeenBetaModal) {
+      const timer = setTimeout(() => {
+        setShowBetaModal(true);
+        sessionStorage.setItem('hasSeenBetaModal', 'true');
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   const handleSignOut = async () => {
     if (isSigningOut) return;
@@ -396,30 +409,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Beta Access Banner */}
-      <section className="py-4 border-t border-[#F0EBE5] bg-gradient-to-br from-[#F5F3FF] via-white to-[#EDE9FE]">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6">
-          <div className="rounded-xl border border-[#7C3AED]/30 bg-white/90 backdrop-blur-sm px-4 py-3 shadow-sm">
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 text-center">
-              <div className="flex items-center gap-2">
-                <span className="text-lg">🚀</span>
-                <p className="text-sm text-[#6B6560]">
-                  <span className="font-bold text-[#7C3AED]">Free Beta Access</span> • 50 Solo Practitioners • Unlimited exports
-                </p>
-              </div>
-              <Link
-                href="/beta-apply"
-                className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#7C3AED] to-[#6D28D9] px-4 py-1.5 text-xs font-bold text-white shadow-sm hover:shadow-md transition-all"
-              >
-                Apply Now
-                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Drag-and-drop proof element */}
       <section className="py-16 border-t border-[#F0EBE5] relative z-10">
@@ -974,6 +963,90 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* Beta Access Modal */}
+      {showBetaModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowBetaModal(false)}>
+          <div
+            className="relative bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 animate-fade-in-up"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close button */}
+            <button
+              onClick={() => setShowBetaModal(false)}
+              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+            >
+              <svg className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            {/* Decorative gradient bar */}
+            <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-[#7C3AED] via-[#A78BFA] to-[#7C3AED] rounded-t-3xl" />
+
+            {/* Content */}
+            <div className="mt-4 text-center space-y-6">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-[#F5F3FF] to-[#EDE9FE] border-2 border-[#7C3AED]/20">
+                <span className="text-4xl">🚀</span>
+              </div>
+
+              <div>
+                <h3 className="text-2xl font-bold text-[#0F1419] mb-2">
+                  Free Beta Access Available
+                </h3>
+                <p className="text-[#6B6560] text-sm">
+                  Limited to <span className="font-bold text-[#7C3AED]">50 Solo Practitioners</span>
+                </p>
+              </div>
+
+              <div className="bg-gradient-to-br from-[#F5F3FF] to-white rounded-2xl p-6 border border-[#7C3AED]/20">
+                <ul className="space-y-3 text-left text-sm text-[#6B6560]">
+                  <li className="flex items-start gap-3">
+                    <svg className="w-5 h-5 text-[#7C3AED] flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span><span className="font-semibold text-[#0F1419]">Unlimited exports</span> during beta period</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <svg className="w-5 h-5 text-[#7C3AED] flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span><span className="font-semibold text-[#0F1419]">All premium features</span> unlocked</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <svg className="w-5 h-5 text-[#7C3AED] flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span><span className="font-semibold text-[#0F1419]">Priority support</span> from our team</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <svg className="w-5 h-5 text-[#7C3AED] flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span><span className="font-semibold text-[#0F1419]">Free forever</span> for beta testers</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="space-y-3">
+                <Link
+                  href="/beta-apply"
+                  onClick={() => setShowBetaModal(false)}
+                  className="block w-full rounded-full bg-gradient-to-r from-[#7C3AED] to-[#6D28D9] px-6 py-3 text-base font-bold text-white shadow-lg shadow-[#7C3AED]/30 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
+                >
+                  Apply for Beta Access
+                </Link>
+                <button
+                  onClick={() => setShowBetaModal(false)}
+                  className="block w-full text-sm text-[#6B6560] hover:text-[#0F1419] transition-colors"
+                >
+                  Maybe later
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
