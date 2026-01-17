@@ -163,10 +163,13 @@ export default function Home() {
   return (
     <main className="relative min-h-screen flex flex-col bg-[#F7F1EA]">
       {/* Header */}
-      <header className="w-full border-b border-[#E5E0D8] bg-white/80 backdrop-blur-sm">
-        <div className="mx-auto max-w-6xl flex items-center justify-between py-4 px-4 sm:px-6">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="h-12 w-12 rounded-2xl bg-white shadow-sm flex items-center justify-center border border-[#F0EBE5]">
+      <header className="w-full border-b border-[#0F1419] bg-gradient-to-br from-[#1A202C] via-[#16324A] to-[#1A202C] backdrop-blur-sm relative overflow-hidden">
+        {/* Subtle animated gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-40 animate-shimmer"></div>
+
+        <div className="mx-auto max-w-6xl flex items-center justify-between py-4 px-4 sm:px-6 relative z-10">
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="h-12 w-12 rounded-2xl bg-white shadow-lg group-hover:shadow-xl flex items-center justify-center border border-[#F0EBE5] transition-all duration-300 group-hover:scale-105">
               <NextImage
                 src="/logo.svg"
                 alt="CaseReady logo"
@@ -177,10 +180,10 @@ export default function Home() {
               />
             </div>
             <div className="flex flex-col leading-tight">
-              <span className="font-semibold tracking-tight text-lg text-[#0F1419]">
+              <span className="font-semibold tracking-tight text-lg text-white group-hover:text-gray-100 transition-colors">
                 CaseReady
               </span>
-              <span className="text-xs text-[#6B6560] hidden sm:block">
+              <span className="text-xs text-gray-300 hidden sm:block group-hover:text-gray-200 transition-colors">
                 Evidence made effortless.
               </span>
             </div>
@@ -189,34 +192,34 @@ export default function Home() {
           <div className="flex items-center gap-3">
             <Link
               href="/features"
-              className="hidden md:inline-flex items-center rounded-full border-2 border-[var(--color-brand-royal)]/20 bg-white px-4 py-2 text-sm font-semibold text-[var(--color-brand-royal)] hover:border-[var(--color-brand-royal)]/40 hover:bg-[var(--color-brand-royal)]/5 shadow-sm hover:shadow-md transition-all duration-200"
+              className="hidden md:inline-flex items-center rounded-full border-2 border-white/30 bg-[#16324A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#12293C] hover:border-white/50 shadow-sm hover:shadow-md transition-all duration-200"
             >
               Features
             </Link>
             <Link
               href="/pricing"
-              className="hidden md:inline-flex items-center rounded-full border-2 border-[var(--color-brand-royal)]/20 bg-white px-4 py-2 text-sm font-semibold text-[var(--color-brand-royal)] hover:border-[var(--color-brand-royal)]/40 hover:bg-[var(--color-brand-royal)]/5 shadow-sm hover:shadow-md transition-all duration-200"
+              className="hidden md:inline-flex items-center rounded-full border-2 border-white/30 bg-[#16324A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#12293C] hover:border-white/50 shadow-sm hover:shadow-md transition-all duration-200"
             >
               Pricing
             </Link>
             <Link
               href="/security"
-              className="hidden lg:inline-flex items-center rounded-full border-2 border-[var(--color-brand-royal)]/20 bg-white px-4 py-2 text-sm font-semibold text-[var(--color-brand-royal)] hover:border-[var(--color-brand-royal)]/40 hover:bg-[var(--color-brand-royal)]/5 shadow-sm hover:shadow-md transition-all duration-200"
+              className="hidden lg:inline-flex items-center rounded-full border-2 border-white/30 bg-[#16324A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#12293C] hover:border-white/50 shadow-sm hover:shadow-md transition-all duration-200"
             >
               Security
             </Link>
             <Link
               href="/examples"
-              className="hidden lg:inline-flex items-center rounded-full border-2 border-[var(--color-brand-royal)]/20 bg-white px-4 py-2 text-sm font-semibold text-[var(--color-brand-royal)] hover:border-[var(--color-brand-royal)]/40 hover:bg-[var(--color-brand-royal)]/5 shadow-sm hover:shadow-md transition-all duration-200"
+              className="hidden lg:inline-flex items-center rounded-full border-2 border-white/30 bg-[#16324A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#12293C] hover:border-white/50 shadow-sm hover:shadow-md transition-all duration-200"
             >
               Examples
             </Link>
 
             {isAuthenticated ? (
-              <div className="inline-flex items-center gap-1.5 rounded-full border border-[#E5E0D8] bg-white/90 px-1.5 py-1 shadow-sm">
+              <div className="inline-flex items-center gap-2">
                 <Link
                   href="/dashboard"
-                  className="inline-flex items-center rounded-full bg-[var(--color-brand-royal)] px-3.5 py-1.5 text-sm font-semibold text-white hover:bg-[var(--color-brand-royal-hover)] transition"
+                  className="inline-flex items-center rounded-full border-2 border-white/30 bg-[#16324A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#12293C] hover:border-white/50 shadow-sm transition"
                 >
                   Dashboard
                 </Link>
@@ -224,7 +227,7 @@ export default function Home() {
                   type="button"
                   onClick={handleSignOut}
                   disabled={isSigningOut}
-                  className="inline-flex items-center rounded-full border border-[#E5E0D8] bg-white px-3.5 py-1.5 text-sm font-medium text-[#1A1614] hover:bg-[#F7F1EA] transition disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="inline-flex items-center rounded-full border-2 border-white/30 bg-[#16324A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#12293C] hover:border-white/50 transition disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
                 >
                   {isSigningOut ? "Signing out…" : "Sign out"}
                 </button>
@@ -233,13 +236,13 @@ export default function Home() {
               <div className="flex items-center gap-2">
                 <Link
                   href="/signin"
-                  className="inline-flex items-center rounded-full bg-[var(--color-brand-royal)] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[var(--color-brand-royal-hover)] transition"
+                  className="inline-flex items-center rounded-full border-2 border-white/30 bg-[#16324A] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#12293C] hover:border-white/50 transition"
                 >
                   {isCheckingSession ? "Checking…" : "Sign in"}
                 </Link>
                 <Link
                   href="/signup"
-                  className="inline-flex items-center rounded-full bg-[var(--color-brand-royal)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--color-brand-royal-hover)] transition"
+                  className="inline-flex items-center rounded-full border-2 border-white/30 bg-[#16324A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#12293C] hover:border-white/50 transition"
                 >
                   Get started
                 </Link>
@@ -250,17 +253,21 @@ export default function Home() {
       </header>
 
       {/* Hero section */}
-      <section className="flex-1 flex items-center">
-        <div className="mx-auto max-w-5xl w-full px-4 sm:px-6 py-12 sm:py-16">
+      <section className="flex-1 flex items-center relative overflow-hidden">
+        {/* Background gradient orbs */}
+        <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-br from-[#16324A]/10 to-transparent rounded-full blur-3xl"></div>
+        <div className="absolute bottom-20 right-10 w-80 h-80 bg-gradient-to-tl from-[#7C3AED]/10 to-transparent rounded-full blur-3xl"></div>
+
+        <div className="mx-auto max-w-5xl w-full px-4 sm:px-6 py-12 sm:py-16 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 items-start gap-12">
             <div
-              className="flex-1 max-w-3xl text-left space-y-6"
+              className="flex-1 max-w-3xl text-left space-y-6 animate-fade-in-up"
               style={{ fontFamily: "Inter, 'Helvetica Neue', Arial, sans-serif" }}
             >
 
-            {/* Headline */}
+            {/* Headline with gradient */}
             <h1
-              className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[var(--color-brand-royal)] leading-tight tracking-tight"
+              className="text-4xl sm:text-5xl lg:text-6xl font-bold bg-gradient-to-br from-[#0A1F3F] via-[#16324A] to-[#16324A] bg-clip-text text-transparent leading-tight tracking-tight"
             >
               The automatic exhibit builder for lawyers.
             </h1>
@@ -272,7 +279,7 @@ export default function Home() {
               Turn screenshots and PDFs into Bates-stamped, court-ready exhibit bundles in minutes—not hours.
             </p>
 
-            {/* CTA buttons */}
+            {/* CTA buttons with enhanced styling */}
             <div className="flex flex-col sm:flex-row gap-3 justify-start items-center">
               <button
                 type="button"
@@ -283,9 +290,12 @@ export default function Home() {
                     router.push("/signup?redirectedFrom=/builder");
                   }
                 }}
-                className="inline-flex items-center justify-center rounded-full bg-[var(--color-brand-royal)] px-9 py-3.5 text-base font-semibold text-white shadow-lg shadow-[var(--color-brand-royal)]/20 hover:shadow-xl hover:shadow-[var(--color-brand-royal)]/30 hover:bg-[var(--color-brand-royal-hover)] hover:scale-[1.02] transition-all duration-200"
+                className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#16324A] to-[#12293C] px-9 py-3.5 text-base font-semibold text-white shadow-lg shadow-[#16324A]/30 hover:shadow-xl hover:shadow-[#16324A]/40 hover:scale-[1.02] transition-all duration-200 group"
               >
-                Try Exhibit Builder Free
+                <span>Try Exhibit Builder Free</span>
+                <svg className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
               </button>
               <button
                 type="button"
@@ -294,7 +304,7 @@ export default function Home() {
                     .getElementById("how-it-works")
                     ?.scrollIntoView({ behavior: "smooth" })
                 }
-                className="inline-flex items-center justify-center rounded-full border-2 border-[var(--color-brand-royal)]/20 bg-white px-9 py-3 text-base font-semibold text-[var(--color-brand-royal)] hover:border-[var(--color-brand-royal)]/40 hover:bg-[var(--color-brand-royal)]/5 shadow-sm hover:shadow-md transition-all duration-200"
+                className="inline-flex items-center justify-center rounded-full border-2 border-[var(--color-brand-royal)]/30 bg-white/80 backdrop-blur-sm px-9 py-3 text-base font-semibold text-[var(--color-brand-royal)] hover:border-[var(--color-brand-royal)]/50 hover:bg-white shadow-sm hover:shadow-md transition-all duration-200"
               >
                 See Live Demo
               </button>
@@ -356,24 +366,30 @@ export default function Home() {
               <button
                 type="button"
                 onClick={handleMiniVideoClick}
-                className="w-full text-left rounded-2xl border border-[#E5E0D8] bg-white shadow-sm overflow-hidden hover:shadow-md transition"
+                className="w-full text-left rounded-2xl border-2 border-[#E5E0D8] bg-gradient-to-br from-white to-gray-50 shadow-lg overflow-hidden hover:shadow-2xl hover:border-[#16324A]/20 transition-all duration-300 hover:scale-[1.02] group"
               >
-                <div className="flex items-center justify-between px-4 py-3 border-b border-[#F0EBE5]">
+                <div className="flex items-center justify-between px-4 py-3 border-b border-[#F0EBE5] bg-white/80 backdrop-blur-sm">
                   <div>
-                    <span className="text-sm font-semibold text-[#0F1419] block">1-min demo</span>
+                    <span className="text-sm font-semibold text-[#0F1419] block group-hover:text-[#16324A] transition-colors">1-min demo</span>
                     <span className="text-[11px] text-[#6B6560]">Preview of the builder flow</span>
                   </div>
-                  <span className="text-xs text-[#6B6560]">Auto-play muted</span>
+                  <div className="flex items-center gap-1">
+                    <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></div>
+                    <span className="text-xs text-[#6B6560]">Auto-play muted</span>
+                  </div>
                 </div>
-                <video
-                  src="/case1.mp4"
-                  poster="/casereadyvid.gif"
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className="w-full h-auto"
-                />
+                <div className="relative overflow-hidden">
+                  <video
+                    src="/case1.mp4"
+                    poster="/casereadyvid.gif"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="w-full h-auto"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+                </div>
               </button>
             </div>
           </div>

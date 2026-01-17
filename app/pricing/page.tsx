@@ -185,10 +185,13 @@ export default function PricingPage() {
   return (
     <main className="min-h-screen bg-[#F5F2ED] text-[#1A1614] flex flex-col">
       {/* Top nav */}
-      <header className="w-full border-b border-[#E5E0D8] bg-white/80 backdrop-blur-sm">
-        <div className="mx-auto max-w-6xl flex items-center justify-between py-4 px-4 sm:px-6">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="h-12 w-12 rounded-2xl bg-white shadow-sm flex items-center justify-center border border-[#F0EBE5]">
+      <header className="w-full border-b border-[#0F1419] bg-gradient-to-br from-[#1A202C] via-[#16324A] to-[#1A202C] backdrop-blur-sm relative overflow-hidden">
+        {/* Subtle animated gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-40 animate-shimmer"></div>
+
+        <div className="mx-auto max-w-6xl flex items-center justify-between py-4 px-4 sm:px-6 relative z-10">
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="h-12 w-12 rounded-2xl bg-white shadow-lg group-hover:shadow-xl flex items-center justify-center border border-[#F0EBE5] transition-all duration-300 group-hover:scale-105">
               <NextImage
                 src="/logo.svg"
                 alt="CaseReady logo"
@@ -199,47 +202,47 @@ export default function PricingPage() {
               />
             </div>
             <div className="flex flex-col leading-tight">
-              <span className="font-semibold tracking-tight text-lg text-[#0F1419]">
+              <span className="font-semibold tracking-tight text-lg text-white group-hover:text-gray-100 transition-colors">
                 CaseReady
               </span>
-              <span className="text-xs text-[#6B6560] hidden sm:block">
+              <span className="text-xs text-gray-300 hidden sm:block group-hover:text-gray-200 transition-colors">
                 Evidence made effortless.
               </span>
             </div>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-3 text-xs font-semibold text-[#1A1614]">
+          <nav className="hidden md:flex items-center gap-3">
             <Link
-              href="/how-it-works"
-              className="rounded-full border border-[#E5E0D8] bg-white px-3 py-1 hover:border-[var(--color-brand-royal)] hover:text-[var(--color-brand-royal)] transition"
+              href="/features"
+              className="inline-flex items-center rounded-full border-2 border-white/30 bg-[#16324A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#12293C] hover:border-white/50 shadow-sm hover:shadow-md transition-all duration-200"
             >
-              How it works
-            </Link>
-            <Link
-              href="/features#roadmap"
-              className="rounded-full border border-[#E5E0D8] bg-white px-3 py-1 hover:border-[var(--color-brand-royal)] hover:text-[var(--color-brand-royal)] transition"
-            >
-              Roadmap
+              Features
             </Link>
             <Link
               href="/pricing"
-              className="rounded-full border border-transparent bg-[var(--color-brand-royal)] px-3 py-1 text-white hover:bg-[var(--color-brand-royal-hover)] transition"
+              className="inline-flex items-center rounded-full border-2 border-white/30 bg-[#16324A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#12293C] hover:border-white/50 shadow-sm hover:shadow-md transition-all duration-200"
             >
               Pricing
             </Link>
             <Link
               href="/security"
-              className="rounded-full border border-[#E5E0D8] bg-white px-3 py-1 hover:border-[var(--color-brand-royal)] hover:text-[var(--color-brand-royal)] transition"
+              className="inline-flex items-center rounded-full border-2 border-white/30 bg-[#16324A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#12293C] hover:border-white/50 shadow-sm hover:shadow-md transition-all duration-200"
             >
               Security
+            </Link>
+            <Link
+              href="/examples"
+              className="inline-flex items-center rounded-full border-2 border-white/30 bg-[#16324A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#12293C] hover:border-white/50 shadow-sm hover:shadow-md transition-all duration-200"
+            >
+              Examples
             </Link>
           </nav>
 
           {userEmail ? (
-            <div className="flex items-center gap-2">
+            <div className="inline-flex items-center gap-2">
               <Link
                 href="/dashboard"
-                className="inline-flex items-center rounded-full bg-[var(--color-brand-royal)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--color-brand-royal-hover)] transition"
+                className="inline-flex items-center rounded-full border-2 border-white/30 bg-[#16324A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#12293C] hover:border-white/50 shadow-sm transition"
               >
                 Dashboard
               </Link>
@@ -247,9 +250,7 @@ export default function PricingPage() {
                 type="button"
                 onClick={handleSignOut}
                 disabled={isSigningOut}
-                className={`inline-flex items-center rounded-full border border-[#E5E0D8] bg-white px-4 py-2 text-sm font-medium text-[#1A1614] hover:bg-[#F5F2ED] transition ${
-                  isSigningOut ? "opacity-60 cursor-not-allowed" : ""
-                }`}
+                className="inline-flex items-center rounded-full border-2 border-white/30 bg-[#16324A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#12293C] hover:border-white/50 transition disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
               >
                 {isSigningOut ? "Signing out…" : "Sign out"}
               </button>
@@ -258,15 +259,15 @@ export default function PricingPage() {
             <div className="flex items-center gap-2">
               <Link
                 href="/signin"
-                className="inline-flex items-center rounded-full border border-[#E5E0D8] bg-white px-4 py-2 text-sm font-medium text-[#1A1614] hover:bg-[#F5F2ED] transition"
+                className="inline-flex items-center rounded-full border-2 border-white/30 bg-[#16324A] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#12293C] hover:border-white/50 transition"
               >
                 {isCheckingSession ? "Checking…" : "Sign in"}
               </Link>
               <Link
                 href="/signup"
-                className="inline-flex items-center rounded-full bg-[var(--color-brand-royal)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--color-brand-royal-hover)] transition"
+                className="inline-flex items-center rounded-full border-2 border-white/30 bg-[#16324A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#12293C] hover:border-white/50 transition"
               >
-                Sign up
+                Get started
               </Link>
             </div>
           )}
@@ -295,42 +296,33 @@ export default function PricingPage() {
             </p>
           </div>
 
-          {/* Beta Access Banner */}
-          <div className="rounded-2xl border-2 border-[#7C3AED] bg-gradient-to-br from-[#F5F3FF] via-white to-[#EDE9FE] px-4 py-5 sm:px-6 sm:py-6 shadow-lg relative overflow-hidden">
+          {/* Beta Access Banner - Compact */}
+          <div className="rounded-xl border border-[#7C3AED]/40 bg-gradient-to-r from-[#F5F3FF] to-white px-4 py-3 shadow-sm relative overflow-hidden">
             {/* Decorative gradient overlay */}
-            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#7C3AED] via-[#A78BFA] to-[#7C3AED]" />
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#7C3AED] via-[#A78BFA] to-[#7C3AED]" />
 
-            <div className="relative z-10 text-center space-y-3">
-              <div className="inline-flex items-center justify-center gap-2">
-                <span className="text-2xl">🚀</span>
-                <span className="inline-flex items-center justify-center rounded-full bg-[#7C3AED] text-white text-[10px] font-bold px-2.5 py-1 uppercase tracking-wider">
-                  Limited Beta
-                </span>
+            <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="flex items-center gap-2 text-center sm:text-left">
+                <span className="text-lg">🚀</span>
+                <div>
+                  <h3 className="text-sm font-bold text-[#0F1419]">
+                    Free Beta Access Available
+                  </h3>
+                  <p className="text-xs text-[#6B6560] mt-0.5">
+                    Limited to <span className="font-semibold text-[#7C3AED]">50 Solo Practitioners</span> • Unlimited exports
+                  </p>
+                </div>
               </div>
 
-              <h2 className="text-xl sm:text-2xl font-bold text-[#0F1419]">
-                Free Beta Access Available
-              </h2>
-
-              <p className="text-sm sm:text-base text-[#6B6560] max-w-xl mx-auto">
-                Limited to <span className="font-bold text-[#7C3AED]">50 Solo Practitioners</span> in Personal Injury, Criminal Defense, or Divorce practice areas.
-              </p>
-
-              <div className="pt-1">
-                <a
-                  href="/beta-apply"
-                  className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#7C3AED] to-[#6D28D9] px-6 py-3 text-sm font-bold text-white shadow-lg shadow-[#7C3AED]/30 hover:shadow-xl hover:-translate-y-0.5 hover:scale-105 transition-all duration-300"
-                >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                  Apply for Beta Access
-                </a>
-              </div>
-
-              <p className="text-[11px] text-[#6B6560] pt-1">
-                No credit card required • Instant approval • Full access to all features
-              </p>
+              <a
+                href="/beta-apply"
+                className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#7C3AED] to-[#6D28D9] px-4 py-2 text-xs font-bold text-white shadow-md shadow-[#7C3AED]/20 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 whitespace-nowrap"
+              >
+                Apply Now
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </a>
             </div>
           </div>
 
